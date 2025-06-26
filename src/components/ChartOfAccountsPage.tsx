@@ -51,6 +51,9 @@ export const ChartOfAccountsPage = () => {
       if (selectedUnit === 'recreio') {
         return accountName.includes('recreio');
       }
+      if (selectedUnit === 'barra') {
+        return accountName.includes('barra');
+      }
       return true;
     });
   };
@@ -78,6 +81,7 @@ export const ChartOfAccountsPage = () => {
     switch (selectedUnit) {
       case 'campo-grande': return 'Campo Grande';
       case 'recreio': return 'Recreio';
+      case 'barra': return 'Barra';
       default: return 'Todas as Unidades';
     }
   };

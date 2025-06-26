@@ -12,7 +12,8 @@ export const UnitFilter = ({ selectedUnit, onUnitChange }: UnitFilterProps) => {
   const units = [
     { id: 'all', name: 'Todas as Unidades' },
     { id: 'campo-grande', name: 'Campo Grande' },
-    { id: 'recreio', name: 'Recreio' }
+    { id: 'recreio', name: 'Recreio' },
+    { id: 'barra', name: 'Barra' }
   ];
 
   return (
