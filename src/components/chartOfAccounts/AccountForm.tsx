@@ -21,7 +21,7 @@ export const AccountForm = ({ account, accounts, onSave, onCancel }: AccountForm
     name: '',
     description: '',
     type: 'expense' as AccountType,
-    parentId: '',
+    parentId: 'none', // Use 'none' instead of empty string
     isActive: true
   });
 
@@ -34,7 +34,7 @@ export const AccountForm = ({ account, accounts, onSave, onCancel }: AccountForm
         name: account.name,
         description: account.description || '',
         type: account.type,
-        parentId: account.parentId || '',
+        parentId: account.parentId || 'none', // Use 'none' instead of empty string
         isActive: account.isActive
       });
     }
@@ -83,12 +83,16 @@ export const AccountForm = ({ account, accounts, onSave, onCancel }: AccountForm
       return;
     }
 
-    const level = formData.parentId 
-      ? (accounts.find(acc => acc.id === formData.parentId)?.level || 0) + 1 
+    // Convert 'none' back to undefined for parentId
+    const actualParentId = formData.parentId === 'none' ? undefined : formData.parentId;
+    
+    const level = actualParentId 
+      ? (accounts.find(acc => acc.id === actualParentId)?.level || 0) + 1 
       : 0;
 
     onSave({
       ...formData,
+      parentId: actualParentId,
       level,
       hasChildren: false
     });
@@ -111,7 +115,7 @@ export const AccountForm = ({ account, accounts, onSave, onCancel }: AccountForm
         <div className="space-y-2">
           <Label htmlFor="type">Tipo de Conta *</Label>
           <Select value={formData.type} onValueChange={(value: AccountType) => 
-            setFormData({ ...formData, type: value, parentId: '' })
+            setFormData({ ...formData, type: value, parentId: 'none' })
           }>
             <SelectTrigger>
               <SelectValue />
@@ -148,7 +152,7 @@ export const AccountForm = ({ account, accounts, onSave, onCancel }: AccountForm
             <SelectValue placeholder="Selecione uma conta pai" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Nenhuma (conta principal)</SelectItem>
+            <SelectItem value="none">Nenhuma (conta principal)</SelectItem>
             {getParentAccountsForType(formData.type).map((parentAccount) => (
               <SelectItem key={parentAccount.id} value={parentAccount.id}>
                 {parentAccount.code} - {parentAccount.name}
