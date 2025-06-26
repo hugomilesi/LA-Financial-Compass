@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
@@ -35,10 +34,10 @@ export const PlanningFilters = ({
   ];
 
   const units = [
-    { value: 'all', label: 'Todas as Unidades' },
-    { value: 'unit1', label: 'Unidade Centro' },
-    { value: 'unit2', label: 'Unidade Norte' },
-    { value: 'unit3', label: 'Unidade Sul' }
+    { value: 'all', label: 'Todas Unidades' },
+    { value: 'campo-grande', label: 'Campo Grande' },
+    { value: 'recreio', label: 'Recreio' },
+    { value: 'barra', label: 'Barra' }
   ];
 
   return (
