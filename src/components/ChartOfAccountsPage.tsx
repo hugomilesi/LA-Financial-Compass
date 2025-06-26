@@ -9,6 +9,7 @@ import { Account, AccountType } from '@/types/chartOfAccounts';
 import { useChartOfAccounts } from '@/hooks/useChartOfAccounts';
 import { AccountForm } from '@/components/chartOfAccounts/AccountForm';
 import { AccountTreeItem } from '@/components/chartOfAccounts/AccountTreeItem';
+import { UnitFilter } from '@/components/chartOfAccounts/UnitFilter';
 
 export const ChartOfAccountsPage = () => {
   const { accounts, addAccount, updateAccount, deleteAccount } = useChartOfAccounts();
@@ -16,6 +17,7 @@ export const ChartOfAccountsPage = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [expandedAccounts, setExpandedAccounts] = useState<Set<string>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedUnit, setSelectedUnit] = useState('all');
 
   const toggleExpanded = (accountId: string) => {
     const newExpanded = new Set(expandedAccounts);
@@ -37,9 +39,27 @@ export const ChartOfAccountsPage = () => {
     }
   };
 
-  const filteredAccounts = accounts.filter(account => 
-    account.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    account.code.includes(searchTerm)
+  const filterAccountsByUnit = (accounts: Account[]) => {
+    if (selectedUnit === 'all') return accounts;
+    
+    return accounts.filter(account => {
+      // Filter based on account name containing unit identifier
+      const accountName = account.name.toLowerCase();
+      if (selectedUnit === 'campo-grande') {
+        return accountName.includes('campo grande') || accountName.includes('campo-grande');
+      }
+      if (selectedUnit === 'recreio') {
+        return accountName.includes('recreio');
+      }
+      return true;
+    });
+  };
+
+  const filteredAccounts = filterAccountsByUnit(
+    accounts.filter(account => 
+      account.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      account.code.includes(searchTerm)
+    )
   );
 
   const getAccountsByType = (type: AccountType) => {
@@ -53,6 +73,14 @@ export const ChartOfAccountsPage = () => {
     { type: 'liability', label: 'Passivo', description: 'Obrigações e dívidas' },
     { type: 'equity', label: 'Patrimônio Líquido', description: 'Capital e reservas' }
   ];
+
+  const getUnitDisplayName = () => {
+    switch (selectedUnit) {
+      case 'campo-grande': return 'Campo Grande';
+      case 'recreio': return 'Recreio';
+      default: return 'Todas as Unidades';
+    }
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -70,17 +98,37 @@ export const ChartOfAccountsPage = () => {
         </Button>
       </div>
 
-      <div className="flex gap-4 items-center">
-        <Input
-          placeholder="Buscar contas por nome ou código..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-md"
+      <div className="flex gap-6 items-start">
+        <div className="flex gap-4 items-center flex-1">
+          <Input
+            placeholder="Buscar contas por nome ou código..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="max-w-md"
+          />
+          <Badge variant="outline" className="text-sm">
+            {filteredAccounts.length} contas encontradas
+          </Badge>
+        </div>
+        
+        <UnitFilter 
+          selectedUnit={selectedUnit} 
+          onUnitChange={setSelectedUnit}
         />
-        <Badge variant="outline" className="text-sm">
-          {filteredAccounts.length} contas encontradas
-        </Badge>
       </div>
+
+      {selectedUnit !== 'all' && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+              Filtro Ativo
+            </Badge>
+            <span className="text-sm text-blue-700">
+              Mostrando contas para: <strong>{getUnitDisplayName()}</strong>
+            </span>
+          </div>
+        </div>
+      )}
 
       {(showAddForm || editingAccount) && (
         <Card>
@@ -127,7 +175,7 @@ export const ChartOfAccountsPage = () => {
                     <AccountTreeItem
                       key={account.id}
                       account={account}
-                      accounts={accounts}
+                      accounts={filteredAccounts}
                       expandedAccounts={expandedAccounts}
                       onToggleExpanded={toggleExpanded}
                       onEdit={setEditingAccount}
@@ -142,10 +190,15 @@ export const ChartOfAccountsPage = () => {
         })}
       </div>
 
-      {filteredAccounts.length === 0 && searchTerm && (
+      {filteredAccounts.length === 0 && (searchTerm || selectedUnit !== 'all') && (
         <Card>
           <CardContent className="text-center py-8">
-            <p className="text-gray-500">Nenhuma conta encontrada para "{searchTerm}"</p>
+            <p className="text-gray-500">
+              {searchTerm 
+                ? `Nenhuma conta encontrada para "${searchTerm}"` 
+                : `Nenhuma conta encontrada para a unidade "${getUnitDisplayName()}"`
+              }
+            </p>
           </CardContent>
         </Card>
       )}
