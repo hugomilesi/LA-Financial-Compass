@@ -4,6 +4,7 @@ import { AppSidebar } from '@/components/AppSidebar';
 import { Dashboard } from '@/components/Dashboard';
 import { KPIsPage } from '@/components/KPIsPage';
 import { ReportsDREPage } from '@/components/ReportsDREPage';
+import { PlanningPage } from '@/components/PlanningPage';
 
 const Index = () => {
   const [currentPage, setCurrentPage] = useState('dashboard');
@@ -17,7 +18,7 @@ const Index = () => {
       case 'reports-dre':
         return <ReportsDREPage />;
       case 'planning':
-        return <div className="p-6"><h1 className="text-2xl font-bold">Planejamento Estratégico</h1><p>Em desenvolvimento...</p></div>;
+        return <PlanningPage />;
       case 'costs':
         return <div className="p-6"><h1 className="text-2xl font-bold">Centro de Custos</h1><p>Em desenvolvimento...</p></div>;
       case 'units':
