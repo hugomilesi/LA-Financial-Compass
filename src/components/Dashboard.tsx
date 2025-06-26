@@ -1,35 +1,70 @@
 
 import { KPICard } from './KPICard';
 import { AIInsights } from './AIInsights';
-import { DollarSign, Users, TrendingUp, Percent, Target, Calendar } from 'lucide-react';
+import { DollarSign, Users, TrendingUp, Percent, Target, Calendar, CreditCard } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-const kpiData = [
+// Calculate KPI values from monthly data
+const monthlyData = [
+  { month: 'Jan', receita: 220000, despesa: 180000 },
+  { month: 'Fev', receita: 235000, despesa: 185000 },
+  { month: 'Mar', receita: 245000, despesa: 190000 },
+  { month: 'Abr', receita: 238000, despesa: 188000 },
+  { month: 'Mai', receita: 260000, despesa: 195000 },
+  { month: 'Jun', receita: 245780, despesa: 192000 }
+];
+
+const currentMonth = monthlyData[monthlyData.length - 1];
+const previousMonth = monthlyData[monthlyData.length - 2];
+
+const totalRevenue = currentMonth.receita;
+const totalExpenses = currentMonth.despesa;
+const cashGeneration = totalRevenue - totalExpenses;
+const netMargin = ((cashGeneration / totalRevenue) * 100);
+
+const previousCashGeneration = previousMonth.receita - previousMonth.despesa;
+const previousNetMargin = ((previousCashGeneration / previousMonth.receita) * 100);
+
+// Primary KPIs for the top section
+const primaryKPIs = [
   {
     title: 'Receita Total',
-    value: 'R$ 245.780',
-    change: 8.2,
+    value: `R$ ${totalRevenue.toLocaleString()}`,
+    change: ((totalRevenue - previousMonth.receita) / previousMonth.receita) * 100,
     target: 85,
     icon: DollarSign,
     alert: 'success' as const
   },
   {
-    title: 'Geração de Caixa',
-    value: 'R$ 89.450',
-    change: -3.1,
-    target: 65,
-    icon: TrendingUp,
+    title: 'Despesa Total',
+    value: `R$ ${totalExpenses.toLocaleString()}`,
+    change: ((totalExpenses - previousMonth.despesa) / previousMonth.despesa) * 100,
+    target: 75,
+    icon: CreditCard,
     alert: 'warning' as const
   },
   {
+    title: 'Geração de Caixa',
+    value: `R$ ${cashGeneration.toLocaleString()}`,
+    change: ((cashGeneration - previousCashGeneration) / previousCashGeneration) * 100,
+    target: 65,
+    icon: TrendingUp,
+    alert: cashGeneration > previousCashGeneration ? 'success' as const : 'warning' as const
+  },
+  {
     title: 'Margem Líquida',
-    value: '22.5%',
-    change: -5.8,
+    value: `${netMargin.toFixed(1)}%`,
+    change: netMargin - previousNetMargin,
     target: 40,
     icon: Percent,
-    alert: 'danger' as const
-  },
+    alert: netMargin > previousNetMargin ? 'success' as const : 'danger' as const
+  }
+];
+
+// Secondary KPIs for additional metrics
+const secondaryKPIs = [
   {
     title: 'Despesa Pessoal',
     value: '58.3%',
@@ -56,15 +91,6 @@ const kpiData = [
   }
 ];
 
-const monthlyData = [
-  { month: 'Jan', receita: 220000, despesa: 180000 },
-  { month: 'Fev', receita: 235000, despesa: 185000 },
-  { month: 'Mar', receita: 245000, despesa: 190000 },
-  { month: 'Abr', receita: 238000, despesa: 188000 },
-  { month: 'Mai', receita: 260000, despesa: 195000 },
-  { month: 'Jun', receita: 245780, despesa: 192000 }
-];
-
 const costCenterData = [
   { name: 'Pessoal', value: 58.3, color: '#EF4444' },
   { name: 'Aluguel', value: 18.2, color: '#F59E0B' },
@@ -84,19 +110,31 @@ export const Dashboard = () => {
         </div>
         <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow">
           <Calendar className="w-4 h-4 text-gray-500" />
-          <select className="border-none outline-none text-sm">
-            <option>Todas as Unidades</option>
-            <option>Campo Grande</option>
-            <option>Recreio</option>
-            <option>Barra</option>
-            <option>Botafogo</option>
-          </select>
+          <Select defaultValue="all">
+            <SelectTrigger className="w-[180px] border-none shadow-none">
+              <SelectValue placeholder="Selecionar unidade" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas as Unidades</SelectItem>
+              <SelectItem value="campo-grande">Campo Grande</SelectItem>
+              <SelectItem value="recreio">Recreio</SelectItem>
+              <SelectItem value="barra">Barra</SelectItem>
+              <SelectItem value="botafogo">Botafogo</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
-      {/* KPIs Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {kpiData.map((kpi, index) => (
+      {/* Primary KPIs - Top 4 metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {primaryKPIs.map((kpi, index) => (
+          <KPICard key={index} {...kpi} />
+        ))}
+      </div>
+
+      {/* Secondary KPIs - Additional metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {secondaryKPIs.map((kpi, index) => (
           <KPICard key={index} {...kpi} />
         ))}
       </div>
