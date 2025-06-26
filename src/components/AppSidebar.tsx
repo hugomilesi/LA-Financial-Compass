@@ -1,6 +1,5 @@
-
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight, Home, TrendingUp, FileText, Target, Settings, Building, DollarSign } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Home, TrendingUp, FileText, Target, Settings, Building, DollarSign, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface AppSidebarProps {
@@ -15,6 +14,7 @@ export const AppSidebar = ({ currentPage, onPageChange }: AppSidebarProps) => {
     { id: 'dashboard', icon: Home, label: 'Dashboard', description: 'Visão geral' },
     { id: 'kpis', icon: TrendingUp, label: 'KPIs', description: 'Indicadores chave' },
     { id: 'reports-dre', icon: FileText, label: 'Relatórios & DRE', description: 'Demonstrativos' },
+    { id: 'chart-of-accounts', icon: BookOpen, label: 'Plano de Contas', description: 'Contas contábeis' },
     { id: 'planning', icon: Target, label: 'Planejamento', description: 'Metas e objetivos' },
     { id: 'costs', icon: DollarSign, label: 'Centro de Custos', description: 'Categorias' },
     { id: 'units', icon: Building, label: 'Por Unidade', description: 'Desempenho' },

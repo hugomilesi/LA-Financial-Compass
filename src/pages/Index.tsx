@@ -5,6 +5,7 @@ import { Dashboard } from '@/components/Dashboard';
 import { KPIsPage } from '@/components/KPIsPage';
 import { ReportsDREPage } from '@/components/ReportsDREPage';
 import { PlanningPage } from '@/components/PlanningPage';
+import { ChartOfAccountsPage } from '@/components/ChartOfAccountsPage';
 
 const Index = () => {
   const [currentPage, setCurrentPage] = useState('dashboard');
@@ -17,6 +18,8 @@ const Index = () => {
         return <KPIsPage />;
       case 'reports-dre':
         return <ReportsDREPage />;
+      case 'chart-of-accounts':
+        return <ChartOfAccountsPage />;
       case 'planning':
         return <PlanningPage />;
       case 'costs':
