@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Dashboard } from '@/components/Dashboard';
 import { KPIsPage } from '@/components/KPIsPage';
+import { ReportsDREPage } from '@/components/ReportsDREPage';
 
 const Index = () => {
   const [currentPage, setCurrentPage] = useState('dashboard');
@@ -13,16 +14,14 @@ const Index = () => {
         return <Dashboard />;
       case 'kpis':
         return <KPIsPage />;
-      case 'reports':
-        return <div className="p-6"><h1 className="text-2xl font-bold">Relatórios</h1><p>Em desenvolvimento...</p></div>;
+      case 'reports-dre':
+        return <ReportsDREPage />;
       case 'planning':
         return <div className="p-6"><h1 className="text-2xl font-bold">Planejamento Estratégico</h1><p>Em desenvolvimento...</p></div>;
       case 'costs':
         return <div className="p-6"><h1 className="text-2xl font-bold">Centro de Custos</h1><p>Em desenvolvimento...</p></div>;
       case 'units':
         return <div className="p-6"><h1 className="text-2xl font-bold">Desempenho por Unidade</h1><p>Em desenvolvimento...</p></div>;
-      case 'dre':
-        return <div className="p-6"><h1 className="text-2xl font-bold">DRE Gerencial</h1><p>Em desenvolvimento...</p></div>;
       case 'settings':
         return <div className="p-6"><h1 className="text-2xl font-bold">Configurações</h1><p>Em desenvolvimento...</p></div>;
       default:
