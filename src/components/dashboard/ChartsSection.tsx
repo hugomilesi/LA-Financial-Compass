@@ -1,0 +1,47 @@
+
+import { Card } from '@/components/ui/card';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { monthlyData, costCenterData } from '@/utils/dashboardData';
+
+export const ChartsSection = () => {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Revenue Evolution */}
+      <Card className="p-6">
+        <h3 className="text-lg font-semibold mb-4 text-gray-900">Evolução Receita vs Despesa</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={monthlyData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="month" />
+            <YAxis />
+            <Tooltip formatter={(value) => [`R$ ${(value as number).toLocaleString()}`, '']} />
+            <Bar dataKey="receita" fill="#10B981" name="Receita" />
+            <Bar dataKey="despesa" fill="#EF4444" name="Despesa" />
+          </BarChart>
+        </ResponsiveContainer>
+      </Card>
+
+      {/* Cost Center Distribution */}
+      <Card className="p-6">
+        <h3 className="text-lg font-semibold mb-4 text-gray-900">Distribuição Centro de Custos</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <PieChart>
+            <Pie
+              data={costCenterData}
+              cx="50%"
+              cy="50%"
+              outerRadius={100}
+              dataKey="value"
+              label={({ name, value }) => `${name}: ${value}%`}
+            >
+              {costCenterData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} />
+              ))}
+            </Pie>
+            <Tooltip />
+          </PieChart>
+        </ResponsiveContainer>
+      </Card>
+    </div>
+  );
+};
