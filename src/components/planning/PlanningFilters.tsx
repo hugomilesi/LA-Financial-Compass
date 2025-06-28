@@ -1,21 +1,21 @@
+
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, Building } from 'lucide-react';
+import { useUnit, UNITS } from '@/contexts/UnitContext';
 
 interface PlanningFiltersProps {
   selectedPeriod: { year: number; month: number };
   onPeriodChange: (period: { year: number; month: number }) => void;
-  selectedUnit: string;
-  onUnitChange: (unit: string) => void;
 }
 
 export const PlanningFilters = ({ 
   selectedPeriod, 
-  onPeriodChange, 
-  selectedUnit, 
-  onUnitChange 
+  onPeriodChange
 }: PlanningFiltersProps) => {
+  const { selectedUnit, setSelectedUnit } = useUnit();
+  
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i);
   const months = [
@@ -31,13 +31,6 @@ export const PlanningFilters = ({
     { value: 10, label: 'Outubro' },
     { value: 11, label: 'Novembro' },
     { value: 12, label: 'Dezembro' }
-  ];
-
-  const units = [
-    { value: 'all', label: 'Todas Unidades' },
-    { value: 'campo-grande', label: 'Campo Grande' },
-    { value: 'recreio', label: 'Recreio' },
-    { value: 'barra', label: 'Barra' }
   ];
 
   return (
@@ -86,14 +79,14 @@ export const PlanningFilters = ({
             <span className="text-sm font-medium">Unidade:</span>
           </div>
 
-          <Select value={selectedUnit} onValueChange={onUnitChange}>
+          <Select value={selectedUnit} onValueChange={setSelectedUnit}>
             <SelectTrigger className="w-48">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {units.map((unit) => (
-                <SelectItem key={unit.value} value={unit.value}>
-                  {unit.label}
+              {UNITS.map((unit) => (
+                <SelectItem key={unit.id} value={unit.id}>
+                  {unit.displayName}
                 </SelectItem>
               ))}
             </SelectContent>

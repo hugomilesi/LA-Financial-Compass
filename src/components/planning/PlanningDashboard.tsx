@@ -1,28 +1,33 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, Target, Calendar } from 'lucide-react';
+import { useUnit } from '@/contexts/UnitContext';
+import { getDataByUnit } from '@/utils/unitData';
 
 interface PlanningDashboardProps {
   selectedPeriod: { year: number; month: number };
-  selectedUnit: string;
 }
 
-export const PlanningDashboard = ({ selectedPeriod, selectedUnit }: PlanningDashboardProps) => {
-  // Mock data - replace with real data later
+export const PlanningDashboard = ({ selectedPeriod }: PlanningDashboardProps) => {
+  const { selectedUnit, getUnitDisplayName } = useUnit();
+  
+  // Get dynamic data based on selected unit
+  const unitData = getDataByUnit(selectedUnit);
+  
+  // Mock KPIs based on unit data - replace with real calculations later
   const kpis = [
     {
       name: 'Receita Mensal',
-      current: 185000,
-      target: 200000,
+      current: unitData.receita,
+      target: Math.round(unitData.receita * 1.08),
       progress: 92.5,
       trend: 'up',
       variation: '+8.5%'
     },
     {
       name: 'Margem de Lucro',
-      current: 28.5,
+      current: Math.round(((unitData.receita - unitData.despesa) / unitData.receita) * 100 * 10) / 10,
       target: 30,
       progress: 95,
       trend: 'up',
@@ -30,16 +35,16 @@ export const PlanningDashboard = ({ selectedPeriod, selectedUnit }: PlanningDash
     },
     {
       name: 'Custos Operacionais',
-      current: 132000,
-      target: 140000,
+      current: unitData.despesa,
+      target: Math.round(unitData.despesa * 1.06),
       progress: 94.3,
       trend: 'down',
       variation: '-5.7%'
     },
     {
       name: 'Alunos Ativos',
-      current: 850,
-      target: 900,
+      current: unitData.alunos,
+      target: Math.round(unitData.alunos * 1.06),
       progress: 94.4,
       trend: 'up',
       variation: '+3.2%'
@@ -59,7 +64,7 @@ export const PlanningDashboard = ({ selectedPeriod, selectedUnit }: PlanningDash
           <h2 className="text-xl font-semibold">Dashboard - {monthName}</h2>
         </div>
         <Badge variant="outline" className="text-sm">
-          {selectedUnit === 'all' ? 'Todas as Unidades' : 'Unidade Selecionada'}
+          {getUnitDisplayName(selectedUnit)}
         </Badge>
       </div>
 
