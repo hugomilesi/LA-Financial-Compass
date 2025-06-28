@@ -10,7 +10,6 @@ interface ChartsSectionProps {
 
 export const ChartsSection = ({ onChartClick }: ChartsSectionProps) => {
   const [hoveredSlice, setHoveredSlice] = useState<number | null>(null);
-  const [hoveredBar, setHoveredBar] = useState<{dataKey: string, index: number} | null>(null);
 
   const handleMouseEnter = (data: any, index: number) => {
     setHoveredSlice(index);
@@ -18,24 +17,6 @@ export const ChartsSection = ({ onChartClick }: ChartsSectionProps) => {
 
   const handleMouseLeave = () => {
     setHoveredSlice(null);
-  };
-
-  const handleBarMouseEnter = (data: any, index: number, dataKey: string) => {
-    setHoveredBar({ dataKey, index });
-  };
-
-  const handleBarMouseLeave = () => {
-    setHoveredBar(null);
-  };
-
-  const getBarStyle = (dataKey: string, index: number) => {
-    const isHovered = hoveredBar?.dataKey === dataKey && hoveredBar?.index === index;
-    return {
-      filter: isHovered ? "brightness(1.1) drop-shadow(0 4px 8px rgba(0,0,0,0.2))" : "none",
-      transform: isHovered ? "scaleY(1.02)" : "scaleY(1)",
-      transformOrigin: "bottom",
-      transition: "all 0.2s ease-in-out"
-    };
   };
 
   return (
@@ -49,22 +30,8 @@ export const ChartsSection = ({ onChartClick }: ChartsSectionProps) => {
             <XAxis dataKey="month" />
             <YAxis />
             <Tooltip formatter={(value) => [`R$ ${(value as number).toLocaleString()}`, '']} />
-            <Bar 
-              dataKey="receita" 
-              fill="#10B981" 
-              name="Receita"
-              onMouseEnter={(data, index) => handleBarMouseEnter(data, index, 'receita')}
-              onMouseLeave={handleBarMouseLeave}
-              style={hoveredBar?.dataKey === 'receita' ? getBarStyle('receita', hoveredBar.index) : undefined}
-            />
-            <Bar 
-              dataKey="despesa" 
-              fill="#EF4444" 
-              name="Despesa"
-              onMouseEnter={(data, index) => handleBarMouseEnter(data, index, 'despesa')}
-              onMouseLeave={handleBarMouseLeave}
-              style={hoveredBar?.dataKey === 'despesa' ? getBarStyle('despesa', hoveredBar.index) : undefined}
-            />
+            <Bar dataKey="receita" fill="#10B981" name="Receita" />
+            <Bar dataKey="despesa" fill="#EF4444" name="Despesa" />
           </BarChart>
         </ResponsiveContainer>
         <p className="text-sm text-gray-500 mt-2 text-center">Clique para ver análise detalhada</p>
