@@ -15,30 +15,30 @@ export interface UnitFinancialData {
 export const UNIT_DATA: Record<string, UnitFinancialData> = {
   'campo-grande': {
     receita: 145320,
-    despesa: 113930, // Adjusted to achieve target total of R$285,375
-    alunos: 800, // Corrected number of students
+    despesa: 113930,
+    alunos: 800, // Valor correto fornecido pelo usuário
     matriculas: 67,
-    ticketMedio: 182, // Corrected ticket price (145320/800 = 181.65, rounded to 182)
+    ticketMedio: 182, // Valor correto: 145320/800 = 181.65, arredondado para 182
     capacidade: 950,
-    ocupacao: 84 // 800/950 = 84.2%
+    ocupacao: 84 // 800/950 = 84.2%, arredondado para 84%
   },
   'recreio': {
     receita: 128544,
-    despesa: 101574, // Adjusted to achieve target total of R$285,375
-    alunos: 720, // Corrected number of students
+    despesa: 101574,
+    alunos: 720, // Valor correto fornecido pelo usuário
     matriculas: 56,
-    ticketMedio: 179, // Corrected ticket price (128544/720 = 178.53, rounded to 179)
+    ticketMedio: 179, // Valor correto: 128544/720 = 178.53, arredondado para 179
     capacidade: 880,
-    ocupacao: 82 // 720/880 = 81.8%
+    ocupacao: 82 // 720/880 = 81.8%, arredondado para 82%
   },
   'barra': {
     receita: 117591,
-    despesa: 69871, // Adjusted to achieve target total of R$285,375
-    alunos: 467, // Corrected number of students
+    despesa: 69871,
+    alunos: 467, // Valor correto fornecido pelo usuário
     matriculas: 50,
-    ticketMedio: 252, // Corrected ticket price (117591/467 = 251.8, rounded to 252)
+    ticketMedio: 252, // Valor correto: 117591/467 = 251.8, arredondado para 252
     capacidade: 990,
-    ocupacao: 47 // 467/990 = 47.2%
+    ocupacao: 47 // 467/990 = 47.2%, arredondado para 47%
   }
 };
 
