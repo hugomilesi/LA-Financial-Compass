@@ -58,7 +58,7 @@ export const AIInsights = () => {
     <Card className="p-6">
       <div className="flex items-center gap-2 mb-4">
         <Brain className="w-6 h-6 text-primary-600" />
-        <h2 className="text-xl font-bold text-gray-900">Insights do Consultor IA</h2>
+        <h2 className="text-xl font-bold text-gray-900">Consultor Financeiro Especializado</h2>
       </div>
       
       <div className="space-y-4">

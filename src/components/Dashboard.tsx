@@ -1,7 +1,7 @@
 
 import { KPICard } from './KPICard';
 import { AIInsights } from './AIInsights';
-import { DollarSign, Users, TrendingUp, Percent, Target, Calendar, CreditCard } from 'lucide-react';
+import { DollarSign, Users, TrendingUp, Percent, Target, Calendar, CreditCard, Receipt } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -26,6 +26,12 @@ const netMargin = ((cashGeneration / totalRevenue) * 100);
 
 const previousCashGeneration = previousMonth.receita - previousMonth.despesa;
 const previousNetMargin = ((previousCashGeneration / previousMonth.receita) * 100);
+
+// Calculate Average Ticket (Ticket Médio)
+const currentActiveStudents = 1247;
+const previousActiveStudents = 1113; // Previous month students (12.1% increase)
+const averageTicket = totalRevenue / currentActiveStudents;
+const previousAverageTicket = previousMonth.receita / previousActiveStudents;
 
 // Primary KPIs for the top section
 const primaryKPIs = [
@@ -63,8 +69,16 @@ const primaryKPIs = [
   }
 ];
 
-// Secondary KPIs for additional metrics
+// Secondary KPIs for additional metrics - now includes Ticket Médio
 const secondaryKPIs = [
+  {
+    title: 'Ticket Médio',
+    value: `R$ ${Math.round(averageTicket)}`,
+    change: ((averageTicket - previousAverageTicket) / previousAverageTicket) * 100,
+    target: 75,
+    icon: Receipt,
+    alert: averageTicket > previousAverageTicket ? 'success' as const : 'warning' as const
+  },
   {
     title: 'Despesa Pessoal',
     value: '58.3%',
@@ -119,7 +133,6 @@ export const Dashboard = () => {
               <SelectItem value="campo-grande">Campo Grande</SelectItem>
               <SelectItem value="recreio">Recreio</SelectItem>
               <SelectItem value="barra">Barra</SelectItem>
-              <SelectItem value="botafogo">Botafogo</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -133,7 +146,7 @@ export const Dashboard = () => {
       </div>
 
       {/* Secondary KPIs - Additional metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {secondaryKPIs.map((kpi, index) => (
           <KPICard key={index} {...kpi} />
         ))}
