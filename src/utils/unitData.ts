@@ -18,7 +18,7 @@ export const UNIT_DATA: Record<string, UnitFinancialData> = {
     matriculas: 45,
     ticketMedio: 198,
     capacidade: 650,
-    ocupacao: 498
+    ocupacao: 77 // 498/650 = 76.6%
   },
   'recreio': {
     receita: 87200,
@@ -27,27 +27,27 @@ export const UNIT_DATA: Record<string, UnitFinancialData> = {
     matriculas: 38,
     ticketMedio: 198,
     capacidade: 600,
-    ocupacao: 441
+    ocupacao: 74 // 441/600 = 73.5%
   },
   'barra': {
-    receita: 60080,
-    despesa: 46700,
-    alunos: 308,
+    receita: 65280,
+    despesa: 48700,
+    alunos: 335,
     matriculas: 28,
     ticketMedio: 195,
     capacidade: 550,
-    ocupacao: 308
+    ocupacao: 61 // 335/550 = 60.9%
   }
 };
 
-// Historical data by unit
+// Historical data by unit - updated to match current values
 export const UNIT_HISTORICAL_DATA: Record<string, Array<{month: string, receita: number, despesa: number}>> = {
   'campo-grande': [
     { month: 'Jan', receita: 88000, despesa: 72000 },
     { month: 'Fev', receita: 92000, despesa: 74000 },
     { month: 'Mar', receita: 95000, despesa: 76000 },
     { month: 'Abr', receita: 94000, despesa: 75000 },
-    { month: 'Mai', receita: 102000, despesa: 78000 },
+    { month: 'Mai', receita: 96000, despesa: 76000 },
     { month: 'Jun', receita: 98500, despesa: 76800 }
   ],
   'recreio': [
@@ -55,30 +55,33 @@ export const UNIT_HISTORICAL_DATA: Record<string, Array<{month: string, receita:
     { month: 'Fev', receita: 82000, despesa: 66000 },
     { month: 'Mar', receita: 85000, despesa: 67000 },
     { month: 'Abr', receita: 83000, despesa: 66500 },
-    { month: 'Mai', receita: 89000, despesa: 69000 },
+    { month: 'Mai', receita: 85000, despesa: 67500 },
     { month: 'Jun', receita: 87200, despesa: 68500 }
   ],
   'barra': [
-    { month: 'Jan', receita: 54000, despesa: 44000 },
+    { month: 'Jan', receita: 58000, despesa: 44000 },
     { month: 'Fev', receita: 61000, despesa: 45000 },
-    { month: 'Mar', receita: 65000, despesa: 47000 },
-    { month: 'Abr', receita: 61000, despesa: 46500 },
-    { month: 'Mai', receita: 69000, despesa: 48000 },
-    { month: 'Jun', receita: 60080, despesa: 46700 }
+    { month: 'Mar', receita: 63000, despesa: 46000 },
+    { month: 'Abr', receita: 62000, despesa: 46500 },
+    { month: 'Mai', receita: 64000, despesa: 47500 },
+    { month: 'Jun', receita: 65280, despesa: 48700 }
   ]
 };
 
 // Function to get consolidated data for all units
 export const getConsolidatedData = (): UnitFinancialData => {
   const units = Object.values(UNIT_DATA);
+  const totalReceita = units.reduce((sum, unit) => sum + unit.receita, 0);
+  const totalAlunos = units.reduce((sum, unit) => sum + unit.alunos, 0);
+  
   return {
-    receita: units.reduce((sum, unit) => sum + unit.receita, 0),
+    receita: totalReceita,
     despesa: units.reduce((sum, unit) => sum + unit.despesa, 0),
-    alunos: units.reduce((sum, unit) => sum + unit.alunos, 0),
+    alunos: totalAlunos,
     matriculas: units.reduce((sum, unit) => sum + unit.matriculas, 0),
-    ticketMedio: units.reduce((sum, unit) => sum + (unit.receita / unit.alunos), 0) / units.length,
+    ticketMedio: Math.round(totalReceita / totalAlunos),
     capacidade: units.reduce((sum, unit) => sum + unit.capacidade, 0),
-    ocupacao: units.reduce((sum, unit) => sum + unit.ocupacao, 0)
+    ocupacao: Math.round((totalAlunos / units.reduce((sum, unit) => sum + unit.capacidade, 0)) * 100)
   };
 };
 

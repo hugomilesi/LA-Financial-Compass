@@ -31,38 +31,44 @@ export const getPrimaryKPIs = (unitId: string) => {
   const previousCashGeneration = previousMonth.receita - previousMonth.despesa;
   const previousNetMargin = ((previousCashGeneration / previousMonth.receita) * 100);
 
+  // Calculate percentage changes
+  const revenueChange = ((totalRevenue - previousMonth.receita) / previousMonth.receita) * 100;
+  const expenseChange = ((totalExpenses - previousMonth.despesa) / previousMonth.despesa) * 100;
+  const cashChange = ((cashGeneration - previousCashGeneration) / previousCashGeneration) * 100;
+  const marginChange = netMargin - previousNetMargin;
+
   return [
     {
       title: 'Receita Total',
       value: `R$ ${totalRevenue.toLocaleString()}`,
-      change: ((totalRevenue - previousMonth.receita) / previousMonth.receita) * 100,
+      change: revenueChange,
       target: 85,
       icon: 'DollarSign',
-      alert: 'success' as const
+      alert: revenueChange > 0 ? 'success' as const : 'warning' as const
     },
     {
       title: 'Despesa Total',
       value: `R$ ${totalExpenses.toLocaleString()}`,
-      change: ((totalExpenses - previousMonth.despesa) / previousMonth.despesa) * 100,
+      change: expenseChange,
       target: 75,
       icon: 'CreditCard',
-      alert: 'warning' as const
+      alert: expenseChange < 0 ? 'success' as const : 'danger' as const
     },
     {
       title: 'Geração de Caixa',
       value: `R$ ${cashGeneration.toLocaleString()}`,
-      change: ((cashGeneration - previousCashGeneration) / previousCashGeneration) * 100,
+      change: cashChange,
       target: 65,
       icon: 'TrendingUp',
-      alert: cashGeneration > previousCashGeneration ? 'success' as const : 'warning' as const
+      alert: cashChange > 0 ? 'success' as const : 'warning' as const
     },
     {
       title: 'Margem Líquida',
       value: `${netMargin.toFixed(1)}%`,
-      change: netMargin - previousNetMargin,
+      change: marginChange,
       target: 40,
       icon: 'Percent',
-      alert: netMargin > previousNetMargin ? 'success' as const : 'danger' as const
+      alert: marginChange > 0 ? 'success' as const : 'warning' as const
     }
   ];
 };
@@ -75,26 +81,39 @@ export const getSecondaryKPIs = (unitId: string) => {
   const previousMonth = historicalData[historicalData.length - 2];
   
   const currentActiveStudents = data.alunos;
-  const previousActiveStudents = Math.round(currentActiveStudents * 0.89); // Simulated previous month
-  const averageTicket = currentMonth.receita / currentActiveStudents;
-  const previousAverageTicket = previousMonth.receita / previousActiveStudents;
+  const previousActiveStudents = Math.round(currentActiveStudents * 0.95); // More realistic previous month
+  const averageTicket = data.ticketMedio;
+  const previousAverageTicket = Math.round(averageTicket * 0.98); // Slight growth
+
+  // Calculate occupancy rate
+  const occupancyRate = data.ocupacao;
+  const previousOccupancy = Math.round(occupancyRate * 0.96);
+
+  // Calculate staff cost percentage (mock calculation)
+  const staffCostPercentage = 58.3;
+  const previousStaffCost = 56.8;
+
+  // Calculate goals met (mock calculation based on unit)
+  const goalsMetValue = unitId === 'all' ? '7/12' : 
+                       unitId === 'campo-grande' ? '3/4' :
+                       unitId === 'recreio' ? '2/4' : '2/4';
 
   return [
     {
       title: 'Ticket Médio',
-      value: `R$ ${Math.round(averageTicket)}`,
+      value: `R$ ${averageTicket}`,
       change: ((averageTicket - previousAverageTicket) / previousAverageTicket) * 100,
       target: 75,
       icon: 'Receipt',
       alert: averageTicket > previousAverageTicket ? 'success' as const : 'warning' as const
     },
     {
-      title: 'Despesa Pessoal',
-      value: '58.3%',
-      change: 2.4,
-      target: 95,
-      icon: 'Users',
-      alert: 'warning' as const
+      title: 'Taxa de Ocupação',
+      value: `${occupancyRate}%`,
+      change: ((occupancyRate - previousOccupancy) / previousOccupancy) * 100,
+      target: 80,
+      icon: 'Percent',
+      alert: occupancyRate > previousOccupancy ? 'success' as const : 'warning' as const
     },
     {
       title: 'Alunos Ativos',
@@ -106,7 +125,7 @@ export const getSecondaryKPIs = (unitId: string) => {
     },
     {
       title: 'Metas Batidas',
-      value: unitId === 'all' ? '7/12' : '3/4',
+      value: goalsMetValue,
       change: 0,
       target: 58,
       icon: 'Target',
