@@ -7,6 +7,7 @@ import { DashboardHeader } from './dashboard/DashboardHeader';
 import { KPISections } from './dashboard/KPISections';
 import { ChartsSection } from './dashboard/ChartsSection';
 import { QuickActions } from './dashboard/QuickActions';
+import { Toaster } from '@/components/ui/toaster';
 import { useState } from 'react';
 
 export const Dashboard = () => {
@@ -67,6 +68,9 @@ export const Dashboard = () => {
         onClose={() => setSelectedAction(null)}
         actionType={selectedAction}
       />
+
+      {/* Toast Notifications */}
+      <Toaster />
     </>
   );
 };

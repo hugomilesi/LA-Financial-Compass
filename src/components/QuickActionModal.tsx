@@ -3,7 +3,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
-import { Download, Target, FileText, Building2, TrendingUp } from 'lucide-react';
+import { Download, Target, FileText, Building2, TrendingUp, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { useQuickActions, ExportConfig } from '@/hooks/useQuickActions';
+import { monthlyData, costCenterData } from '@/utils/dashboardData';
 
 interface QuickActionModalProps {
   isOpen: boolean;
@@ -17,24 +20,44 @@ const unitAnalysisData = [
   { unit: 'Barra', receita: 60080, despesa: 46700, lucro: 13380 }
 ];
 
-const goalsData = [
-  { meta: 'Receita Total', atual: 245780, objetivo: 260000, progresso: 94.5 },
-  { meta: 'Alunos Ativos', atual: 1247, objetivo: 1300, progresso: 95.9 },
-  { meta: 'Ticket Médio', atual: 197, objetivo: 200, progresso: 98.5 },
-  { meta: 'Margem Líquida', atual: 21.8, objetivo: 25.0, progresso: 87.2 }
-];
-
-const reportsData = [
-  { mes: 'Jan', dre: 40000, fluxo: 35000 },
-  { mes: 'Fev', dre: 50000, fluxo: 48000 },
-  { mes: 'Mar', dre: 55000, fluxo: 52000 },
-  { mes: 'Abr', dre: 50000, fluxo: 47000 },
-  { mes: 'Mai', dre: 65000, fluxo: 61000 },
-  { mes: 'Jun', dre: 53780, fluxo: 51000 }
-];
+const reportsData = monthlyData.map(item => ({
+  mes: item.month.substring(0, 3),
+  dre: item.receita - item.despesa,
+  fluxo: (item.receita - item.despesa) * 0.95
+}));
 
 export const QuickActionModal = ({ isOpen, onClose, actionType }: QuickActionModalProps) => {
+  const { goals, isLoading, exportDRE, updateGoal, addGoal, generateReport } = useQuickActions();
+  const [exportConfig, setExportConfig] = useState<ExportConfig>({
+    period: 'current',
+    format: 'pdf',
+    units: ['all']
+  });
+  const [newGoal, setNewGoal] = useState({ meta: '', tipo: 'receita' as const, objetivo: 0 });
+  const [editingGoal, setEditingGoal] = useState<string | null>(null);
+
   if (!actionType) return null;
+
+  const handleExportDRE = () => {
+    exportDRE(exportConfig);
+  };
+
+  const handleUpdateGoal = (goalId: string, objetivo: number) => {
+    updateGoal(goalId, { objetivo });
+    setEditingGoal(null);
+  };
+
+  const handleAddGoal = () => {
+    if (newGoal.meta && newGoal.objetivo > 0) {
+      addGoal({
+        meta: newGoal.meta,
+        tipo: newGoal.tipo,
+        atual: 0,
+        objetivo: newGoal.objetivo
+      });
+      setNewGoal({ meta: '', tipo: 'receita', objetivo: 0 });
+    }
+  };
 
   const getModalContent = () => {
     switch (actionType) {
@@ -52,15 +75,30 @@ export const QuickActionModal = ({ isOpen, onClose, actionType }: QuickActionMod
                   <h5 className="font-medium mb-2">Período</h5>
                   <div className="space-y-2">
                     <label className="flex items-center gap-2">
-                      <input type="radio" name="period" defaultChecked />
+                      <input 
+                        type="radio" 
+                        name="period" 
+                        checked={exportConfig.period === 'current'}
+                        onChange={() => setExportConfig(prev => ({ ...prev, period: 'current' }))}
+                      />
                       <span>Junho 2024</span>
                     </label>
                     <label className="flex items-center gap-2">
-                      <input type="radio" name="period" />
+                      <input 
+                        type="radio" 
+                        name="period" 
+                        checked={exportConfig.period === 'previous'}
+                        onChange={() => setExportConfig(prev => ({ ...prev, period: 'previous' }))}
+                      />
                       <span>Maio 2024</span>
                     </label>
                     <label className="flex items-center gap-2">
-                      <input type="radio" name="period" />
+                      <input 
+                        type="radio" 
+                        name="period" 
+                        checked={exportConfig.period === 'semester'}
+                        onChange={() => setExportConfig(prev => ({ ...prev, period: 'semester' }))}
+                      />
                       <span>1º Semestre 2024</span>
                     </label>
                   </div>
@@ -70,15 +108,30 @@ export const QuickActionModal = ({ isOpen, onClose, actionType }: QuickActionMod
                   <h5 className="font-medium mb-2">Formato</h5>
                   <div className="space-y-2">
                     <label className="flex items-center gap-2">
-                      <input type="radio" name="format" defaultChecked />
+                      <input 
+                        type="radio" 
+                        name="format" 
+                        checked={exportConfig.format === 'pdf'}
+                        onChange={() => setExportConfig(prev => ({ ...prev, format: 'pdf' }))}
+                      />
                       <span>PDF Detalhado</span>
                     </label>
                     <label className="flex items-center gap-2">
-                      <input type="radio" name="format" />
+                      <input 
+                        type="radio" 
+                        name="format" 
+                        checked={exportConfig.format === 'excel'}
+                        onChange={() => setExportConfig(prev => ({ ...prev, format: 'excel' }))}
+                      />
                       <span>Excel (XLSX)</span>
                     </label>
                     <label className="flex items-center gap-2">
-                      <input type="radio" name="format" />
+                      <input 
+                        type="radio" 
+                        name="format" 
+                        checked={exportConfig.format === 'csv'}
+                        onChange={() => setExportConfig(prev => ({ ...prev, format: 'csv' }))}
+                      />
                       <span>CSV</span>
                     </label>
                   </div>
@@ -89,21 +142,39 @@ export const QuickActionModal = ({ isOpen, onClose, actionType }: QuickActionMod
                 <h5 className="font-medium mb-2">Unidades</h5>
                 <div className="flex gap-4">
                   <label className="flex items-center gap-2">
-                    <input type="checkbox" defaultChecked />
+                    <input 
+                      type="checkbox" 
+                      checked={exportConfig.units.includes('all')}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setExportConfig(prev => ({ ...prev, units: ['all'] }));
+                        }
+                      }}
+                    />
                     <span>Todas as Unidades</span>
                   </label>
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" />
-                    <span>Campo Grande</span>
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" />
-                    <span>Recreio</span>
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" />
-                    <span>Barra</span>
-                  </label>
+                  {['Campo Grande', 'Recreio', 'Barra'].map(unit => (
+                    <label key={unit} className="flex items-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        checked={exportConfig.units.includes(unit)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setExportConfig(prev => ({ 
+                              ...prev, 
+                              units: prev.units.filter(u => u !== 'all').concat(unit)
+                            }));
+                          } else {
+                            setExportConfig(prev => ({ 
+                              ...prev, 
+                              units: prev.units.filter(u => u !== unit)
+                            }));
+                          }
+                        }}
+                      />
+                      <span>{unit}</span>
+                    </label>
+                  ))}
                 </div>
               </div>
             </Card>
@@ -157,9 +228,17 @@ export const QuickActionModal = ({ isOpen, onClose, actionType }: QuickActionMod
             </Card>
 
             <div className="flex gap-2">
-              <Button className="flex-1">
-                <Download className="w-4 h-4 mr-2" />
-                Exportar DRE
+              <Button 
+                className="flex-1" 
+                onClick={handleExportDRE}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Download className="w-4 h-4 mr-2" />
+                )}
+                {isLoading ? 'Exportando...' : 'Exportar DRE'}
               </Button>
               <Button variant="outline" onClick={onClose}>
                 Cancelar
@@ -178,12 +257,12 @@ export const QuickActionModal = ({ isOpen, onClose, actionType }: QuickActionMod
               </h4>
               
               <div className="space-y-4">
-                {goalsData.map((goal, index) => (
-                  <div key={index} className="border rounded-lg p-4">
+                {goals.map((goal) => (
+                  <div key={goal.id} className="border rounded-lg p-4">
                     <div className="flex justify-between items-center mb-2">
                       <h5 className="font-medium">{goal.meta}</h5>
                       <span className={`text-sm font-medium ${goal.progresso >= 95 ? 'text-green-600' : goal.progresso >= 80 ? 'text-yellow-600' : 'text-red-600'}`}>
-                        {goal.progresso}%
+                        {goal.progresso.toFixed(1)}%
                       </span>
                     </div>
                     <div className="flex items-center gap-4">
@@ -194,12 +273,32 @@ export const QuickActionModal = ({ isOpen, onClose, actionType }: QuickActionMod
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div 
-                            className={`h-2 rounded-full ${goal.progresso >= 95 ? 'bg-green-500' : goal.progresso >= 80 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                            className={`h-2 rounded-full transition-all duration-300 ${goal.progresso >= 95 ? 'bg-green-500' : goal.progresso >= 80 ? 'bg-yellow-500' : 'bg-red-500'}`}
                             style={{ width: `${Math.min(goal.progresso, 100)}%` }}
                           ></div>
                         </div>
                       </div>
-                      <Button size="sm" variant="outline">Editar</Button>
+                      {editingGoal === goal.id ? (
+                        <div className="flex gap-2">
+                          <input
+                            type="number"
+                            className="w-20 px-2 py-1 border rounded text-sm"
+                            defaultValue={goal.objetivo}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                handleUpdateGoal(goal.id, Number((e.target as HTMLInputElement).value));
+                              }
+                            }}
+                          />
+                          <Button size="sm" onClick={() => setEditingGoal(null)}>
+                            Cancelar
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button size="sm" variant="outline" onClick={() => setEditingGoal(goal.id)}>
+                          Editar
+                        </Button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -208,22 +307,51 @@ export const QuickActionModal = ({ isOpen, onClose, actionType }: QuickActionMod
 
             <Card className="p-4">
               <h5 className="font-medium mb-4">Adicionar Nova Meta</h5>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Tipo de Meta</label>
-                  <select className="w-full border rounded px-3 py-2">
-                    <option>Receita</option>
-                    <option>Despesa</option>
-                    <option>Alunos</option>
-                    <option>Ticket Médio</option>
-                  </select>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Nome da Meta</label>
+                    <input 
+                      type="text" 
+                      className="w-full border rounded px-3 py-2" 
+                      placeholder="Nome da meta"
+                      value={newGoal.meta}
+                      onChange={(e) => setNewGoal(prev => ({ ...prev, meta: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Tipo de Meta</label>
+                    <select 
+                      className="w-full border rounded px-3 py-2"
+                      value={newGoal.tipo}
+                      onChange={(e) => setNewGoal(prev => ({ ...prev, tipo: e.target.value as any }))}
+                    >
+                      <option value="receita">Receita</option>
+                      <option value="despesa">Despesa</option>
+                      <option value="alunos">Alunos</option>
+                      <option value="ticket">Ticket Médio</option>
+                      <option value="margem">Margem</option>
+                    </select>
+                  </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Valor</label>
-                  <input type="number" className="w-full border rounded px-3 py-2" placeholder="0" />
+                  <label className="block text-sm font-medium mb-1">Valor da Meta</label>
+                  <input 
+                    type="number" 
+                    className="w-full border rounded px-3 py-2" 
+                    placeholder="0"
+                    value={newGoal.objetivo || ''}
+                    onChange={(e) => setNewGoal(prev => ({ ...prev, objetivo: Number(e.target.value) }))}
+                  />
                 </div>
+                <Button 
+                  className="w-full" 
+                  onClick={handleAddGoal}
+                  disabled={!newGoal.meta || !newGoal.objetivo}
+                >
+                  Adicionar Meta
+                </Button>
               </div>
-              <Button className="w-full mt-4">Adicionar Meta</Button>
             </Card>
           </div>
         );
@@ -248,11 +376,20 @@ export const QuickActionModal = ({ isOpen, onClose, actionType }: QuickActionMod
                       'Análise de Alunos',
                       'Rentabilidade por Unidade',
                       'Comparativo Anual'
-                    ].map((report, index) => (
-                      <div key={index} className="flex items-center justify-between p-2 border rounded">
+                    ].map((report) => (
+                      <div key={report} className="flex items-center justify-between p-2 border rounded">
                         <span className="text-sm">{report}</span>
-                        <Button size="sm" variant="outline">
-                          <Download className="w-3 h-3 mr-1" />
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => generateReport(report)}
+                          disabled={isLoading}
+                        >
+                          {isLoading ? (
+                            <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                          ) : (
+                            <Download className="w-3 h-3 mr-1" />
+                          )}
                           Baixar
                         </Button>
                       </div>
@@ -415,4 +552,19 @@ export const QuickActionModal = ({ isOpen, onClose, actionType }: QuickActionMod
       </DialogContent>
     </Dialog>
   );
+};
+
+const getModalTitle = (actionType: string) => {
+  switch (actionType) {
+    case 'export-dre':
+      return 'Exportar DRE';
+    case 'set-goals':
+      return 'Definir Metas';
+    case 'view-reports':
+      return 'Ver Relatórios';
+    case 'unit-analysis':
+      return 'Análise Unidades';
+    default:
+      return '';
+  }
 };
