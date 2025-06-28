@@ -18,10 +18,10 @@ const unitAnalysisData = [
 ];
 
 const goalsData = [
-  { meta: 'Receita Total', atual: 245780, meta: 260000, progresso: 94.5 },
-  { meta: 'Alunos Ativos', atual: 1247, meta: 1300, progresso: 95.9 },
-  { meta: 'Ticket Médio', atual: 197, meta: 200, progresso: 98.5 },
-  { meta: 'Margem Líquida', atual: 21.8, meta: 25.0, progresso: 87.2 }
+  { meta: 'Receita Total', atual: 245780, objetivo: 260000, progresso: 94.5 },
+  { meta: 'Alunos Ativos', atual: 1247, objetivo: 1300, progresso: 95.9 },
+  { meta: 'Ticket Médio', atual: 197, objetivo: 200, progresso: 98.5 },
+  { meta: 'Margem Líquida', atual: 21.8, objetivo: 25.0, progresso: 87.2 }
 ];
 
 const reportsData = [
@@ -190,7 +190,7 @@ export const QuickActionModal = ({ isOpen, onClose, actionType }: QuickActionMod
                       <div className="flex-1">
                         <div className="flex justify-between text-sm mb-1">
                           <span>Atual: {goal.atual.toLocaleString()}</span>
-                          <span>Meta: {goal.meta.toLocaleString()}</span>
+                          <span>Meta: {goal.objetivo.toLocaleString()}</span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div 
