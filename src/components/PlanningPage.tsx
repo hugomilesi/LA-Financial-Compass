@@ -13,8 +13,6 @@ export const PlanningPage = () => {
     year: new Date().getFullYear(),
     month: new Date().getMonth() + 1
   });
-  
-  const [selectedUnit, setSelectedUnit] = useState<string>('all');
 
   return (
     <div className="p-6 space-y-6">
@@ -28,8 +26,6 @@ export const PlanningPage = () => {
       <PlanningFilters 
         selectedPeriod={selectedPeriod}
         onPeriodChange={setSelectedPeriod}
-        selectedUnit={selectedUnit}
-        onUnitChange={setSelectedUnit}
       />
 
       <Tabs defaultValue="dashboard" className="space-y-4">
@@ -43,28 +39,27 @@ export const PlanningPage = () => {
         <TabsContent value="dashboard" className="space-y-4">
           <PlanningDashboard 
             selectedPeriod={selectedPeriod}
-            selectedUnit={selectedUnit}
           />
         </TabsContent>
 
         <TabsContent value="goals" className="space-y-4">
           <MonthlyGoals 
             selectedPeriod={selectedPeriod}
-            selectedUnit={selectedUnit}
+            selectedUnit="all"
           />
         </TabsContent>
 
         <TabsContent value="projections" className="space-y-4">
           <FutureProjections 
             selectedPeriod={selectedPeriod}
-            selectedUnit={selectedUnit}
+            selectedUnit="all"
           />
         </TabsContent>
 
         <TabsContent value="notes" className="space-y-4">
           <ManagerNotes 
             selectedPeriod={selectedPeriod}
-            selectedUnit={selectedUnit}
+            selectedUnit="all"
           />
         </TabsContent>
       </Tabs>
