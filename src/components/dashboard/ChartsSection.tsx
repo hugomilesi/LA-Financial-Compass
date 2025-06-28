@@ -2,12 +2,23 @@
 import { Card } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { monthlyData, costCenterData } from '@/utils/dashboardData';
+import { useState } from 'react';
 
 interface ChartsSectionProps {
   onChartClick: (chartType: 'revenue' | 'cost-center') => void;
 }
 
 export const ChartsSection = ({ onChartClick }: ChartsSectionProps) => {
+  const [hoveredSlice, setHoveredSlice] = useState<number | null>(null);
+
+  const handleMouseEnter = (data: any, index: number) => {
+    setHoveredSlice(index);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredSlice(null);
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Revenue Evolution */}
@@ -38,9 +49,22 @@ export const ChartsSection = ({ onChartClick }: ChartsSectionProps) => {
               outerRadius={100}
               dataKey="value"
               label={({ name, value }) => `${name}: ${value}%`}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
             >
               {costCenterData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
+                <Cell 
+                  key={`cell-${index}`} 
+                  fill={entry.color}
+                  stroke={hoveredSlice === index ? "#ffffff" : "none"}
+                  strokeWidth={hoveredSlice === index ? 3 : 0}
+                  style={{
+                    filter: hoveredSlice === index ? "brightness(1.1)" : "none",
+                    transform: hoveredSlice === index ? "scale(1.05)" : "scale(1)",
+                    transformOrigin: "center",
+                    transition: "all 0.2s ease-in-out"
+                  }}
+                />
               ))}
             </Pie>
             <Tooltip />
