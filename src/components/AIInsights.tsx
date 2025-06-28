@@ -1,6 +1,8 @@
 
 import { Brain, AlertTriangle, TrendingUp, DollarSign } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { useState } from 'react';
+import { InsightDetailModal } from './InsightDetailModal';
 
 interface Insight {
   id: string;
@@ -38,6 +40,8 @@ const insights: Insight[] = [
 ];
 
 export const AIInsights = () => {
+  const [selectedInsight, setSelectedInsight] = useState<Insight | null>(null);
+
   const getIcon = (type: string) => {
     switch (type) {
       case 'alert': return AlertTriangle;
@@ -55,46 +59,62 @@ export const AIInsights = () => {
   };
 
   return (
-    <Card className="p-6">
-      <div className="flex items-center gap-2 mb-4">
-        <Brain className="w-6 h-6 text-primary-600" />
-        <h2 className="text-xl font-bold text-gray-900">Consultor Financeiro Especializado</h2>
-      </div>
-      
-      <div className="space-y-4">
-        {insights.map((insight) => {
-          const Icon = getIcon(insight.type);
-          
-          return (
-            <div 
-              key={insight.id}
-              className={`p-4 border-l-4 rounded-r-lg ${getColor(insight.type)}`}
-            >
-              <div className="flex items-start gap-3">
-                <Icon className="w-5 h-5 mt-0.5 text-gray-700" />
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900">{insight.title}</h3>
-                  <p className="text-sm text-gray-700 mt-1">{insight.description}</p>
-                  {insight.action && (
+    <>
+      <Card className="p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Brain className="w-6 h-6 text-primary-600" />
+          <h2 className="text-xl font-bold text-gray-900">Consultor Financeiro Especializado</h2>
+        </div>
+        
+        <div className="space-y-4">
+          {insights.map((insight) => {
+            const Icon = getIcon(insight.type);
+            
+            return (
+              <div 
+                key={insight.id}
+                className={`p-4 border-l-4 rounded-r-lg cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-[1.02] ${getColor(insight.type)}`}
+                onClick={() => setSelectedInsight(insight)}
+              >
+                <div className="flex items-start gap-3">
+                  <Icon className="w-5 h-5 mt-0.5 text-gray-700" />
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900">{insight.title}</h3>
+                    <p className="text-sm text-gray-700 mt-1">{insight.description}</p>
+                    {insight.action && (
+                      <div className="mt-2">
+                        <span className="text-xs font-medium text-primary-700 bg-primary-100 px-2 py-1 rounded">
+                          Ação: {insight.action}
+                        </span>
+                      </div>
+                    )}
                     <div className="mt-2">
-                      <span className="text-xs font-medium text-primary-700 bg-primary-100 px-2 py-1 rounded">
-                        Ação: {insight.action}
+                      <span className="text-xs text-gray-500 font-medium">
+                        Clique para análise detalhada
                       </span>
                     </div>
-                  )}
+                  </div>
+                  <span className={`text-xs px-2 py-1 rounded-full ${
+                    insight.impact === 'high' ? 'bg-danger-100 text-danger-700' :
+                    insight.impact === 'medium' ? 'bg-warning-100 text-warning-700' :
+                    'bg-gray-100 text-gray-700'
+                  }`}>
+                    {insight.impact === 'high' ? 'Alto' : insight.impact === 'medium' ? 'Médio' : 'Baixo'}
+                  </span>
                 </div>
-                <span className={`text-xs px-2 py-1 rounded-full ${
-                  insight.impact === 'high' ? 'bg-danger-100 text-danger-700' :
-                  insight.impact === 'medium' ? 'bg-warning-100 text-warning-700' :
-                  'bg-gray-100 text-gray-700'
-                }`}>
-                  {insight.impact === 'high' ? 'Alto' : insight.impact === 'medium' ? 'Médio' : 'Baixo'}
-                </span>
               </div>
-            </div>
-          );
-        })}
-      </div>
-    </Card>
+            );
+          })}
+        </div>
+      </Card>
+
+      {selectedInsight && (
+        <InsightDetailModal
+          isOpen={!!selectedInsight}
+          onClose={() => setSelectedInsight(null)}
+          insight={selectedInsight}
+        />
+      )}
+    </>
   );
 };

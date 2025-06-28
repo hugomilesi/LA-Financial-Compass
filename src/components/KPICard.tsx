@@ -11,6 +11,7 @@ interface KPICardProps {
   icon: LucideIcon;
   format?: 'currency' | 'percentage' | 'number';
   alert?: 'success' | 'warning' | 'danger';
+  onClick?: () => void;
 }
 
 export const KPICard = ({ 
@@ -21,7 +22,8 @@ export const KPICard = ({
   target, 
   icon: Icon, 
   format = 'number',
-  alert 
+  alert,
+  onClick
 }: KPICardProps) => {
   const getAlertColor = () => {
     switch (alert) {
@@ -47,10 +49,14 @@ export const KPICard = ({
   };
 
   return (
-    <div className={cn(
-      "p-6 rounded-xl border-2 shadow-sm hover:shadow-md transition-all duration-200",
-      getAlertColor()
-    )}>
+    <div 
+      className={cn(
+        "p-6 rounded-xl border-2 shadow-sm transition-all duration-200",
+        getAlertColor(),
+        onClick ? "cursor-pointer hover:shadow-lg hover:scale-105" : "hover:shadow-md"
+      )}
+      onClick={onClick}
+    >
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
@@ -85,13 +91,21 @@ export const KPICard = ({
           </div>
         </div>
         
-        {alert && (
-          <div className={cn(
-            "w-3 h-3 rounded-full animate-pulse-glow",
-            alert === 'success' ? 'bg-success-500' :
-            alert === 'warning' ? 'bg-warning-500' : 'bg-danger-500'
-          )} />
-        )}
+        <div className="flex flex-col items-end gap-2">
+          {alert && (
+            <div className={cn(
+              "w-3 h-3 rounded-full animate-pulse-glow",
+              alert === 'success' ? 'bg-success-500' :
+              alert === 'warning' ? 'bg-warning-500' : 'bg-danger-500'
+            )} />
+          )}
+          
+          {onClick && (
+            <div className="text-xs text-gray-400 font-medium">
+              Clique para detalhes
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
