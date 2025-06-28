@@ -14,29 +14,29 @@ export const UNIT_DATA: Record<string, UnitFinancialData> = {
   'campo-grande': {
     receita: 145320,
     despesa: 113930,
-    alunos: 800, // Valor correto fornecido pelo usuário
+    alunos: 800, // Correct value provided by user
     matriculas: 67,
-    ticketMedio: 182, // Valor correto: 145320/800 = 181.65, arredondado para 182
+    ticketMedio: 182, // Calculated: 145320/800 = 181.65, rounded to 182
     capacidade: 950,
-    ocupacao: 84 // 800/950 = 84.2%, arredondado para 84%
+    ocupacao: 84 // 800/950 = 84.2%, rounded to 84%
   },
   'recreio': {
     receita: 128544,
     despesa: 101574,
-    alunos: 720, // Valor correto fornecido pelo usuário
+    alunos: 720, // Correct value provided by user
     matriculas: 56,
-    ticketMedio: 179, // Valor correto: 128544/720 = 178.53, arredondado para 179
+    ticketMedio: 179, // Calculated: 128544/720 = 178.53, rounded to 179
     capacidade: 880,
-    ocupacao: 82 // 720/880 = 81.8%, arredondado para 82%
+    ocupacao: 82 // 720/880 = 81.8%, rounded to 82%
   },
   'barra': {
     receita: 117591,
     despesa: 69871,
-    alunos: 467, // Valor correto fornecido pelo usuário
+    alunos: 467, // Correct value provided by user 
     matriculas: 50,
-    ticketMedio: 252, // Valor correto: 117591/467 = 251.8, arredondado para 252
+    ticketMedio: 252, // Calculated: 117591/467 = 251.8, rounded to 252
     capacidade: 990,
-    ocupacao: 47 // 467/990 = 47.2%, arredondado para 47%
+    ocupacao: 47 // 467/990 = 47.2%, rounded to 47%
   }
 };
 
