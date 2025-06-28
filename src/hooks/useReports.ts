@@ -1,6 +1,6 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { downloadReportFile } from '@/utils/fileDownload';
 
 export interface Report {
   id: string;
@@ -171,15 +171,19 @@ export const useReports = () => {
     setIsLoading(true);
     
     try {
-      // Simulate download process
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Simulate some processing time
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Download the actual report file
+      await downloadReportFile(report);
       
       toast({
-        title: "Download iniciado",
-        description: `${report.title} está sendo baixado`,
+        title: "Download concluído",
+        description: `${report.title} foi baixado com sucesso`,
       });
       
     } catch (error) {
+      console.error('Download error:', error);
       toast({
         title: "Erro no download",
         description: "Não foi possível baixar o relatório",

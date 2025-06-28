@@ -1,6 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { exportDREtoCSV, exportDREtoPDF, exportDREtoExcel, generateReportFile } from '@/utils/fileDownload';
 
 export interface Goal {
   id: string;
@@ -48,18 +48,40 @@ export const useQuickActions = () => {
   const exportDRE = async (config: ExportConfig) => {
     setIsLoading(true);
     try {
-      // Simulate export process
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Simulate some processing time
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Mock DRE data - in real app this would come from API
+      const mockDREData = {
+        totalReceita: 245780,
+        totalDespesa: 192000,
+        lucroLiquido: 53780
+      };
+      
+      const period = config.period === 'current' ? 'Junho 2024' : 
+                    config.period === 'previous' ? 'Maio 2024' : '1º Semestre 2024';
+      
+      // Export based on selected format
+      switch (config.format) {
+        case 'csv':
+          exportDREtoCSV(period, mockDREData);
+          break;
+        case 'excel':
+          await exportDREtoExcel(period, mockDREData);
+          break;
+        case 'pdf':
+        default:
+          await exportDREtoPDF(period, mockDREData);
+          break;
+      }
       
       toast({
         title: "Exportação concluída",
         description: `DRE exportado em formato ${config.format.toUpperCase()}`,
       });
       
-      // In a real app, this would trigger the actual file download
-      console.log('Exporting DRE with config:', config);
-      
     } catch (error) {
+      console.error('Export error:', error);
       toast({
         title: "Erro na exportação",
         description: "Não foi possível exportar o DRE. Tente novamente.",
@@ -101,17 +123,18 @@ export const useQuickActions = () => {
   const generateReport = async (reportType: string) => {
     setIsLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Generate and download the report file
+      await generateReportFile(reportType);
       
       toast({
         title: "Relatório gerado",
-        description: `${reportType} foi gerado com sucesso.`,
+        description: `${reportType} foi gerado e baixado com sucesso.`,
       });
       
-      // In a real app, this would trigger the actual file download
-      console.log('Generating report:', reportType);
-      
     } catch (error) {
+      console.error('Report generation error:', error);
       toast({
         title: "Erro na geração",
         description: "Não foi possível gerar o relatório. Tente novamente.",
