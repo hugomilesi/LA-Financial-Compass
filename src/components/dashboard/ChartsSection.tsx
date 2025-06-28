@@ -3,11 +3,15 @@ import { Card } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { monthlyData, costCenterData } from '@/utils/dashboardData';
 
-export const ChartsSection = () => {
+interface ChartsSectionProps {
+  onChartClick: (chartType: 'revenue' | 'cost-center') => void;
+}
+
+export const ChartsSection = ({ onChartClick }: ChartsSectionProps) => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Revenue Evolution */}
-      <Card className="p-6">
+      <Card className="p-6 cursor-pointer hover:shadow-lg transition-shadow" onClick={() => onChartClick('revenue')}>
         <h3 className="text-lg font-semibold mb-4 text-gray-900">Evolução Receita vs Despesa</h3>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={monthlyData}>
@@ -19,10 +23,11 @@ export const ChartsSection = () => {
             <Bar dataKey="despesa" fill="#EF4444" name="Despesa" />
           </BarChart>
         </ResponsiveContainer>
+        <p className="text-sm text-gray-500 mt-2 text-center">Clique para ver análise detalhada</p>
       </Card>
 
       {/* Cost Center Distribution */}
-      <Card className="p-6">
+      <Card className="p-6 cursor-pointer hover:shadow-lg transition-shadow" onClick={() => onChartClick('cost-center')}>
         <h3 className="text-lg font-semibold mb-4 text-gray-900">Distribuição Centro de Custos</h3>
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
@@ -41,6 +46,7 @@ export const ChartsSection = () => {
             <Tooltip />
           </PieChart>
         </ResponsiveContainer>
+        <p className="text-sm text-gray-500 mt-2 text-center">Clique para ver análise detalhada</p>
       </Card>
     </div>
   );
