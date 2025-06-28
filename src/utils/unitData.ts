@@ -12,59 +12,59 @@ export interface UnitFinancialData {
 
 export const UNIT_DATA: Record<string, UnitFinancialData> = {
   'campo-grande': {
-    receita: 98500,
-    despesa: 76800,
-    alunos: 498,
-    matriculas: 45,
+    receita: 145320,
+    despesa: 113200,
+    alunos: 734,
+    matriculas: 67,
     ticketMedio: 198,
-    capacidade: 650,
-    ocupacao: 77 // 498/650 = 76.6%
+    capacidade: 950,
+    ocupacao: 77 // 734/950 = 77.3%
   },
   'recreio': {
-    receita: 87200,
-    despesa: 68500,
-    alunos: 441,
-    matriculas: 38,
+    receita: 128544,
+    despesa: 101000,
+    alunos: 650,
+    matriculas: 56,
     ticketMedio: 198,
-    capacidade: 600,
-    ocupacao: 74 // 441/600 = 73.5%
+    capacidade: 880,
+    ocupacao: 74 // 650/880 = 73.9%
   },
   'barra': {
-    receita: 65280,
-    despesa: 48700,
-    alunos: 335,
-    matriculas: 28,
+    receita: 117591,
+    despesa: 87700,
+    alunos: 603,
+    matriculas: 50,
     ticketMedio: 195,
-    capacidade: 550,
-    ocupacao: 61 // 335/550 = 60.9%
+    capacidade: 990,
+    ocupacao: 61 // 603/990 = 60.9%
   }
 };
 
-// Historical data by unit - updated to match current values
+// Historical data by unit - updated to match current values with proportional growth
 export const UNIT_HISTORICAL_DATA: Record<string, Array<{month: string, receita: number, despesa: number}>> = {
   'campo-grande': [
-    { month: 'Jan', receita: 88000, despesa: 72000 },
-    { month: 'Fev', receita: 92000, despesa: 74000 },
-    { month: 'Mar', receita: 95000, despesa: 76000 },
-    { month: 'Abr', receita: 94000, despesa: 75000 },
-    { month: 'Mai', receita: 96000, despesa: 76000 },
-    { month: 'Jun', receita: 98500, despesa: 76800 }
+    { month: 'Jan', receita: 129800, despesa: 106200 },
+    { month: 'Fev', receita: 135600, despesa: 109100 },
+    { month: 'Mar', receita: 140100, despesa: 111500 },
+    { month: 'Abr', receita: 138700, despesa: 110700 },
+    { month: 'Mai', receita: 141500, despesa: 112000 },
+    { month: 'Jun', receita: 145320, despesa: 113200 }
   ],
   'recreio': [
-    { month: 'Jan', receita: 78000, despesa: 64000 },
-    { month: 'Fev', receita: 82000, despesa: 66000 },
-    { month: 'Mar', receita: 85000, despesa: 67000 },
-    { month: 'Abr', receita: 83000, despesa: 66500 },
-    { month: 'Mai', receita: 85000, despesa: 67500 },
-    { month: 'Jun', receita: 87200, despesa: 68500 }
+    { month: 'Jan', receita: 114900, despesa: 94400 },
+    { month: 'Fev', receita: 120900, despesa: 97300 },
+    { month: 'Mar', receita: 125400, despesa: 99000 },
+    { month: 'Abr', receita: 122400, despesa: 98100 },
+    { month: 'Mai', receita: 125400, despesa: 99600 },
+    { month: 'Jun', receita: 128544, despesa: 101000 }
   ],
   'barra': [
-    { month: 'Jan', receita: 58000, despesa: 44000 },
-    { month: 'Fev', receita: 61000, despesa: 45000 },
-    { month: 'Mar', receita: 63000, despesa: 46000 },
-    { month: 'Abr', receita: 62000, despesa: 46500 },
-    { month: 'Mai', receita: 64000, despesa: 47500 },
-    { month: 'Jun', receita: 65280, despesa: 48700 }
+    { month: 'Jan', receita: 104600, despesa: 79200 },
+    { month: 'Fev', receita: 109900, despesa: 81100 },
+    { month: 'Mar', receita: 113600, despesa: 82900 },
+    { month: 'Abr', receita: 111800, despesa: 83800 },
+    { month: 'Mai', receita: 115400, despesa: 85600 },
+    { month: 'Jun', receita: 117591, despesa: 87700 }
   ]
 };
 
