@@ -1,6 +1,4 @@
 
-
-
 // Unit-specific data structure
 export interface UnitFinancialData {
   receita: number;
@@ -72,49 +70,99 @@ export const UNIT_HISTORICAL_DATA: Record<string, Array<{month: string, receita:
 
 // Function to get consolidated data for all units
 export const getConsolidatedData = (): UnitFinancialData => {
+  console.log('🔍 [getConsolidatedData] Starting calculation...');
+  
   const units = Object.values(UNIT_DATA);
+  console.log('📊 [getConsolidatedData] Unit data:', units);
+  
   const totalReceita = units.reduce((sum, unit) => sum + unit.receita, 0);
   const totalAlunos = units.reduce((sum, unit) => sum + unit.alunos, 0);
+  const totalDespesa = units.reduce((sum, unit) => sum + unit.despesa, 0);
+  const totalMatriculas = units.reduce((sum, unit) => sum + unit.matriculas, 0);
+  const totalCapacidade = units.reduce((sum, unit) => sum + unit.capacidade, 0);
   
-  return {
+  const ticketMedio = Math.round(totalReceita / totalAlunos);
+  const ocupacao = Math.round((totalAlunos / totalCapacidade) * 100);
+  
+  console.log('💰 [getConsolidatedData] Total Receita:', totalReceita);
+  console.log('👥 [getConsolidatedData] Total Alunos:', totalAlunos);
+  console.log('💸 [getConsolidatedData] Total Despesa:', totalDespesa);
+  console.log('📝 [getConsolidatedData] Total Matriculas:', totalMatriculas);
+  console.log('🎯 [getConsolidatedData] Ticket Médio:', ticketMedio);
+  console.log('📈 [getConsolidatedData] Ocupação:', ocupacao);
+  
+  const result = {
     receita: totalReceita,
-    despesa: units.reduce((sum, unit) => sum + unit.despesa, 0),
+    despesa: totalDespesa,
     alunos: totalAlunos,
-    matriculas: units.reduce((sum, unit) => sum + unit.matriculas, 0),
-    ticketMedio: Math.round(totalReceita / totalAlunos),
-    capacidade: units.reduce((sum, unit) => sum + unit.capacidade, 0),
-    ocupacao: Math.round((totalAlunos / units.reduce((sum, unit) => sum + unit.capacidade, 0)) * 100)
+    matriculas: totalMatriculas,
+    ticketMedio: ticketMedio,
+    capacidade: totalCapacidade,
+    ocupacao: ocupacao
   };
+  
+  console.log('✅ [getConsolidatedData] Final result:', result);
+  return result;
 };
 
 // Function to get consolidated historical data
 export const getConsolidatedHistoricalData = () => {
+  console.log('📈 [getConsolidatedHistoricalData] Starting calculation...');
+  
   const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'];
-  return months.map(month => {
+  const result = months.map(month => {
     const monthData = Object.values(UNIT_HISTORICAL_DATA).map(unitHistory => 
       unitHistory.find(data => data.month === month)
     ).filter(Boolean);
     
-    return {
+    const monthResult = {
       month,
       receita: monthData.reduce((sum, data) => sum + (data?.receita || 0), 0),
       despesa: monthData.reduce((sum, data) => sum + (data?.despesa || 0), 0)
     };
+    
+    console.log(`📊 [getConsolidatedHistoricalData] ${month}:`, monthResult);
+    return monthResult;
   });
+  
+  console.log('✅ [getConsolidatedHistoricalData] Final result:', result);
+  return result;
 };
 
 // Function to get data by unit (or consolidated if 'all')
 export const getDataByUnit = (unitId: string): UnitFinancialData => {
+  console.log('🔍 [getDataByUnit] Requested unit:', unitId);
+  
   if (unitId === 'all') {
+    console.log('🌐 [getDataByUnit] Getting consolidated data...');
     return getConsolidatedData();
   }
-  return UNIT_DATA[unitId] || getConsolidatedData();
+  
+  const unitData = UNIT_DATA[unitId];
+  if (unitData) {
+    console.log('🏢 [getDataByUnit] Unit data found:', unitData);
+    return unitData;
+  }
+  
+  console.log('⚠️ [getDataByUnit] Unit not found, returning consolidated data');
+  return getConsolidatedData();
 };
 
 // Function to get historical data by unit (or consolidated if 'all')
 export const getHistoricalDataByUnit = (unitId: string) => {
+  console.log('📈 [getHistoricalDataByUnit] Requested unit:', unitId);
+  
   if (unitId === 'all') {
+    console.log('🌐 [getHistoricalDataByUnit] Getting consolidated historical data...');
     return getConsolidatedHistoricalData();
   }
-  return UNIT_HISTORICAL_DATA[unitId] || getConsolidatedHistoricalData();
+  
+  const unitHistoricalData = UNIT_HISTORICAL_DATA[unitId];
+  if (unitHistoricalData) {
+    console.log('🏢 [getHistoricalDataByUnit] Unit historical data found:', unitHistoricalData);
+    return unitHistoricalData;
+  }
+  
+  console.log('⚠️ [getHistoricalDataByUnit] Unit historical data not found, returning consolidated data');
+  return getConsolidatedHistoricalData();
 };

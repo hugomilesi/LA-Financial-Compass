@@ -2,9 +2,20 @@
 import { Calendar } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useUnit, UNITS } from '@/contexts/UnitContext';
+import { useEffect } from 'react';
 
 export const DashboardHeader = () => {
   const { selectedUnit, setSelectedUnit, getUnitDisplayName } = useUnit();
+
+  useEffect(() => {
+    console.log('🏢 [DashboardHeader] Selected Unit:', selectedUnit);
+    console.log('🏢 [DashboardHeader] Display Name:', getUnitDisplayName(selectedUnit));
+  }, [selectedUnit, getUnitDisplayName]);
+
+  const handleUnitChange = (newUnit: string) => {
+    console.log('🔄 [DashboardHeader] Unit changing from', selectedUnit, 'to', newUnit);
+    setSelectedUnit(newUnit);
+  };
 
   return (
     <div className="flex items-center justify-between">
@@ -16,7 +27,7 @@ export const DashboardHeader = () => {
       </div>
       <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow">
         <Calendar className="w-4 h-4 text-gray-500" />
-        <Select value={selectedUnit} onValueChange={setSelectedUnit}>
+        <Select value={selectedUnit} onValueChange={handleUnitChange}>
           <SelectTrigger className="w-[180px] border-none shadow-none">
             <SelectValue placeholder="Selecionar unidade" />
           </SelectTrigger>

@@ -12,16 +12,27 @@ export const costCenterData = [
 
 // Dynamic monthly data based on selected unit
 export const getMonthlyData = (unitId: string) => {
-  return getHistoricalDataByUnit(unitId);
+  console.log('📊 [dashboardData.getMonthlyData] Requested unit:', unitId);
+  const result = getHistoricalDataByUnit(unitId);
+  console.log('📈 [dashboardData.getMonthlyData] Result:', result);
+  return result;
 };
 
 // Dynamic KPI calculations based on selected unit
 export const getPrimaryKPIs = (unitId: string) => {
+  console.log('🎯 [dashboardData.getPrimaryKPIs] Starting calculation for unit:', unitId);
+  
   const data = getDataByUnit(unitId);
+  console.log('📊 [dashboardData.getPrimaryKPIs] Unit data:', data);
+  
   const historicalData = getHistoricalDataByUnit(unitId);
+  console.log('📈 [dashboardData.getPrimaryKPIs] Historical data:', historicalData);
   
   const currentMonth = historicalData[historicalData.length - 1];
   const previousMonth = historicalData[historicalData.length - 2];
+  
+  console.log('📅 [dashboardData.getPrimaryKPIs] Current month:', currentMonth);
+  console.log('📅 [dashboardData.getPrimaryKPIs] Previous month:', previousMonth);
   
   const totalRevenue = currentMonth.receita;
   const totalExpenses = currentMonth.despesa;
@@ -37,7 +48,12 @@ export const getPrimaryKPIs = (unitId: string) => {
   const cashChange = ((cashGeneration - previousCashGeneration) / previousCashGeneration) * 100;
   const marginChange = netMargin - previousNetMargin;
 
-  return [
+  console.log('💰 [dashboardData.getPrimaryKPIs] Total Revenue:', totalRevenue);
+  console.log('💸 [dashboardData.getPrimaryKPIs] Total Expenses:', totalExpenses);
+  console.log('💵 [dashboardData.getPrimaryKPIs] Cash Generation:', cashGeneration);
+  console.log('📊 [dashboardData.getPrimaryKPIs] Net Margin:', netMargin);
+
+  const result = [
     {
       title: 'Receita Total',
       value: `R$ ${totalRevenue.toLocaleString()}`,
@@ -71,10 +87,17 @@ export const getPrimaryKPIs = (unitId: string) => {
       alert: marginChange > 0 ? 'success' as const : 'warning' as const
     }
   ];
+
+  console.log('✅ [dashboardData.getPrimaryKPIs] Final result:', result);
+  return result;
 };
 
 export const getSecondaryKPIs = (unitId: string) => {
+  console.log('🎯 [dashboardData.getSecondaryKPIs] Starting calculation for unit:', unitId);
+  
   const data = getDataByUnit(unitId);
+  console.log('📊 [dashboardData.getSecondaryKPIs] Unit data:', data);
+  
   const historicalData = getHistoricalDataByUnit(unitId);
   
   const currentMonth = historicalData[historicalData.length - 1];
@@ -98,7 +121,11 @@ export const getSecondaryKPIs = (unitId: string) => {
                        unitId === 'campo-grande' ? '3/4' :
                        unitId === 'recreio' ? '2/4' : '2/4';
 
-  return [
+  console.log('🎫 [dashboardData.getSecondaryKPIs] Average Ticket:', averageTicket);
+  console.log('📈 [dashboardData.getSecondaryKPIs] Occupancy Rate:', occupancyRate);
+  console.log('👥 [dashboardData.getSecondaryKPIs] Active Students:', currentActiveStudents);
+
+  const result = [
     {
       title: 'Ticket Médio',
       value: `R$ ${averageTicket}`,
@@ -132,6 +159,9 @@ export const getSecondaryKPIs = (unitId: string) => {
       alert: 'warning' as const
     }
   ];
+
+  console.log('✅ [dashboardData.getSecondaryKPIs] Final result:', result);
+  return result;
 };
 
 // Legacy exports for backward compatibility
