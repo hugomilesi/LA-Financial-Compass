@@ -1,4 +1,3 @@
-
 // Unit-specific data structure
 export interface UnitFinancialData {
   receita: number;
@@ -14,29 +13,29 @@ export const UNIT_DATA: Record<string, UnitFinancialData> = {
   'campo-grande': {
     receita: 145320,
     despesa: 113930,
-    alunos: 800, // Correct value provided by user
+    alunos: 465, // Updated to correct value
     matriculas: 67,
     ticketMedio: 362, // Updated to R$362 as requested
     capacidade: 950,
-    ocupacao: 84 // 800/950 = 84.2%, rounded to 84%
+    ocupacao: 49 // 465/950 = 48.9%, rounded to 49%
   },
   'recreio': {
     receita: 128544,
     despesa: 101574,
-    alunos: 720, // Correct value provided by user
+    alunos: 315, // Updated to correct value
     matriculas: 56,
     ticketMedio: 415, // Updated to R$415 as requested
     capacidade: 880,
-    ocupacao: 82 // 720/880 = 81.8%, rounded to 82%
+    ocupacao: 36 // 315/880 = 35.8%, rounded to 36%
   },
   'barra': {
     receita: 117591,
     despesa: 69871,
-    alunos: 467, // Correct value provided by user 
+    alunos: 220, // Updated to correct value
     matriculas: 50,
     ticketMedio: 420, // Updated to R$420 as requested
     capacidade: 990,
-    ocupacao: 47 // 467/990 = 47.2%, rounded to 47%
+    ocupacao: 22 // 220/990 = 22.2%, rounded to 22%
   }
 };
 
