@@ -1,8 +1,8 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card } from '@/components/ui/card';
 import { LucideIcon } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useReports, Report } from '@/hooks/useReports';
 
 interface KPIDetailModalProps {
   isOpen: boolean;
@@ -15,6 +15,7 @@ interface KPIDetailModalProps {
     icon: LucideIcon;
     alert?: 'success' | 'warning' | 'danger';
   };
+  onReportClick?: (report: Report) => void;
 }
 
 const getHistoricalData = (title: string) => {
@@ -130,10 +131,24 @@ const getAnalysis = (title: string) => {
   }
 };
 
-export const KPIDetailModal = ({ isOpen, onClose, kpi }: KPIDetailModalProps) => {
+export const KPIDetailModal = ({ isOpen, onClose, kpi, onReportClick }: KPIDetailModalProps) => {
   const Icon = kpi.icon;
   const historicalData = getHistoricalData(kpi.title);
   const analysis = getAnalysis(kpi.title);
+  const { getRelatedReports } = useReports();
+
+  const getContextKey = (title: string) => {
+    switch (title) {
+      case 'Receita Total': return 'receita-total';
+      case 'Despesa Total': return 'despesa-total';
+      case 'Geração de Caixa': return 'geracao-caixa';
+      case 'Margem Líquida': return 'margem-liquida';
+      case 'Ticket Médio': return 'ticket-medio';
+      default: return 'receita-total';
+    }
+  };
+
+  const relatedReports = getRelatedReports(getContextKey(kpi.title));
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -235,6 +250,26 @@ export const KPIDetailModal = ({ isOpen, onClose, kpi }: KPIDetailModalProps) =>
                     style={{ width: `${Math.min(kpi.target || 0, 100)}%` }}
                   />
                 </div>
+              </div>
+            </Card>
+          )}
+
+          {/* Related Reports */}
+          {onReportClick && (
+            <Card className="p-6">
+              <h3 className="text-lg font-semibold mb-4">Relatórios Relacionados</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {relatedReports.map((report) => (
+                  <button
+                    key={report.id}
+                    onClick={() => onReportClick(report)}
+                    className="p-3 text-left border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <FileText className="w-4 h-4 text-primary-600 mb-1" />
+                    <p className="text-sm font-medium text-gray-900">{report.title}</p>
+                    <p className="text-xs text-gray-500 mt-1">{report.period}</p>
+                  </button>
+                ))}
               </div>
             </Card>
           )}

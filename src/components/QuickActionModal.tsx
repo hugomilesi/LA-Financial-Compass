@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,11 +6,13 @@ import { Download, Target, FileText, Building2, TrendingUp, Loader2 } from 'luci
 import { useState } from 'react';
 import { useQuickActions, ExportConfig } from '@/hooks/useQuickActions';
 import { monthlyData, costCenterData } from '@/utils/dashboardData';
+import { useReports, Report } from '@/hooks/useReports';
 
 interface QuickActionModalProps {
   isOpen: boolean;
   onClose: () => void;
   actionType: 'export-dre' | 'set-goals' | 'view-reports' | 'unit-analysis' | null;
+  onReportClick?: (report: Report) => void;
 }
 
 const unitAnalysisData = [
@@ -26,8 +27,9 @@ const reportsData = monthlyData.map(item => ({
   fluxo: (item.receita - item.despesa) * 0.95
 }));
 
-export const QuickActionModal = ({ isOpen, onClose, actionType }: QuickActionModalProps) => {
+export const QuickActionModal = ({ isOpen, onClose, actionType, onReportClick }: QuickActionModalProps) => {
   const { goals, isLoading, exportDRE, updateGoal, addGoal, generateReport } = useQuickActions();
+  const { getRelatedReports } = useReports();
   const [exportConfig, setExportConfig] = useState<ExportConfig>({
     period: 'current',
     format: 'pdf',
@@ -58,6 +60,8 @@ export const QuickActionModal = ({ isOpen, onClose, actionType }: QuickActionMod
       setNewGoal({ meta: '', tipo: 'receita', objetivo: 0 });
     }
   };
+
+  const relatedReports = getRelatedReports('receita-total');
 
   const getModalContent = () => {
     switch (actionType) {
@@ -226,6 +230,26 @@ export const QuickActionModal = ({ isOpen, onClose, actionType }: QuickActionMod
                 </div>
               </div>
             </Card>
+
+            {/* Related Reports */}
+            {onReportClick && (
+              <Card className="p-4">
+                <h5 className="font-medium mb-3">Relatórios Relacionados</h5>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {relatedReports.map((report) => (
+                    <button
+                      key={report.id}
+                      onClick={() => onReportClick(report)}
+                      className="p-3 text-left border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      <FileText className="w-4 h-4 text-primary-600 mb-1" />
+                      <p className="text-sm font-medium text-gray-900">{report.title}</p>
+                      <p className="text-xs text-gray-500 mt-1">{report.period}</p>
+                    </button>
+                  ))}
+                </div>
+              </Card>
+            )}
 
             <div className="flex gap-2">
               <Button 
@@ -519,6 +543,26 @@ export const QuickActionModal = ({ isOpen, onClose, actionType }: QuickActionMod
                 </table>
               </div>
             </Card>
+
+            {/* Related Reports */}
+            {onReportClick && (
+              <Card className="p-4">
+                <h5 className="font-medium mb-3">Relatórios Relacionados</h5>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {relatedReports.map((report) => (
+                    <button
+                      key={report.id}
+                      onClick={() => onReportClick(report)}
+                      className="p-3 text-left border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      <FileText className="w-4 h-4 text-primary-600 mb-1" />
+                      <p className="text-sm font-medium text-gray-900">{report.title}</p>
+                      <p className="text-xs text-gray-500 mt-1">{report.period}</p>
+                    </button>
+                  ))}
+                </div>
+              </Card>
+            )}
           </div>
         );
 

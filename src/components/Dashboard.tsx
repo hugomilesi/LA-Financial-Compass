@@ -1,4 +1,3 @@
-
 import { AIInsights } from './AIInsights';
 import { KPIDetailModal } from './KPIDetailModal';
 import { ChartDetailModal } from './ChartDetailModal';
@@ -9,11 +8,14 @@ import { ChartsSection } from './dashboard/ChartsSection';
 import { QuickActions } from './dashboard/QuickActions';
 import { Toaster } from '@/components/ui/toaster';
 import { useState } from 'react';
+import { ReportDetailModal } from './ReportDetailModal';
+import { useReports, Report } from '@/hooks/useReports';
 
 export const Dashboard = () => {
   const [selectedKPI, setSelectedKPI] = useState<any>(null);
   const [selectedChart, setSelectedChart] = useState<'revenue' | 'cost-center' | null>(null);
   const [selectedAction, setSelectedAction] = useState<'export-dre' | 'set-goals' | 'view-reports' | 'unit-analysis' | null>(null);
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
 
   const handleKPIClick = (kpi: any) => {
     setSelectedKPI(kpi);
@@ -25,6 +27,10 @@ export const Dashboard = () => {
 
   const handleActionClick = (actionType: 'export-dre' | 'set-goals' | 'view-reports' | 'unit-analysis') => {
     setSelectedAction(actionType);
+  };
+
+  const handleReportClick = (report: Report) => {
+    setSelectedReport(report);
   };
 
   return (
@@ -52,6 +58,7 @@ export const Dashboard = () => {
           isOpen={!!selectedKPI}
           onClose={() => setSelectedKPI(null)}
           kpi={selectedKPI}
+          onReportClick={handleReportClick}
         />
       )}
 
@@ -60,6 +67,7 @@ export const Dashboard = () => {
         isOpen={!!selectedChart}
         onClose={() => setSelectedChart(null)}
         chartType={selectedChart}
+        onReportClick={handleReportClick}
       />
 
       {/* Quick Action Modal */}
@@ -67,6 +75,14 @@ export const Dashboard = () => {
         isOpen={!!selectedAction}
         onClose={() => setSelectedAction(null)}
         actionType={selectedAction}
+        onReportClick={handleReportClick}
+      />
+
+      {/* Report Detail Modal */}
+      <ReportDetailModal
+        isOpen={!!selectedReport}
+        onClose={() => setSelectedReport(null)}
+        report={selectedReport}
       />
 
       {/* Toast Notifications */}

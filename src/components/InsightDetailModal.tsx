@@ -1,7 +1,7 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card } from '@/components/ui/card';
 import { AlertTriangle, TrendingUp, DollarSign, Calendar, FileText, Target } from 'lucide-react';
+import { useReports, Report } from '@/hooks/useReports';
 
 interface Insight {
   id: string;
@@ -16,6 +16,7 @@ interface InsightDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   insight: Insight;
+  onReportClick?: (report: Report) => void;
 }
 
 const getDetailedAnalysis = (insightId: string) => {
@@ -137,9 +138,12 @@ const getStatusColor = (status: string) => {
   }
 };
 
-export const InsightDetailModal = ({ isOpen, onClose, insight }: InsightDetailModalProps) => {
+export const InsightDetailModal = ({ isOpen, onClose, insight, onReportClick }: InsightDetailModalProps) => {
   const Icon = getIcon(insight.type);
   const analysis = getDetailedAnalysis(insight.id);
+  const { getRelatedReports } = useReports();
+
+  const relatedReports = getRelatedReports('margem-liquida');
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -252,20 +256,24 @@ export const InsightDetailModal = ({ isOpen, onClose, insight }: InsightDetailMo
           </Card>
 
           {/* Related Reports */}
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Relatórios Relacionados</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {analysis.relatedReports.map((report, index) => (
-                <button
-                  key={index}
-                  className="p-3 text-left border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <FileText className="w-4 h-4 text-primary-600 mb-1" />
-                  <p className="text-sm font-medium text-gray-900">{report}</p>
-                </button>
-              ))}
-            </div>
-          </Card>
+          {onReportClick && (
+            <Card className="p-6">
+              <h3 className="text-lg font-semibold mb-4">Relatórios Relacionados</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {relatedReports.map((report) => (
+                  <button
+                    key={report.id}
+                    onClick={() => onReportClick(report)}
+                    className="p-3 text-left border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <FileText className="w-4 h-4 text-primary-600 mb-1" />
+                    <p className="text-sm font-medium text-gray-900">{report.title}</p>
+                    <p className="text-xs text-gray-500 mt-1">{report.period}</p>
+                  </button>
+                ))}
+              </div>
+            </Card>
+          )}
         </div>
       </DialogContent>
     </Dialog>

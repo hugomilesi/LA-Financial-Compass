@@ -1,13 +1,15 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { monthlyData, costCenterData } from '@/utils/dashboardData';
+import { useReports, Report } from '@/hooks/useReports';
+import { FileText } from 'lucide-react';
 
 interface ChartDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   chartType: 'revenue' | 'cost-center' | null;
+  onReportClick?: (report: Report) => void;
 }
 
 const revenueDetailData = [
@@ -27,8 +29,20 @@ const costCenterDetailData = [
   { categoria: 'Outros', valor: 4300, percentual: 2.3 }
 ];
 
-export const ChartDetailModal = ({ isOpen, onClose, chartType }: ChartDetailModalProps) => {
+export const ChartDetailModal = ({ isOpen, onClose, chartType, onReportClick }: ChartDetailModalProps) => {
+  const { getRelatedReports } = useReports();
+
   if (!chartType) return null;
+
+  const getContextKey = (type: string) => {
+    switch (type) {
+      case 'revenue': return 'revenue-chart';
+      case 'cost-center': return 'cost-center-chart';
+      default: return 'revenue-chart';
+    }
+  };
+
+  const relatedReports = getRelatedReports(getContextKey(chartType));
 
   const getModalContent = () => {
     switch (chartType) {
@@ -101,6 +115,26 @@ export const ChartDetailModal = ({ isOpen, onClose, chartType }: ChartDetailModa
                 </div>
               </Card>
             </div>
+
+            {/* Related Reports */}
+            {onReportClick && (
+              <Card className="p-4">
+                <h4 className="font-semibold mb-4">Relatórios Relacionados</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {relatedReports.map((report) => (
+                    <button
+                      key={report.id}
+                      onClick={() => onReportClick(report)}
+                      className="p-3 text-left border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      <FileText className="w-4 h-4 text-primary-600 mb-1" />
+                      <p className="text-sm font-medium text-gray-900">{report.title}</p>
+                      <p className="text-xs text-gray-500 mt-1">{report.period}</p>
+                    </button>
+                  ))}
+                </div>
+              </Card>
+            )}
           </div>
         );
 
@@ -184,6 +218,26 @@ export const ChartDetailModal = ({ isOpen, onClose, chartType }: ChartDetailModa
                 </div>
               </div>
             </Card>
+
+            {/* Related Reports */}
+            {onReportClick && (
+              <Card className="p-4">
+                <h4 className="font-semibold mb-4">Relatórios Relacionados</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {relatedReports.map((report) => (
+                    <button
+                      key={report.id}
+                      onClick={() => onReportClick(report)}
+                      className="p-3 text-left border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      <FileText className="w-4 h-4 text-primary-600 mb-1" />
+                      <p className="text-sm font-medium text-gray-900">{report.title}</p>
+                      <p className="text-xs text-gray-500 mt-1">{report.period}</p>
+                    </button>
+                  ))}
+                </div>
+              </Card>
+            )}
           </div>
         );
 
