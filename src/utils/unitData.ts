@@ -1,4 +1,5 @@
 
+
 // Unit-specific data structure
 export interface UnitFinancialData {
   receita: number;
@@ -13,7 +14,7 @@ export interface UnitFinancialData {
 export const UNIT_DATA: Record<string, UnitFinancialData> = {
   'campo-grande': {
     receita: 145320,
-    despesa: 113200,
+    despesa: 120900, // Adjusted to match consolidated total
     alunos: 734,
     matriculas: 67,
     ticketMedio: 198,
@@ -22,7 +23,7 @@ export const UNIT_DATA: Record<string, UnitFinancialData> = {
   },
   'recreio': {
     receita: 128544,
-    despesa: 101000,
+    despesa: 107800, // Adjusted to match consolidated total
     alunos: 650,
     matriculas: 56,
     ticketMedio: 198,
@@ -31,7 +32,7 @@ export const UNIT_DATA: Record<string, UnitFinancialData> = {
   },
   'barra': {
     receita: 117591,
-    despesa: 87700,
+    despesa: 73200, // Adjusted to match consolidated total
     alunos: 603,
     matriculas: 50,
     ticketMedio: 195,
@@ -40,31 +41,31 @@ export const UNIT_DATA: Record<string, UnitFinancialData> = {
   }
 };
 
-// Historical data by unit - updated to match current values with proportional growth
+// Historical data by unit - updated to match new expense values with proportional growth
 export const UNIT_HISTORICAL_DATA: Record<string, Array<{month: string, receita: number, despesa: number}>> = {
   'campo-grande': [
-    { month: 'Jan', receita: 129800, despesa: 106200 },
-    { month: 'Fev', receita: 135600, despesa: 109100 },
-    { month: 'Mar', receita: 140100, despesa: 111500 },
-    { month: 'Abr', receita: 138700, despesa: 110700 },
-    { month: 'Mai', receita: 141500, despesa: 112000 },
-    { month: 'Jun', receita: 145320, despesa: 113200 }
+    { month: 'Jan', receita: 129800, despesa: 113500 },
+    { month: 'Fev', receita: 135600, despesa: 116400 },
+    { month: 'Mar', receita: 140100, despesa: 119100 },
+    { month: 'Abr', receita: 138700, despesa: 118200 },
+    { month: 'Mai', receita: 141500, despesa: 119600 },
+    { month: 'Jun', receita: 145320, despesa: 120900 }
   ],
   'recreio': [
-    { month: 'Jan', receita: 114900, despesa: 94400 },
-    { month: 'Fev', receita: 120900, despesa: 97300 },
-    { month: 'Mar', receita: 125400, despesa: 99000 },
-    { month: 'Abr', receita: 122400, despesa: 98100 },
-    { month: 'Mai', receita: 125400, despesa: 99600 },
-    { month: 'Jun', receita: 128544, despesa: 101000 }
+    { month: 'Jan', receita: 114900, despesa: 101200 },
+    { month: 'Fev', receita: 120900, despesa: 103800 },
+    { month: 'Mar', receita: 125400, despesa: 105900 },
+    { month: 'Abr', receita: 122400, despesa: 104800 },
+    { month: 'Mai', receita: 125400, despesa: 106400 },
+    { month: 'Jun', receita: 128544, despesa: 107800 }
   ],
   'barra': [
-    { month: 'Jan', receita: 104600, despesa: 79200 },
-    { month: 'Fev', receita: 109900, despesa: 81100 },
-    { month: 'Mar', receita: 113600, despesa: 82900 },
-    { month: 'Abr', receita: 111800, despesa: 83800 },
-    { month: 'Mai', receita: 115400, despesa: 85600 },
-    { month: 'Jun', receita: 117591, despesa: 87700 }
+    { month: 'Jan', receita: 104600, despesa: 68600 },
+    { month: 'Fev', receita: 109900, despesa: 70200 },
+    { month: 'Mar', receita: 113600, despesa: 71500 },
+    { month: 'Abr', receita: 111800, despesa: 70900 },
+    { month: 'Mai', receita: 115400, despesa: 72100 },
+    { month: 'Jun', receita: 117591, despesa: 73200 }
   ]
 };
 
@@ -116,3 +117,4 @@ export const getHistoricalDataByUnit = (unitId: string) => {
   }
   return UNIT_HISTORICAL_DATA[unitId] || getConsolidatedHistoricalData();
 };
+
