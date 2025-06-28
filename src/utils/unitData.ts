@@ -16,29 +16,29 @@ export const UNIT_DATA: Record<string, UnitFinancialData> = {
   'campo-grande': {
     receita: 145320,
     despesa: 113930, // Adjusted to achieve target total of R$285,375
-    alunos: 734,
+    alunos: 800, // Corrected number of students
     matriculas: 67,
-    ticketMedio: 198,
+    ticketMedio: 182, // Corrected ticket price (145320/800 = 181.65, rounded to 182)
     capacidade: 950,
-    ocupacao: 77 // 734/950 = 77.3%
+    ocupacao: 84 // 800/950 = 84.2%
   },
   'recreio': {
     receita: 128544,
     despesa: 101574, // Adjusted to achieve target total of R$285,375
-    alunos: 650,
+    alunos: 720, // Corrected number of students
     matriculas: 56,
-    ticketMedio: 198,
+    ticketMedio: 179, // Corrected ticket price (128544/720 = 178.53, rounded to 179)
     capacidade: 880,
-    ocupacao: 74 // 650/880 = 73.9%
+    ocupacao: 82 // 720/880 = 81.8%
   },
   'barra': {
     receita: 117591,
     despesa: 69871, // Adjusted to achieve target total of R$285,375
-    alunos: 603,
+    alunos: 467, // Corrected number of students
     matriculas: 50,
-    ticketMedio: 195,
+    ticketMedio: 252, // Corrected ticket price (117591/467 = 251.8, rounded to 252)
     capacidade: 990,
-    ocupacao: 61 // 603/990 = 60.9%
+    ocupacao: 47 // 467/990 = 47.2%
   }
 };
 
