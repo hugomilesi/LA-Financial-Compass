@@ -3,100 +3,98 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Save, X, History } from 'lucide-react';
+import { Plus, Edit2, Check, X, Target, TrendingUp, AlertTriangle } from 'lucide-react';
+import { useUnit } from '@/contexts/UnitContext';
+import { getDataByUnit } from '@/utils/unitData';
 
 interface MonthlyGoalsProps {
   selectedPeriod: { year: number; month: number };
-  selectedUnit: string;
+  selectedUnit: string; // Keep for compatibility but use context
 }
 
 interface Goal {
   id: string;
-  indicator: string;
+  title: string;
+  current: number;
   target: number;
   unit: string;
-  description: string;
-  status: 'active' | 'draft' | 'archived';
-  createdAt: string;
-  updatedAt: string;
+  category: 'receita' | 'despesa' | 'alunos' | 'margem';
 }
 
-export const MonthlyGoals = ({ selectedPeriod, selectedUnit }: MonthlyGoalsProps) => {
-  const [goals, setGoals] = useState<Goal[]>([
-    {
-      id: '1',
-      indicator: 'Receita Mensal',
-      target: 200000,
-      unit: 'R$',
-      description: 'Meta de receita bruta mensal',
-      status: 'active',
-      createdAt: '2024-01-15',
-      updatedAt: '2024-01-15'
-    },
-    {
-      id: '2',
-      indicator: 'Margem de Lucro',
-      target: 30,
-      unit: '%',
-      description: 'Percentual de margem de lucro líquido',
-      status: 'active',
-      createdAt: '2024-01-15',
-      updatedAt: '2024-01-20'
-    },
-    {
-      id: '3',
-      indicator: 'Alunos Ativos',
-      target: 900,
-      unit: 'unidades',
-      description: 'Número total de alunos ativos',
-      status: 'active',
-      createdAt: '2024-01-15',
-      updatedAt: '2024-01-15'
+export const MonthlyGoals = ({ selectedPeriod }: MonthlyGoalsProps) => {
+  const { selectedUnit, getUnitDisplayName } = useUnit();
+  const unitData = getDataByUnit(selectedUnit);
+  const [editingGoal, setEditingGoal] = useState<string | null>(null);
+  const [newGoalTitle, setNewGoalTitle] = useState('');
+  const [newGoalTarget, setNewGoalTarget] = useState('');
+
+  // Generate goals based on selected unit data
+  const generateGoalsForUnit = (): Goal[] => {
+    const baseGoals: Goal[] = [
+      {
+        id: '1',
+        title: 'Receita Mensal',
+        current: unitData.receita,
+        target: Math.round(unitData.receita * 1.08),
+        unit: 'R$',
+        category: 'receita'
+      },
+      {
+        id: '2',
+        title: 'Controle de Despesas',
+        current: unitData.despesa,
+        target: Math.round(unitData.despesa * 0.95),
+        unit: 'R$',
+        category: 'despesa'
+      },
+      {
+        id: '3',
+        title: 'Alunos Ativos',
+        current: unitData.alunos,
+        target: Math.round(unitData.alunos * 1.06),
+        unit: '',
+        category: 'alunos'
+      },
+      {
+        id: '4',
+        title: 'Margem de Lucro',
+        current: Math.round(((unitData.receita - unitData.despesa) / unitData.receita) * 100 * 10) / 10,
+        target: 25,
+        unit: '%',
+        category: 'margem'
+      }
+    ];
+
+    return baseGoals;
+  };
+
+  const [goals, setGoals] = useState<Goal[]>(generateGoalsForUnit());
+
+  // Update goals when unit changes
+  React.useEffect(() => {
+    setGoals(generateGoalsForUnit());
+  }, [selectedUnit, unitData]);
+
+  const getProgressPercentage = (current: number, target: number, category: string) => {
+    if (category === 'despesa') {
+      // For expenses, we want current to be lower than target
+      return Math.min((target / current) * 100, 100);
     }
-  ]);
-
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [newGoal, setNewGoal] = useState({
-    indicator: '',
-    target: '',
-    unit: '',
-    description: ''
-  });
-  const [showAddForm, setShowAddForm] = useState(false);
-
-  const handleEdit = (id: string) => {
-    setEditingId(id);
+    return Math.min((current / target) * 100, 100);
   };
 
-  const handleSave = (id: string) => {
-    setEditingId(null);
-    // Here you would save to backend
+  const getStatusColor = (progress: number) => {
+    if (progress >= 95) return 'text-green-600';
+    if (progress >= 80) return 'text-yellow-600';
+    return 'text-red-600';
   };
 
-  const handleCancel = () => {
-    setEditingId(null);
-    setShowAddForm(false);
-    setNewGoal({ indicator: '', target: '', unit: '', description: '' });
-  };
-
-  const handleAddGoal = () => {
-    if (newGoal.indicator && newGoal.target) {
-      const goal: Goal = {
-        id: Date.now().toString(),
-        indicator: newGoal.indicator,
-        target: parseFloat(newGoal.target),
-        unit: newGoal.unit,
-        description: newGoal.description,
-        status: 'active',
-        createdAt: new Date().toISOString().split('T')[0],
-        updatedAt: new Date().toISOString().split('T')[0]
-      };
-      setGoals([...goals, goal]);
-      setNewGoal({ indicator: '', target: '', unit: '', description: '' });
-      setShowAddForm(false);
-    }
+  const getStatusIcon = (progress: number) => {
+    if (progress >= 95) return <Check className="h-4 w-4 text-green-600" />;
+    if (progress >= 80) return <TrendingUp className="h-4 w-4 text-yellow-600" />;
+    return <AlertTriangle className="h-4 w-4 text-red-600" />;
   };
 
   const monthName = new Date(selectedPeriod.year, selectedPeriod.month - 1).toLocaleDateString('pt-BR', { 
@@ -107,148 +105,113 @@ export const MonthlyGoals = ({ selectedPeriod, selectedUnit }: MonthlyGoalsProps
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
+        <div className="flex items-center gap-2">
+          <Target className="h-5 w-5 text-primary" />
           <h2 className="text-xl font-semibold">Metas Mensais - {monthName}</h2>
-          <p className="text-sm text-gray-600 mt-1">Defina e acompanhe as metas por indicador</p>
         </div>
-        <Button onClick={() => setShowAddForm(true)} className="gap-2">
-          <Plus className="h-4 w-4" />
-          Nova Meta
-        </Button>
+        <Badge variant="outline" className="text-sm">
+          {getUnitDisplayName(selectedUnit)}
+        </Badge>
       </div>
 
-      {showAddForm && (
-        <Card className="border-2 border-dashed border-primary/20">
-          <CardHeader>
-            <CardTitle className="text-lg">Nova Meta</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="indicator">Indicador</Label>
-                <Input
-                  id="indicator"
-                  value={newGoal.indicator}
-                  onChange={(e) => setNewGoal({ ...newGoal, indicator: e.target.value })}
-                  placeholder="Ex: Receita Mensal"
-                />
-              </div>
-              <div>
-                <Label htmlFor="target">Meta</Label>
-                <Input
-                  id="target"
-                  type="number"
-                  value={newGoal.target}
-                  onChange={(e) => setNewGoal({ ...newGoal, target: e.target.value })}
-                  placeholder="Ex: 200000"
-                />
-              </div>
-              <div>
-                <Label htmlFor="unit">Unidade</Label>
-                <Input
-                  id="unit"
-                  value={newGoal.unit}
-                  onChange={(e) => setNewGoal({ ...newGoal, unit: e.target.value })}
-                  placeholder="Ex: R$, %, unidades"
-                />
-              </div>
-              <div>
-                <Label htmlFor="description">Descrição</Label>
-                <Input
-                  id="description"
-                  value={newGoal.description}
-                  onChange={(e) => setNewGoal({ ...newGoal, description: e.target.value })}
-                  placeholder="Descrição da meta"
-                />
-              </div>
-            </div>
-            <div className="flex gap-2 mt-4">
-              <Button onClick={handleAddGoal} className="gap-2">
-                <Save className="h-4 w-4" />
-                Salvar Meta
-              </Button>
-              <Button variant="outline" onClick={handleCancel} className="gap-2">
-                <X className="h-4 w-4" />
-                Cancelar
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      <div className="grid gap-4">
-        {goals.map((goal) => (
-          <Card key={goal.id}>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  {editingId === goal.id ? (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <Label>Indicador</Label>
-                        <Input defaultValue={goal.indicator} />
-                      </div>
-                      <div>
-                        <Label>Meta</Label>
-                        <Input type="number" defaultValue={goal.target} />
-                      </div>
-                      <div>
-                        <Label>Unidade</Label>
-                        <Input defaultValue={goal.unit} />
-                      </div>
-                      <div className="md:col-span-3">
-                        <Label>Descrição</Label>
-                        <Input defaultValue={goal.description} />
-                      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {goals.map((goal) => {
+          const progress = getProgressPercentage(goal.current, goal.target, goal.category);
+          
+          return (
+            <Card key={goal.id}>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center justify-between">
+                  <span>{goal.title}</span>
+                  {getStatusIcon(progress)}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-600">Atual</p>
+                      <p className="text-2xl font-bold">
+                        {goal.unit === 'R$' ? `R$ ${goal.current.toLocaleString()}` : 
+                         goal.unit === '%' ? `${goal.current}%` : 
+                         goal.current.toLocaleString()}{goal.unit && goal.unit !== 'R$' && goal.unit !== '%' ? ` ${goal.unit}` : ''}
+                      </p>
                     </div>
-                  ) : (
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-3">
-                        <h3 className="text-lg font-semibold">{goal.indicator}</h3>
-                        <Badge variant={goal.status === 'active' ? 'default' : 'secondary'}>
-                          {goal.status === 'active' ? 'Ativa' : 'Rascunho'}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center gap-4 text-sm text-gray-600">
-                        <span>Meta: <strong>{goal.target.toLocaleString()} {goal.unit}</strong></span>
-                        <span>•</span>
-                        <span>Atualizado em: {new Date(goal.updatedAt).toLocaleDateString('pt-BR')}</span>
-                      </div>
-                      <p className="text-sm text-gray-700">{goal.description}</p>
+                    <div className="text-right">
+                      <p className="text-sm text-gray-600">Meta</p>
+                      <p className="text-xl font-semibold">
+                        {goal.unit === 'R$' ? `R$ ${goal.target.toLocaleString()}` : 
+                         goal.unit === '%' ? `${goal.target}%` : 
+                         goal.target.toLocaleString()}{goal.unit && goal.unit !== 'R$' && goal.unit !== '%' ? ` ${goal.unit}` : ''}
+                      </p>
                     </div>
-                  )}
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Progresso</span>
+                      <span className={getStatusColor(progress)}>
+                        {progress.toFixed(1)}%
+                      </span>
+                    </div>
+                    <Progress value={progress} className="h-2" />
+                  </div>
+                  
+                  <div className="flex justify-between text-xs text-gray-500">
+                    <span>
+                      {goal.category === 'despesa' ? 'Redução necessária:' : 'Faltam:'} 
+                    </span>
+                    <span>
+                      {goal.category === 'despesa' 
+                        ? `R$ ${Math.max(0, goal.current - goal.target).toLocaleString()}`
+                        : goal.unit === 'R$' 
+                          ? `R$ ${Math.max(0, goal.target - goal.current).toLocaleString()}`
+                          : goal.unit === '%'
+                            ? `${Math.max(0, goal.target - goal.current).toFixed(1)}%`
+                            : Math.max(0, goal.target - goal.current).toLocaleString()
+                      }
+                    </span>
+                  </div>
                 </div>
-                
-                <div className="flex gap-2 ml-4">
-                  {editingId === goal.id ? (
-                    <>
-                      <Button size="sm" onClick={() => handleSave(goal.id)} className="gap-1">
-                        <Save className="h-3 w-3" />
-                        Salvar
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={handleCancel} className="gap-1">
-                        <X className="h-3 w-3" />
-                        Cancelar
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button size="sm" variant="outline" onClick={() => handleEdit(goal.id)} className="gap-1">
-                        <Edit className="h-3 w-3" />
-                        Editar
-                      </Button>
-                      <Button size="sm" variant="outline" className="gap-1">
-                        <History className="h-3 w-3" />
-                        Histórico
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Plus className="h-5 w-5" />
+            Resumo de Performance
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="text-center">
+              <p className="text-2xl font-bold text-green-600">
+                {goals.filter(g => getProgressPercentage(g.current, g.target, g.category) >= 95).length}
+              </p>
+              <p className="text-sm text-gray-600">Metas Atingidas</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold text-yellow-600">
+                {goals.filter(g => {
+                  const prog = getProgressPercentage(g.current, g.target, g.category);
+                  return prog >= 80 && prog < 95;
+                }).length}
+              </p>
+              <p className="text-sm text-gray-600">Em Progresso</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold text-red-600">
+                {goals.filter(g => getProgressPercentage(g.current, g.target, g.category) < 80).length}
+              </p>
+              <p className="text-sm text-gray-600">Precisam Atenção</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

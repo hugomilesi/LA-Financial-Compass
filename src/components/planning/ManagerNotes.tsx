@@ -2,206 +2,256 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MessageSquare, Calendar, User, Plus, Edit, Trash2 } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { Plus, Edit2, Save, X, MessageSquare, AlertCircle, CheckCircle, Clock } from 'lucide-react';
+import { useUnit } from '@/contexts/UnitContext';
 
 interface ManagerNotesProps {
   selectedPeriod: { year: number; month: number };
-  selectedUnit: string;
+  selectedUnit: string; // Keep for compatibility but use context
 }
 
 interface Note {
   id: string;
   title: string;
   content: string;
+  category: 'observacao' | 'acao' | 'alerta' | 'sucesso';
+  date: Date;
+  unit: string;
   author: string;
-  date: string;
-  category: 'strategic' | 'operational' | 'financial' | 'alert';
-  priority: 'low' | 'medium' | 'high';
 }
 
-export const ManagerNotes = ({ selectedPeriod, selectedUnit }: ManagerNotesProps) => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [selectedPriority, setSelectedPriority] = useState<string>('all');
+export const ManagerNotes = ({ selectedPeriod }: ManagerNotesProps) => {
+  const { selectedUnit, getUnitDisplayName } = useUnit();
+  const [notes, setNotes] = useState<Note[]>(generateNotesForUnit());
+  const [isAddingNote, setIsAddingNote] = useState(false);
+  const [editingNote, setEditingNote] = useState<string | null>(null);
+  const [newNoteTitle, setNewNoteTitle] = useState('');
+  const [newNoteContent, setNewNoteContent] = useState('');
+  const [newNoteCategory, setNewNoteCategory] = useState<Note['category']>('observacao');
 
-  // Dados mockados para demonstração
-  const [notes] = useState<Note[]>([
-    {
-      id: '1',
-      title: 'Análise de Performance Q1',
-      content: 'Os resultados do primeiro trimestre superaram as expectativas em 15%. Principais fatores: aumento das vendas online e otimização de custos operacionais.',
-      author: 'João Silva',
-      date: '2024-06-20',
-      category: 'strategic',
-      priority: 'high'
-    },
-    {
-      id: '2',
-      title: 'Ajuste de Metas - Unidade Norte',
-      content: 'Necessário revisar as metas da Unidade Norte devido à sazonalidade do mercado local. Proposta de redução de 8% na meta mensal.',
-      author: 'Maria Santos',
-      date: '2024-06-18',
-      category: 'operational',
-      priority: 'medium'
-    },
-    {
-      id: '3',
-      title: 'Alerta: Aumento de Custos',
-      content: 'Identificado aumento significativo nos custos de matéria-prima. Impacto estimado de R$ 50.000 no orçamento mensal.',
-      author: 'Carlos Oliveira',
-      date: '2024-06-15',
-      category: 'alert',
-      priority: 'high'
-    },
-    {
-      id: '4',
-      title: 'Oportunidade de Expansão',
-      content: 'Análise de mercado indica oportunidade de expansão para região Sul. ROI estimado em 18 meses.',
-      author: 'Ana Costa',
-      date: '2024-06-12',
-      category: 'strategic',
-      priority: 'medium'
+  function generateNotesForUnit(): Note[] {
+    const baseNotes: Note[] = [
+      {
+        id: '1',
+        title: 'Performance Junho 2024',
+        content: selectedUnit === 'all' 
+          ? 'Consolidado apresentou crescimento de 8.5% comparado ao mês anterior. Destaque para Campo Grande com melhor margem.'
+          : `Unidade ${getUnitDisplayName(selectedUnit)} teve performance acima da média do grupo.`,
+        category: 'sucesso',
+        date: new Date('2024-06-30'),
+        unit: selectedUnit,
+        author: 'Gerente Financeiro'
+      },
+      {
+        id: '2',
+        title: 'Ações para Julho',
+        content: selectedUnit === 'all'
+          ? 'Implementar otimização de custos em todas as unidades. Foco especial na Barra para melhorar ocupação.'
+          : `Revisar estratégia de captação e retenção específica para ${getUnitDisplayName(selectedUnit)}.`,
+        category: 'acao',
+        date: new Date('2024-06-29'),
+        unit: selectedUnit,
+        author: 'Diretor Operacional'
+      }
+    ];
+
+    if (selectedUnit !== 'all') {
+      baseNotes.push({
+        id: '3',
+        title: 'Observação Operacional',
+        content: `Necessário acompanhar de perto os indicadores de ${getUnitDisplayName(selectedUnit)} no próximo trimestre.`,
+        category: 'observacao',
+        date: new Date('2024-06-28'),
+        unit: selectedUnit,
+        author: 'Coordenador'
+      });
     }
-  ]);
 
-  const categories = [
-    { value: 'all', label: 'Todas as Categorias' },
-    { value: 'strategic', label: 'Estratégico' },
-    { value: 'operational', label: 'Operacional' },
-    { value: 'financial', label: 'Financeiro' },
-    { value: 'alert', label: 'Alerta' }
-  ];
+    return baseNotes;
+  }
 
-  const priorities = [
-    { value: 'all', label: 'Todas as Prioridades' },
-    { value: 'high', label: 'Alta' },
-    { value: 'medium', label: 'Média' },
-    { value: 'low', label: 'Baixa' }
-  ];
+  // Update notes when unit changes
+  React.useEffect(() => {
+    setNotes(generateNotesForUnit());
+  }, [selectedUnit]);
 
-  const getCategoryColor = (category: string) => {
+  const getCategoryIcon = (category: Note['category']) => {
     switch (category) {
-      case 'strategic': return 'bg-blue-100 text-blue-800';
-      case 'operational': return 'bg-green-100 text-green-800';
-      case 'financial': return 'bg-purple-100 text-purple-800';
-      case 'alert': return 'bg-red-100 text-red-800';
+      case 'sucesso': return <CheckCircle className="h-4 w-4 text-green-600" />;
+      case 'alerta': return <AlertCircle className="h-4 w-4 text-red-600" />;
+      case 'acao': return <Clock className="h-4 w-4 text-blue-600" />;
+      default: return <MessageSquare className="h-4 w-4 text-gray-600" />;
+    }
+  };
+
+  const getCategoryColor = (category: Note['category']) => {
+    switch (category) {
+      case 'sucesso': return 'border-green-200 bg-green-50';
+      case 'alerta': return 'border-red-200 bg-red-50';
+      case 'acao': return 'border-blue-200 bg-blue-50';
+      default: return 'border-gray-200 bg-gray-50';
+    }
+  };
+
+  const getCategoryBadgeColor = (category: Note['category']) => {
+    switch (category) {
+      case 'sucesso': return 'bg-green-100 text-green-800';
+      case 'alerta': return 'bg-red-100 text-red-800';
+      case 'acao': return 'bg-blue-100 text-blue-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high': return 'border-l-red-500';
-      case 'medium': return 'border-l-yellow-500';
-      case 'low': return 'border-l-green-500';
-      default: return 'border-l-gray-500';
+  const handleAddNote = () => {
+    if (newNoteTitle.trim() && newNoteContent.trim()) {
+      const newNote: Note = {
+        id: Date.now().toString(),
+        title: newNoteTitle,
+        content: newNoteContent,
+        category: newNoteCategory,
+        date: new Date(),
+        unit: selectedUnit,
+        author: 'Usuário Atual'
+      };
+      
+      setNotes(prev => [newNote, ...prev]);
+      setNewNoteTitle('');
+      setNewNoteContent('');
+      setIsAddingNote(false);
     }
   };
 
-  const filteredNotes = notes.filter(note => {
-    const categoryMatch = selectedCategory === 'all' || note.category === selectedCategory;
-    const priorityMatch = selectedPriority === 'all' || note.priority === selectedPriority;
-    return categoryMatch && priorityMatch;
+  const monthName = new Date(selectedPeriod.year, selectedPeriod.month - 1).toLocaleDateString('pt-BR', { 
+    month: 'long', 
+    year: 'numeric' 
   });
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">Observações Gerenciais</h2>
-        <Button className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Nova Observação
-        </Button>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <MessageSquare className="h-5 w-5 text-primary" />
+          <h2 className="text-xl font-semibold">Observações Gerenciais - {monthName}</h2>
+        </div>
+        <div className="flex items-center gap-3">
+          <Badge variant="outline" className="text-sm">
+            {getUnitDisplayName(selectedUnit)}
+          </Badge>
+          <Button onClick={() => setIsAddingNote(true)} size="sm">
+            <Plus className="h-4 w-4 mr-2" />
+            Nova Observação
+          </Button>
+        </div>
       </div>
 
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex flex-wrap gap-4 items-center">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">Categoria:</span>
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="w-48">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category.value} value={category.value}>
-                      {category.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+      {isAddingNote && (
+        <Card className="border-primary-200">
+          <CardHeader>
+            <CardTitle className="text-lg">Nova Observação</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Título</label>
+              <input
+                type="text"
+                value={newNoteTitle}
+                onChange={(e) => setNewNoteTitle(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                placeholder="Título da observação..."
+              />
             </div>
-
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">Prioridade:</span>
-              <Select value={selectedPriority} onValueChange={setSelectedPriority}>
-                <SelectTrigger className="w-48">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {priorities.map((priority) => (
-                    <SelectItem key={priority.value} value={priority.value}>
-                      {priority.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div>
+              <label className="text-sm font-medium mb-2 block">Categoria</label>
+              <select
+                value={newNoteCategory}
+                onChange={(e) => setNewNoteCategory(e.target.value as Note['category'])}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                <option value="observacao">Observação</option>
+                <option value="acao">Ação Necessária</option>
+                <option value="alerta">Alerta</option>
+                <option value="sucesso">Sucesso</option>
+              </select>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+            <div>
+              <label className="text-sm font-medium mb-2 block">Conteúdo</label>
+              <Textarea
+                value={newNoteContent}
+                onChange={(e) => setNewNoteContent(e.target.value)}
+                placeholder="Descreva sua observação..."
+                rows={4}
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={handleAddNote} size="sm">
+                <Save className="h-4 w-4 mr-2" />
+                Salvar
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsAddingNote(false);
+                  setNewNoteTitle('');
+                  setNewNoteContent('');
+                }}
+                size="sm"
+              >
+                <X className="h-4 w-4 mr-2" />
+                Cancelar
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="space-y-4">
-        {filteredNotes.map((note) => (
-          <Card key={note.id} className={`border-l-4 ${getPriorityColor(note.priority)}`}>
+        {notes.map((note) => (
+          <Card key={note.id} className={getCategoryColor(note.category)}>
             <CardHeader className="pb-3">
-              <div className="flex justify-between items-start">
-                <div className="space-y-2">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-2">
+                  {getCategoryIcon(note.category)}
                   <CardTitle className="text-lg">{note.title}</CardTitle>
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
-                    <div className="flex items-center gap-1">
-                      <User className="h-4 w-4" />
-                      {note.author}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      {new Date(note.date).toLocaleDateString('pt-BR')}
-                    </div>
-                  </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(note.category)}`}>
-                    {categories.find(c => c.value === note.category)?.label}
-                  </span>
-                  <div className="flex gap-1">
-                    <Button variant="ghost" size="sm">
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  <Badge className={getCategoryBadgeColor(note.category)}>
+                    {note.category === 'observacao' ? 'Observação' :
+                     note.category === 'acao' ? 'Ação' :
+                     note.category === 'alerta' ? 'Alerta' : 'Sucesso'}
+                  </Badge>
+                  <Button variant="ghost" size="sm">
+                    <Edit2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-700 leading-relaxed">{note.content}</p>
+              <p className="text-gray-700 mb-4">{note.content}</p>
+              <div className="flex justify-between text-sm text-gray-500">
+                <span>Por: {note.author}</span>
+                <span>{note.date.toLocaleDateString('pt-BR')}</span>
+              </div>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {filteredNotes.length === 0 && (
+      {notes.length === 0 && (
         <Card>
-          <CardContent className="py-12 text-center">
+          <CardContent className="text-center py-12">
             <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">
               Nenhuma observação encontrada
             </h3>
-            <p className="text-gray-600">
-              Não há observações que correspondam aos filtros selecionados.
+            <p className="text-gray-500 mb-4">
+              Adicione observações para acompanhar o desempenho de {getUnitDisplayName(selectedUnit)}.
             </p>
+            <Button onClick={() => setIsAddingNote(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Adicionar Primeira Observação
+            </Button>
           </CardContent>
         </Card>
       )}
