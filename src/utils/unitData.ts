@@ -1,3 +1,4 @@
+
 // Unit-specific data structure
 export interface UnitFinancialData {
   receita: number;
@@ -80,7 +81,8 @@ export const getConsolidatedData = (): UnitFinancialData => {
   const totalMatriculas = units.reduce((sum, unit) => sum + unit.matriculas, 0);
   const totalCapacidade = units.reduce((sum, unit) => sum + unit.capacidade, 0);
   
-  const ticketMedio = Math.round(totalReceita / totalAlunos);
+  // Fixed consolidated ticket price as requested by user
+  const ticketMedio = 399;
   const ocupacao = Math.round((totalAlunos / totalCapacidade) * 100);
   
   console.log('💰 [getConsolidatedData] Total Receita:', totalReceita);
