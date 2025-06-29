@@ -1,7 +1,29 @@
+import { getDataByUnit, getHistoricalDataByUnit, getCostCenterDataByUnit } from './unitData';
 
-import { getDataByUnit, getHistoricalDataByUnit } from './unitData';
+// Dynamic cost center data based on selected unit
+export const getCostCenterData = (unitId: string) => {
+  console.log('📊 [dashboardData.getCostCenterData] Requested unit:', unitId);
+  const result = getCostCenterDataByUnit(unitId);
+  console.log('📈 [dashboardData.getCostCenterData] Result:', result);
+  return result;
+};
 
-// Static cost center data (proportional to each unit)
+// Dynamic cost center detail data based on selected unit
+export const getCostCenterDetailData = (unitId: string) => {
+  console.log('📊 [dashboardData.getCostCenterDetailData] Requested unit:', unitId);
+  const costCenterData = getCostCenterDataByUnit(unitId);
+  
+  const result = costCenterData.map(item => ({
+    categoria: item.name,
+    valor: item.amount,
+    percentual: item.value
+  }));
+  
+  console.log('📈 [dashboardData.getCostCenterDetailData] Result:', result);
+  return result;
+};
+
+// Static cost center data (for backward compatibility)
 export const costCenterData = [
   { name: 'Pessoal', value: 58.3, color: '#EF4444' },
   { name: 'Aluguel', value: 18.2, color: '#F59E0B' },

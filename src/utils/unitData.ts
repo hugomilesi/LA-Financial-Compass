@@ -9,34 +9,67 @@ export interface UnitFinancialData {
   ocupacao: number;
 }
 
+// Unit-specific cost center data structure
+export interface UnitCostCenterData {
+  name: string;
+  value: number;
+  color: string;
+  amount: number;
+}
+
 export const UNIT_DATA: Record<string, UnitFinancialData> = {
   'campo-grande': {
     receita: 145320,
     despesa: 113930,
-    alunos: 465, // Updated to correct value
+    alunos: 465,
     matriculas: 67,
-    ticketMedio: 362, // Updated to R$362 as requested
+    ticketMedio: 362,
     capacidade: 950,
-    ocupacao: 49 // 465/950 = 48.9%, rounded to 49%
+    ocupacao: 49
   },
   'recreio': {
     receita: 128544,
     despesa: 101574,
-    alunos: 315, // Updated to correct value
+    alunos: 315,
     matriculas: 56,
-    ticketMedio: 415, // Updated to R$415 as requested
+    ticketMedio: 415,
     capacidade: 880,
-    ocupacao: 36 // 315/880 = 35.8%, rounded to 36%
+    ocupacao: 36
   },
   'barra': {
     receita: 117591,
     despesa: 69871,
-    alunos: 220, // Updated to correct value
+    alunos: 220,
     matriculas: 50,
-    ticketMedio: 420, // Updated to R$420 as requested
+    ticketMedio: 420,
     capacidade: 990,
-    ocupacao: 22 // 220/990 = 22.2%, rounded to 22%
+    ocupacao: 22
   }
+};
+
+// Unit-specific cost center data
+export const UNIT_COST_CENTER_DATA: Record<string, UnitCostCenterData[]> = {
+  'campo-grande': [
+    { name: 'Pessoal', value: 60.1, color: '#EF4444', amount: 68451 },
+    { name: 'Aluguel', value: 17.5, color: '#F59E0B', amount: 19938 },
+    { name: 'Marketing', value: 12.8, color: '#10B981', amount: 14583 },
+    { name: 'Operacional', value: 7.9, color: '#3B82F6', amount: 9001 },
+    { name: 'Outros', value: 1.7, color: '#6B7280', amount: 1957 }
+  ],
+  'recreio': [
+    { name: 'Pessoal', value: 57.2, color: '#EF4444', amount: 58100 },
+    { name: 'Aluguel', value: 19.1, color: '#F59E0B', amount: 19401 },
+    { name: 'Marketing', value: 13.5, color: '#10B981', amount: 13712 },
+    { name: 'Operacional', value: 8.4, color: '#3B82F6', amount: 8532 },
+    { name: 'Outros', value: 1.8, color: '#6B7280', amount: 1829 }
+  ],
+  'barra': [
+    { name: 'Pessoal', value: 55.8, color: '#EF4444', amount: 38968 },
+    { name: 'Aluguel', value: 18.7, color: '#F59E0B', amount: 13066 },
+    { name: 'Marketing', value: 14.2, color: '#10B981', amount: 9922 },
+    { name: 'Operacional', value: 9.1, color: '#3B82F6', amount: 6360 },
+    { name: 'Outros', value: 2.2, color: '#6B7280', amount: 1555 }
+  ]
 };
 
 // Historical data by unit - updated to match new expense values with proportional adjustments
@@ -105,6 +138,36 @@ export const getConsolidatedData = (): UnitFinancialData => {
   return result;
 };
 
+// Function to get consolidated cost center data
+export const getConsolidatedCostCenterData = (): UnitCostCenterData[] => {
+  console.log('🔍 [getConsolidatedCostCenterData] Starting calculation...');
+  
+  const allUnits = Object.values(UNIT_COST_CENTER_DATA);
+  const categories = ['Pessoal', 'Aluguel', 'Marketing', 'Operacional', 'Outros'];
+  
+  const result = categories.map(category => {
+    const totalAmount = allUnits.reduce((sum, unitData) => {
+      const categoryData = unitData.find(item => item.name === category);
+      return sum + (categoryData?.amount || 0);
+    }, 0);
+    
+    const totalExpenses = Object.values(UNIT_DATA).reduce((sum, unit) => sum + unit.despesa, 0);
+    const percentage = (totalAmount / totalExpenses) * 100;
+    
+    const categoryItem = allUnits[0].find(item => item.name === category);
+    
+    return {
+      name: category,
+      value: Math.round(percentage * 10) / 10,
+      color: categoryItem?.color || '#6B7280',
+      amount: totalAmount
+    };
+  });
+  
+  console.log('✅ [getConsolidatedCostCenterData] Final result:', result);
+  return result;
+};
+
 // Function to get consolidated historical data
 export const getConsolidatedHistoricalData = () => {
   console.log('📈 [getConsolidatedHistoricalData] Starting calculation...');
@@ -146,6 +209,25 @@ export const getDataByUnit = (unitId: string): UnitFinancialData => {
   
   console.log('⚠️ [getDataByUnit] Unit not found, returning consolidated data');
   return getConsolidatedData();
+};
+
+// Function to get cost center data by unit (or consolidated if 'all')
+export const getCostCenterDataByUnit = (unitId: string): UnitCostCenterData[] => {
+  console.log('🔍 [getCostCenterDataByUnit] Requested unit:', unitId);
+  
+  if (unitId === 'all') {
+    console.log('🌐 [getCostCenterDataByUnit] Getting consolidated cost center data...');
+    return getConsolidatedCostCenterData();
+  }
+  
+  const unitCostData = UNIT_COST_CENTER_DATA[unitId];
+  if (unitCostData) {
+    console.log('🏢 [getCostCenterDataByUnit] Unit cost center data found:', unitCostData);
+    return unitCostData;
+  }
+  
+  console.log('⚠️ [getCostCenterDataByUnit] Unit cost center data not found, returning consolidated data');
+  return getConsolidatedCostCenterData();
 };
 
 // Function to get historical data by unit (or consolidated if 'all')

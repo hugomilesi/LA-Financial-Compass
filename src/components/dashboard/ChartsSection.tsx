@@ -1,7 +1,7 @@
 
 import { Card } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { getMonthlyData, costCenterData } from '@/utils/dashboardData';
+import { getMonthlyData, getCostCenterData } from '@/utils/dashboardData';
 import { useUnit } from '@/contexts/UnitContext';
 import { useState } from 'react';
 
@@ -14,6 +14,7 @@ export const ChartsSection = ({ onChartClick }: ChartsSectionProps) => {
   const [hoveredSlice, setHoveredSlice] = useState<number | null>(null);
   
   const monthlyData = getMonthlyData(selectedUnit);
+  const costCenterData = getCostCenterData(selectedUnit);
 
   const handleMouseEnter = (data: any, index: number) => {
     setHoveredSlice(index);

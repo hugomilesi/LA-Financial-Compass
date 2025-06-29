@@ -1,9 +1,11 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
-import { monthlyData, costCenterData } from '@/utils/dashboardData';
+import { getMonthlyData, getCostCenterData, getCostCenterDetailData } from '@/utils/dashboardData';
 import { useReports, Report } from '@/hooks/useReports';
 import { FileText } from 'lucide-react';
+import { useUnit } from '@/contexts/UnitContext';
 
 interface ChartDetailModalProps {
   isOpen: boolean;
@@ -21,16 +23,9 @@ const revenueDetailData = [
   { month: 'Jun', receita: 245780, despesa: 192000, lucro: 53780 }
 ];
 
-const costCenterDetailData = [
-  { categoria: 'Salários', valor: 112000, percentual: 58.3 },
-  { categoria: 'Aluguel', valor: 35000, percentual: 18.2 },
-  { categoria: 'Marketing', valor: 24000, percentual: 12.5 },
-  { categoria: 'Operacional', valor: 16700, percentual: 8.7 },
-  { categoria: 'Outros', valor: 4300, percentual: 2.3 }
-];
-
 export const ChartDetailModal = ({ isOpen, onClose, chartType, onReportClick }: ChartDetailModalProps) => {
   const { getRelatedReports } = useReports();
+  const { selectedUnit, getUnitDisplayName } = useUnit();
 
   if (!chartType) return null;
 
@@ -44,6 +39,17 @@ export const ChartDetailModal = ({ isOpen, onClose, chartType, onReportClick }: 
 
   const relatedReports = getRelatedReports(getContextKey(chartType));
 
+  // Get dynamic data based on selected unit
+  const costCenterData = getCostCenterData(selectedUnit);
+  const costCenterDetailData = getCostCenterDetailData(selectedUnit);
+  const monthlyData = getMonthlyData(selectedUnit);
+
+  // Calculate current month totals from monthly data
+  const currentMonth = monthlyData[monthlyData.length - 1];
+  const totalRevenue = currentMonth?.receita || 0;
+  const totalExpenses = currentMonth?.despesa || 0;
+  const profit = totalRevenue - totalExpenses;
+
   const getModalContent = () => {
     switch (chartType) {
       case 'revenue':
@@ -51,15 +57,15 @@ export const ChartDetailModal = ({ isOpen, onClose, chartType, onReportClick }: 
           <div className="space-y-6">
             <div className="grid grid-cols-3 gap-4">
               <Card className="p-4 text-center">
-                <div className="text-2xl font-bold text-green-600">R$ 245.780</div>
+                <div className="text-2xl font-bold text-green-600">R$ {totalRevenue.toLocaleString()}</div>
                 <div className="text-sm text-gray-600">Receita Total</div>
               </Card>
               <Card className="p-4 text-center">
-                <div className="text-2xl font-bold text-red-600">R$ 192.000</div>
+                <div className="text-2xl font-bold text-red-600">R$ {totalExpenses.toLocaleString()}</div>
                 <div className="text-sm text-gray-600">Despesa Total</div>
               </Card>
               <Card className="p-4 text-center">
-                <div className="text-2xl font-bold text-blue-600">R$ 53.780</div>
+                <div className="text-2xl font-bold text-blue-600">R$ {profit.toLocaleString()}</div>
                 <div className="text-sm text-gray-600">Lucro Líquido</div>
               </Card>
             </div>
@@ -67,14 +73,13 @@ export const ChartDetailModal = ({ isOpen, onClose, chartType, onReportClick }: 
             <Card className="p-4">
               <h4 className="text-lg font-semibold mb-4">Evolução Mensal Detalhada</h4>
               <ResponsiveContainer width="100%" height={400}>
-                <LineChart data={revenueDetailData}>
+                <LineChart data={monthlyData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" />
                   <YAxis />
                   <Tooltip formatter={(value) => [`R$ ${(value as number).toLocaleString()}`, '']} />
                   <Line dataKey="receita" stroke="#10B981" name="Receita" strokeWidth={2} />
                   <Line dataKey="despesa" stroke="#EF4444" name="Despesa" strokeWidth={2} />
-                  <Line dataKey="lucro" stroke="#3B82F6" name="Lucro" strokeWidth={2} />
                 </LineChart>
               </ResponsiveContainer>
             </Card>
@@ -85,33 +90,27 @@ export const ChartDetailModal = ({ isOpen, onClose, chartType, onReportClick }: 
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span>Mensalidades</span>
-                    <span>R$ 195.624 (79.6%)</span>
+                    <span>R$ {Math.round(totalRevenue * 0.796).toLocaleString()} (79.6%)</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Matrículas</span>
-                    <span>R$ 32.456 (13.2%)</span>
+                    <span>R$ {Math.round(totalRevenue * 0.132).toLocaleString()} (13.2%)</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Uniformes/Material</span>
-                    <span>R$ 17.700 (7.2%)</span>
+                    <span>R$ {Math.round(totalRevenue * 0.072).toLocaleString()} (7.2%)</span>
                   </div>
                 </div>
               </Card>
               <Card className="p-4">
                 <h4 className="font-semibold mb-2">Principais Despesas</h4>
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span>Folha de Pagamento</span>
-                    <span>R$ 112.000 (58.3%)</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Aluguel</span>
-                    <span>R$ 35.000 (18.2%)</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Marketing</span>
-                    <span>R$ 24.000 (12.5%)</span>
-                  </div>
+                  {costCenterDetailData.slice(0, 3).map((item, index) => (
+                    <div key={index} className="flex justify-between">
+                      <span>{item.categoria}</span>
+                      <span>R$ {item.valor.toLocaleString()} ({item.percentual.toFixed(1)}%)</span>
+                    </div>
+                  ))}
                 </div>
               </Card>
             </div>
@@ -142,7 +141,7 @@ export const ChartDetailModal = ({ isOpen, onClose, chartType, onReportClick }: 
         return (
           <div className="space-y-6">
             <Card className="p-4">
-              <h4 className="text-lg font-semibold mb-4">Distribuição Detalhada por Centro de Custos</h4>
+              <h4 className="text-lg font-semibold mb-4">Distribuição Detalhada por Centro de Custos - {getUnitDisplayName(selectedUnit)}</h4>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
@@ -168,7 +167,7 @@ export const ChartDetailModal = ({ isOpen, onClose, chartType, onReportClick }: 
                   <div className="flex justify-between items-center">
                     <div>
                       <h4 className="font-semibold">{item.categoria}</h4>
-                      <p className="text-sm text-gray-600">{item.percentual}% do total</p>
+                      <p className="text-sm text-gray-600">{item.percentual.toFixed(1)}% do total</p>
                     </div>
                     <div className="text-right">
                       <div className="text-xl font-bold">R$ {item.valor.toLocaleString()}</div>
@@ -249,9 +248,9 @@ export const ChartDetailModal = ({ isOpen, onClose, chartType, onReportClick }: 
   const getModalTitle = () => {
     switch (chartType) {
       case 'revenue':
-        return 'Análise Detalhada - Receita vs Despesa';
+        return `Análise Detalhada - Receita vs Despesa - ${getUnitDisplayName(selectedUnit)}`;
       case 'cost-center':
-        return 'Análise Detalhada - Centro de Custos';
+        return `Análise Detalhada - Centro de Custos - ${getUnitDisplayName(selectedUnit)}`;
       default:
         return '';
     }
