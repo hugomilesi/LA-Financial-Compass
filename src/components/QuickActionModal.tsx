@@ -3,10 +3,12 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { Download, Target, FileText, Building2, TrendingUp, Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuickActions, ExportConfig } from '@/hooks/useQuickActions';
-import { monthlyData, costCenterData } from '@/utils/dashboardData';
+import { monthlyData, costCenterData, getDREData, getConsolidatedDREData } from '@/utils/dashboardData';
 import { useReports, Report } from '@/hooks/useReports';
+import { useUnit } from '@/contexts/UnitContext';
+import { usePeriod } from '@/contexts/PeriodContext';
 
 interface QuickActionModalProps {
   isOpen: boolean;
@@ -30,6 +32,9 @@ const reportsData = monthlyData.map(item => ({
 export const QuickActionModal = ({ isOpen, onClose, actionType, onReportClick }: QuickActionModalProps) => {
   const { goals, isLoading, exportDRE, updateGoal, addGoal, generateReport } = useQuickActions();
   const { getRelatedReports } = useReports();
+  const { selectedUnit, getUnitDisplayName } = useUnit();
+  const { periodFilter } = usePeriod();
+  
   const [exportConfig, setExportConfig] = useState<ExportConfig>({
     period: 'current',
     format: 'pdf',
@@ -37,6 +42,34 @@ export const QuickActionModal = ({ isOpen, onClose, actionType, onReportClick }:
   });
   const [newGoal, setNewGoal] = useState({ meta: '', tipo: 'receita' as const, objetivo: 0 });
   const [editingGoal, setEditingGoal] = useState<string | null>(null);
+  const [drePreviewData, setDrePreviewData] = useState<any>(null);
+
+  // Update DRE preview data when export config changes
+  useEffect(() => {
+    if (actionType === 'export-dre') {
+      console.log('🔄 [QuickActionModal] Updating DRE preview data');
+      console.log('📊 Export config:', exportConfig);
+      console.log('📅 Period filter:', periodFilter);
+      
+      // Determine which period to use based on export config
+      let period = periodFilter;
+      if (exportConfig.period === 'previous') {
+        // Calculate previous month
+        const prevMonth = periodFilter.month === 1 ? 12 : periodFilter.month - 1;
+        const prevYear = periodFilter.month === 1 ? periodFilter.year - 1 : periodFilter.year;
+        period = { ...periodFilter, month: prevMonth, year: prevYear };
+      } else if (exportConfig.period === 'semester') {
+        // For semester, we'll use YTD view
+        period = { ...periodFilter, viewType: 'ytd' as const };
+      }
+      
+      // Get consolidated data for selected units
+      const dreData = getConsolidatedDREData(exportConfig.units, period);
+      setDrePreviewData(dreData);
+      
+      console.log('📈 [QuickActionModal] DRE preview data updated:', dreData);
+    }
+  }, [actionType, exportConfig, periodFilter]);
 
   if (!actionType) return null;
 
@@ -157,78 +190,97 @@ export const QuickActionModal = ({ isOpen, onClose, actionType, onReportClick }:
                     />
                     <span>Todas as Unidades</span>
                   </label>
-                  {['Campo Grande', 'Recreio', 'Barra'].map(unit => (
-                    <label key={unit} className="flex items-center gap-2">
+                  {[
+                    { id: 'campo-grande', name: 'Campo Grande' },
+                    { id: 'recreio', name: 'Recreio' },
+                    { id: 'barra', name: 'Barra' }
+                  ].map(unit => (
+                    <label key={unit.id} className="flex items-center gap-2">
                       <input 
                         type="checkbox" 
-                        checked={exportConfig.units.includes(unit)}
+                        checked={exportConfig.units.includes(unit.id)}
                         onChange={(e) => {
                           if (e.target.checked) {
                             setExportConfig(prev => ({ 
                               ...prev, 
-                              units: prev.units.filter(u => u !== 'all').concat(unit)
+                              units: prev.units.filter(u => u !== 'all').concat(unit.id)
                             }));
                           } else {
                             setExportConfig(prev => ({ 
                               ...prev, 
-                              units: prev.units.filter(u => u !== unit)
+                              units: prev.units.filter(u => u !== unit.id)
                             }));
                           }
                         }}
                       />
-                      <span>{unit}</span>
+                      <span>{unit.name}</span>
                     </label>
                   ))}
                 </div>
               </div>
             </Card>
 
+            {/* Dynamic DRE Preview */}
             <Card className="p-4">
-              <h5 className="font-medium mb-2">Preview do DRE - Junho 2024</h5>
-              <div className="text-sm space-y-1 bg-gray-50 p-4 rounded">
-                <div className="flex justify-between font-semibold border-b pb-1">
-                  <span>RECEITAS</span>
-                  <span>R$ 245.780</span>
+              <h5 className="font-medium mb-2">
+                Preview do DRE - {drePreviewData?.periodLabel || 'Carregando...'}
+              </h5>
+              {drePreviewData ? (
+                <div className="text-sm space-y-1 bg-gray-50 p-4 rounded">
+                  <div className="flex justify-between font-semibold border-b pb-1">
+                    <span>RECEITAS</span>
+                    <span>R$ {drePreviewData.receitas.total.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between pl-4">
+                    <span>Mensalidades</span>
+                    <span>R$ {drePreviewData.receitas.mensalidades.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between pl-4">
+                    <span>Matrículas</span>
+                    <span>R$ {drePreviewData.receitas.matriculas.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between pl-4">
+                    <span>Outras Receitas</span>
+                    <span>R$ {drePreviewData.receitas.outras.toLocaleString()}</span>
+                  </div>
+                  
+                  <div className="flex justify-between font-semibold border-b pb-1 pt-2">
+                    <span>DESPESAS</span>
+                    <span>R$ {drePreviewData.despesas.total.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between pl-4">
+                    <span>Pessoal</span>
+                    <span>R$ {drePreviewData.despesas.pessoal.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between pl-4">
+                    <span>Aluguel</span>
+                    <span>R$ {drePreviewData.despesas.aluguel.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between pl-4">
+                    <span>Marketing</span>
+                    <span>R$ {drePreviewData.despesas.marketing.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between pl-4">
+                    <span>Operacional</span>
+                    <span>R$ {drePreviewData.despesas.operacional.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between pl-4">
+                    <span>Outros</span>
+                    <span>R$ {drePreviewData.despesas.outros.toLocaleString()}</span>
+                  </div>
+                  
+                  <div className="flex justify-between font-bold text-lg border-t pt-2">
+                    <span>LUCRO LÍQUIDO</span>
+                    <span className={`${drePreviewData.lucroLiquido >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      R$ {drePreviewData.lucroLiquido.toLocaleString()}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex justify-between pl-4">
-                  <span>Mensalidades</span>
-                  <span>R$ 195.624</span>
+              ) : (
+                <div className="text-sm text-gray-500 bg-gray-50 p-4 rounded">
+                  Carregando preview...
                 </div>
-                <div className="flex justify-between pl-4">
-                  <span>Matrículas</span>
-                  <span>R$ 32.456</span>
-                </div>
-                <div className="flex justify-between pl-4">
-                  <span>Outras Receitas</span>
-                  <span>R$ 17.700</span>
-                </div>
-                
-                <div className="flex justify-between font-semibold border-b pb-1 pt-2">
-                  <span>DESPESAS</span>
-                  <span>R$ 192.000</span>
-                </div>
-                <div className="flex justify-between pl-4">
-                  <span>Pessoal</span>
-                  <span>R$ 112.000</span>
-                </div>
-                <div className="flex justify-between pl-4">
-                  <span>Aluguel</span>
-                  <span>R$ 35.000</span>
-                </div>
-                <div className="flex justify-between pl-4">
-                  <span>Marketing</span>
-                  <span>R$ 24.000</span>
-                </div>
-                <div className="flex justify-between pl-4">
-                  <span>Outras Despesas</span>
-                  <span>R$ 21.000</span>
-                </div>
-                
-                <div className="flex justify-between font-bold text-lg border-t pt-2">
-                  <span>LUCRO LÍQUIDO</span>
-                  <span className="text-green-600">R$ 53.780</span>
-                </div>
-              </div>
+              )}
             </Card>
 
             {/* Related Reports */}

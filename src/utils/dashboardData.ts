@@ -1,4 +1,3 @@
-
 import { getDataByUnit, getHistoricalDataByUnit, getCostCenterDataByUnit } from './unitData';
 import { PeriodFilter } from '@/contexts/PeriodContext';
 
@@ -270,6 +269,127 @@ export const getSecondaryKPIs = (unitId: string, period?: PeriodFilter) => {
 
   console.log('✅ [dashboardData.getSecondaryKPIs] Final result:', result);
   return result;
+};
+
+// Dynamic DRE data calculation
+export const getDREData = (unitId: string, period?: PeriodFilter) => {
+  console.log('📊 [dashboardData.getDREData] Calculating DRE for unit:', unitId, 'Period:', period);
+  
+  const historicalData = getHistoricalDataByUnit(unitId);
+  const costCenterData = getCostCenterDataByUnit(unitId);
+  
+  let currentPeriodData;
+  let periodLabel = 'Junho 2024';
+  
+  if (period && period.viewType === 'monthly' && !period.dateRange) {
+    // Get data for specific month/year
+    const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Aug', 'Set', 'Out', 'Nov', 'Dez'];
+    const monthNamesFull = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    const targetMonth = monthNames[period.month - 1];
+    
+    currentPeriodData = historicalData.find(item => item.month === targetMonth) || historicalData[historicalData.length - 1];
+    periodLabel = `${monthNamesFull[period.month - 1]} ${period.year}`;
+  } else if (period && period.viewType === 'ytd') {
+    // Calculate YTD accumulated values
+    const currentDate = new Date();
+    const currentMonthIndex = Math.min(currentDate.getMonth(), historicalData.length - 1);
+    
+    const ytdData = historicalData.slice(0, currentMonthIndex + 1);
+    const totalReceita = ytdData.reduce((sum, item) => sum + item.receita, 0);
+    const totalDespesa = ytdData.reduce((sum, item) => sum + item.despesa, 0);
+    
+    currentPeriodData = { receita: totalReceita, despesa: totalDespesa };
+    periodLabel = `Acumulado ${period.year}`;
+  } else {
+    // Default to latest month
+    currentPeriodData = historicalData[historicalData.length - 1];
+  }
+  
+  const totalReceita = currentPeriodData.receita;
+  const totalDespesa = currentPeriodData.despesa;
+  const lucroLiquido = totalReceita - totalDespesa;
+  
+  // Calculate revenue breakdown (percentages based on typical education business)
+  const mensalidades = Math.round(totalReceita * 0.796);
+  const matriculas = Math.round(totalReceita * 0.132);
+  const outrasReceitas = totalReceita - mensalidades - matriculas;
+  
+  // Calculate expense breakdown based on cost center data
+  const despesasPorCategoria = costCenterData.reduce((acc, item) => {
+    const valor = Math.round((item.value / 100) * totalDespesa);
+    acc[item.name] = valor;
+    return acc;
+  }, {} as Record<string, number>);
+  
+  // Ensure we have all major categories
+  const pessoal = despesasPorCategoria['Pessoal'] || Math.round(totalDespesa * 0.583);
+  const aluguel = despesasPorCategoria['Aluguel'] || Math.round(totalDespesa * 0.182);
+  const marketing = despesasPorCategoria['Marketing'] || Math.round(totalDespesa * 0.125);
+  const operacional = despesasPorCategoria['Operacional'] || Math.round(totalDespesa * 0.087);
+  const outros = totalDespesa - pessoal - aluguel - marketing - operacional;
+  
+  console.log('📈 [dashboardData.getDREData] Calculated DRE:', {
+    totalReceita,
+    totalDespesa,
+    lucroLiquido,
+    periodLabel
+  });
+  
+  return {
+    periodLabel,
+    receitas: {
+      total: totalReceita,
+      mensalidades,
+      matriculas,
+      outras: outrasReceitas
+    },
+    despesas: {
+      total: totalDespesa,
+      pessoal,
+      aluguel,
+      marketing,
+      operacional,
+      outros
+    },
+    lucroLiquido
+  };
+};
+
+// Helper function to get consolidated data for multiple units
+export const getConsolidatedDREData = (unitIds: string[], period?: PeriodFilter) => {
+  console.log('📊 [dashboardData.getConsolidatedDREData] Consolidating for units:', unitIds, 'Period:', period);
+  
+  if (unitIds.includes('all') || unitIds.length === 0) {
+    return getDREData('all', period);
+  }
+  
+  // Sum up data from multiple specific units
+  const unitDataArray = unitIds.map(unitId => getDREData(unitId, period));
+  
+  const consolidated = unitDataArray.reduce((acc, unitData) => {
+    acc.receitas.total += unitData.receitas.total;
+    acc.receitas.mensalidades += unitData.receitas.mensalidades;
+    acc.receitas.matriculas += unitData.receitas.matriculas;
+    acc.receitas.outras += unitData.receitas.outras;
+    
+    acc.despesas.total += unitData.despesas.total;
+    acc.despesas.pessoal += unitData.despesas.pessoal;
+    acc.despesas.aluguel += unitData.despesas.aluguel;
+    acc.despesas.marketing += unitData.despesas.marketing;
+    acc.despesas.operacional += unitData.despesas.operacional;
+    acc.despesas.outros += unitData.despesas.outros;
+    
+    return acc;
+  }, {
+    periodLabel: unitDataArray[0]?.periodLabel || 'Período',
+    receitas: { total: 0, mensalidades: 0, matriculas: 0, outras: 0 },
+    despesas: { total: 0, pessoal: 0, aluguel: 0, marketing: 0, operacional: 0, outros: 0 },
+    lucroLiquido: 0
+  });
+  
+  consolidated.lucroLiquido = consolidated.receitas.total - consolidated.despesas.total;
+  
+  return consolidated;
 };
 
 // Legacy exports for backward compatibility
