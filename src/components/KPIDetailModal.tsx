@@ -66,10 +66,10 @@ const getHistoricalData = (title: string) => {
         { month: 'Mai', value: 3.2 },
         { month: 'Jun', value: 2.9 }
       ];
-    case 'Pessoal',
-    case 'Aluguel',
-    case 'Marketing',
-    case 'Operacional',
+    case 'Pessoal':
+    case 'Aluguel':
+    case 'Marketing':
+    case 'Operacional':
     case 'Outros':
       return [
         { month: 'Jan', value: 5.2 },
@@ -203,6 +203,16 @@ const getAnalysis = (title: string) => {
           'Implementar tracking detalhado de ROI por canal',
           'Criar campanhas direcionadas para perfis de maior valor'
         ]
+      };
+    case 'Pessoal':
+    case 'Aluguel':
+    case 'Marketing':
+    case 'Operacional':
+    case 'Outros':
+      return {
+        trend: 'Análise não disponível',
+        analysis: 'Dados insuficientes para análise detalhada.',
+        recommendations: []
       };
     case 'Receita Total':
       return {
