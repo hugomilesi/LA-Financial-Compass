@@ -1,4 +1,5 @@
 
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card } from '@/components/ui/card';
 import { LucideIcon, FileText } from 'lucide-react';
@@ -66,6 +67,15 @@ const getHistoricalData = (title: string) => {
         { month: 'Mai', value: 195 },
         { month: 'Jun', value: 197 }
       ];
+    case 'Custo por Aluno':
+      return [
+        { month: 'Jan', value: 268 },
+        { month: 'Fev', value: 275 },
+        { month: 'Mar', value: 280 },
+        { month: 'Abr', value: 278 },
+        { month: 'Mai', value: 282 },
+        { month: 'Jun', value: 285 }
+      ];
     default:
       return [];
   }
@@ -123,6 +133,17 @@ const getAnalysis = (title: string) => {
           'Criar pacotes premium para aumentar ainda mais o ticket'
         ]
       };
+    case 'Custo por Aluno':
+      return {
+        trend: 'Tendência gradual de aumento no custo por aluno',
+        analysis: 'O custo por aluno apresentou crescimento constante ao longo dos meses, indicando necessidade de otimização de processos e revisão de gastos operacionais para manter a eficiência.',
+        recommendations: [
+          'Revisar estrutura de custos variáveis por aluno',
+          'Implementar programa de eficiência operacional',
+          'Analisar possibilidades de automação de processos',
+          'Negociar melhores condições com fornecedores'
+        ]
+      };
     default:
       return {
         trend: 'Análise não disponível',
@@ -145,6 +166,7 @@ export const KPIDetailModal = ({ isOpen, onClose, kpi, onReportClick }: KPIDetai
       case 'Geração de Caixa': return 'geracao-caixa';
       case 'Margem Líquida': return 'margem-liquida';
       case 'Ticket Médio': return 'ticket-medio';
+      case 'Custo por Aluno': return 'custo-aluno';
       default: return 'receita-total';
     }
   };
@@ -173,7 +195,10 @@ export const KPIDetailModal = ({ isOpen, onClose, kpi, onReportClick }: KPIDetai
                 <div className="text-right">
                   <p className="text-sm text-gray-600">Variação</p>
                   <p className={`text-xl font-semibold ${
-                    kpi.change > 0 ? 'text-success-600' : 'text-danger-600'
+                    // Special handling for cost-based metrics - negative change is good (green)
+                    kpi.title === 'Custo por Aluno' || kpi.title === 'Despesa Total'
+                      ? kpi.change < 0 ? 'text-success-600' : 'text-danger-600'
+                      : kpi.change > 0 ? 'text-success-600' : 'text-danger-600'
                   }`}>
                     {kpi.change > 0 ? '+' : ''}{kpi.change.toFixed(1)}%
                   </p>
@@ -195,8 +220,6 @@ export const KPIDetailModal = ({ isOpen, onClose, kpi, onReportClick }: KPIDetai
                     formatter={(value) => [
                       kpi.title.includes('Margem') || kpi.title.includes('%') 
                         ? `${value}%` 
-                        : kpi.title.includes('Ticket') 
-                        ? `R$ ${value}`
                         : `R$ ${(value as number).toLocaleString()}`, 
                       kpi.title
                     ]}
@@ -279,3 +302,4 @@ export const KPIDetailModal = ({ isOpen, onClose, kpi, onReportClick }: KPIDetai
     </Dialog>
   );
 };
+
