@@ -1,5 +1,6 @@
+
 import { Card } from '@/components/ui/card';
-import { DollarSign, CreditCard, TrendingUp, Clock, Target } from 'lucide-react';
+import { DollarSign, TrendingUp, Clock, TrendingDown } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { getKPIsByUnit } from '@/utils/kpiData';
 import { KPIDetailModal } from './KPIDetailModal';
@@ -7,20 +8,19 @@ import { useState } from 'react';
 import { useUnit } from '@/contexts/UnitContext';
 
 const evolutionData = [
-  { month: 'Jan', cac: 145, ltv: 2650, ltvCacRatio: 18.3 },
-  { month: 'Fev', cac: 142, ltv: 2720, ltvCacRatio: 19.2 },
-  { month: 'Mar', cac: 138, ltv: 2780, ltvCacRatio: 20.1 },
-  { month: 'Abr', cac: 135, ltv: 2850, ltvCacRatio: 21.1 },
-  { month: 'Mai', cac: 132, ltv: 2890, ltvCacRatio: 21.9 },
-  { month: 'Jun', cac: 140, ltv: 2850, ltvCacRatio: 20.4 }
+  { month: 'Jan', cac: 145, ltv: 2650, churnRate: 6.2 },
+  { month: 'Fev', cac: 142, ltv: 2720, churnRate: 5.8 },
+  { month: 'Mar', cac: 138, ltv: 2780, churnRate: 5.1 },
+  { month: 'Abr', cac: 135, ltv: 2850, churnRate: 4.9 },
+  { month: 'Mai', cac: 132, ltv: 2890, churnRate: 4.5 },
+  { month: 'Jun', cac: 140, ltv: 2850, churnRate: 4.6 }
 ];
 
 const iconMap = {
   DollarSign,
-  CreditCard,
   TrendingUp,
   Clock,
-  Target
+  TrendingDown
 };
 
 export const KPIsPage = () => {
@@ -69,7 +69,7 @@ export const KPIsPage = () => {
       </div>
 
       {/* Main KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {kpis.map((kpi) => {
           const IconComponent = iconMap[kpi.icon as keyof typeof iconMap];
           const changeColor = kpi.change > 0 ? 'text-green-600' : kpi.change < 0 ? 'text-red-600' : 'text-gray-600';
@@ -134,14 +134,14 @@ export const KPIsPage = () => {
         </Card>
 
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">Evolução LTV/CAC Ratio</h3>
+          <h3 className="text-lg font-semibold mb-4 text-gray-900">Evolução Churn Rate</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={evolutionData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis />
-              <Tooltip formatter={(value) => [`${(value as number).toFixed(1)}x`, 'LTV/CAC']} />
-              <Bar dataKey="ltvCacRatio" fill="#8B5CF6" />
+              <Tooltip formatter={(value) => [`${(value as number).toFixed(1)}%`, 'Churn Rate']} />
+              <Bar dataKey="churnRate" fill="#F59E0B" />
             </BarChart>
           </ResponsiveContainer>
         </Card>
@@ -156,10 +156,9 @@ export const KPIsPage = () => {
               <tr className="border-b border-gray-200">
                 <th className="text-left py-3 px-4 font-semibold text-gray-700">Unidade</th>
                 <th className="text-right py-3 px-4 font-semibold text-gray-700">CAC</th>
-                <th className="text-right py-3 px-4 font-semibold text-gray-700">CRC</th>
                 <th className="text-right py-3 px-4 font-semibold text-gray-700">LTV</th>
                 <th className="text-right py-3 px-4 font-semibold text-gray-700">Permanência</th>
-                <th className="text-right py-3 px-4 font-semibold text-gray-700">LTV/CAC</th>
+                <th className="text-right py-3 px-4 font-semibold text-gray-700">Churn Rate</th>
               </tr>
             </thead>
             <tbody>
@@ -176,7 +175,6 @@ export const KPIsPage = () => {
                     <td className="text-right py-3 px-4">{unitKPIs[1].value}</td>
                     <td className="text-right py-3 px-4">{unitKPIs[2].value}</td>
                     <td className="text-right py-3 px-4">{unitKPIs[3].value}</td>
-                    <td className="text-right py-3 px-4">{unitKPIs[4].value}</td>
                   </tr>
                 );
               })}

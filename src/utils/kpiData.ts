@@ -16,24 +16,21 @@ export interface KPIData {
 const unitKPIData = {
   'campo-grande': {
     cac: 130.50,
-    crc: 89.20,
     ltv: 2850,
     permanencia: 18.5, // months
-    ltvCacRatio: 21.84 // LTV/CAC calculated as 2850/130.50
+    churnRate: 4.2 // percentage
   },
   'recreio': {
     cac: 142.75,
-    crc: 78.30,
     ltv: 2650,
     permanencia: 16.2,
-    ltvCacRatio: 18.56 // LTV/CAC calculated as 2650/142.75
+    churnRate: 5.8 // percentage
   },
   'barra': {
     cac: 138.90,
-    crc: 92.10,
     ltv: 2920,
     permanencia: 19.8,
-    ltvCacRatio: 21.02 // LTV/CAC calculated as 2920/138.90
+    churnRate: 3.9 // percentage
   }
 };
 
@@ -44,10 +41,9 @@ const getConsolidatedKPIs = () => {
   
   return {
     cac: Math.round((units.reduce((sum, unit) => sum + unit.cac, 0) / count) * 100) / 100,
-    crc: Math.round((units.reduce((sum, unit) => sum + unit.crc, 0) / count) * 100) / 100,
     ltv: Math.round(units.reduce((sum, unit) => sum + unit.ltv, 0) / count),
     permanencia: Math.round((units.reduce((sum, unit) => sum + unit.permanencia, 0) / count) * 10) / 10,
-    ltvCacRatio: Math.round((units.reduce((sum, unit) => sum + unit.ltvCacRatio, 0) / count) * 100) / 100
+    churnRate: Math.round((units.reduce((sum, unit) => sum + unit.churnRate, 0) / count) * 10) / 10
   };
 };
 
@@ -85,16 +81,6 @@ export const getKPIsByUnit = (unitId: string): KPIData[] => {
       unit: unitName
     },
     {
-      id: 'crc',
-      title: 'CRC',
-      value: `R$ ${data.crc.toFixed(2)}`,
-      change: generateChange(data.crc),
-      icon: 'CreditCard',
-      color: '#F59E0B',
-      description: 'Custo de Retenção de Cliente',
-      unit: unitName
-    },
-    {
       id: 'ltv',
       title: 'LTV',
       value: `R$ ${data.ltv.toLocaleString()}`,
@@ -115,13 +101,13 @@ export const getKPIsByUnit = (unitId: string): KPIData[] => {
       unit: unitName
     },
     {
-      id: 'ltv-cac',
-      title: 'LTV/CAC',
-      value: `${data.ltvCacRatio.toFixed(2)}x`,
-      change: generateChange(data.ltvCacRatio),
-      icon: 'Target',
-      color: '#8B5CF6',
-      description: 'Relação entre Lifetime Value e Custo de Aquisição',
+      id: 'churn-rate',
+      title: 'Churn Rate',
+      value: `${data.churnRate.toFixed(1)}%`,
+      change: generateChange(data.churnRate),
+      icon: 'TrendingDown',
+      color: '#F59E0B',
+      description: 'Taxa de Cancelamento de Clientes',
       unit: unitName
     }
   ];
@@ -155,23 +141,6 @@ export const getKPIDetails = (kpiId: string, unitId: string) => {
             'Focar em canais de menor custo',
             'Implementar programa de referência',
             'Melhorar taxa de conversão'
-          ]
-        };
-      
-      case 'crc':
-        return {
-          currentValue: kpi.value,
-          target: 'R$ 75,00',
-          trend: 'Crescendo',
-          factors: [
-            'Programas de retenção',
-            'Suporte ao cliente',
-            'Atividades de engajamento'
-          ],
-          recommendations: [
-            'Automatizar comunicação',
-            'Personalizar experiência',
-            'Implementar feedback contínuo'
           ]
         };
       
@@ -209,20 +178,20 @@ export const getKPIDetails = (kpiId: string, unitId: string) => {
           ]
         };
       
-      case 'ltv-cac':
+      case 'churn-rate':
         return {
           currentValue: kpi.value,
-          target: '25,00x',
-          trend: 'Crescendo',
+          target: '3,0%',
+          trend: 'Decrescendo',
           factors: [
-            'Eficiência na aquisição',
-            'Retenção de clientes',
-            'Otimização de custos'
+            'Satisfação do cliente',
+            'Qualidade do serviço',
+            'Preço competitivo'
           ],
           recommendations: [
-            'Reduzir CAC',
-            'Aumentar LTV',
-            'Equilibrar investimentos'
+            'Melhorar atendimento',
+            'Implementar pesquisas de satisfação',
+            'Criar programas de fidelidade'
           ]
         };
       
