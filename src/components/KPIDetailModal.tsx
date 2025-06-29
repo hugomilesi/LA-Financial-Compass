@@ -21,6 +21,64 @@ interface KPIDetailModalProps {
 
 const getHistoricalData = (title: string) => {
   switch (title) {
+    case 'Churn Financeiro':
+      return [
+        { month: 'Jan', value: 4.1 },
+        { month: 'Fev', value: 3.8 },
+        { month: 'Mar', value: 3.5 },
+        { month: 'Abr', value: 3.3 },
+        { month: 'Mai', value: 3.6 },
+        { month: 'Jun', value: 3.2 }
+      ];
+    case 'Margem Líquida':
+      return [
+        { month: 'Jan', value: 18.2 },
+        { month: 'Fev', value: 19.5 },
+        { month: 'Mar', value: 20.8 },
+        { month: 'Abr', value: 19.9 },
+        { month: 'Mai', value: 21.2 },
+        { month: 'Jun', value: 21.9 }
+      ];
+    case 'Permanência Média':
+      return [
+        { month: 'Jan', value: 17.5 },
+        { month: 'Fev', value: 18.2 },
+        { month: 'Mar', value: 18.8 },
+        { month: 'Abr', value: 18.5 },
+        { month: 'Mai', value: 19.1 },
+        { month: 'Jun', value: 19.2 }
+      ];
+    case 'Receita/Colaborador':
+      return [
+        { month: 'Jan', value: 4800 },
+        { month: 'Fev', value: 5100 },
+        { month: 'Mar', value: 5200 },
+        { month: 'Abr', value: 5050 },
+        { month: 'Mai', value: 5300 },
+        { month: 'Jun', value: 5250 }
+      ];
+    case 'Ticket/CAC Ratio':
+      return [
+        { month: 'Jan', value: 2.8 },
+        { month: 'Fev', value: 2.9 },
+        { month: 'Mar', value: 3.1 },
+        { month: 'Abr', value: 3.0 },
+        { month: 'Mai', value: 3.2 },
+        { month: 'Jun', value: 2.9 }
+      ];
+    case 'Pessoal',
+    case 'Aluguel',
+    case 'Marketing',
+    case 'Operacional',
+    case 'Outros':
+      return [
+        { month: 'Jan', value: 5.2 },
+        { month: 'Fev', value: 4.8 },
+        { month: 'Mar', value: 4.5 },
+        { month: 'Abr', value: 4.7 },
+        { month: 'Mai', value: 4.3 },
+        { month: 'Jun', value: 4.4 }
+      ];
     case 'Receita Total':
       return [
         { month: 'Jan', value: 220000 },
@@ -91,6 +149,61 @@ const getHistoricalData = (title: string) => {
 
 const getAnalysis = (title: string) => {
   switch (title) {
+    case 'Churn Financeiro':
+      return {
+        trend: 'Redução consistente do churn com controle efetivo',
+        analysis: 'A taxa de churn financeiro apresentou tendência de queda nos últimos meses, indicando melhora na retenção de alunos e na estratégia de relacionamento.',
+        recommendations: [
+          'Implementar programa de fidelização mais robusto',
+          'Criar alertas automáticos para alunos em risco de cancelamento',
+          'Desenvolver ações preventivas baseadas em comportamento do aluno',
+          'Monitorar churn por segmento de ticket médio'
+        ]
+      };
+    case 'Margem Líquida':
+      return {
+        trend: 'Crescimento sustentado da margem com pico em maio',
+        analysis: 'A margem líquida apresentou evolução positiva consistente, com destaque para maio. Junho manteve patamar elevado, indicando sustentabilidade da melhoria.',
+        recommendations: [
+          'Manter foco em serviços de maior valor agregado',
+          'Otimizar custos operacionais sem impactar qualidade',
+          'Revisar precificação para maximizar rentabilidade',
+          'Estabelecer metas de margem por unidade'
+        ]
+      };
+    case 'Permanência Média':
+      return {
+        trend: 'Aumento gradual da permanência média dos alunos',
+        analysis: 'A permanência média dos alunos cresceu de forma consistente, indicando maior satisfação e engajamento com os serviços oferecidos.',
+        recommendations: [
+          'Desenvolver programas de longo prazo para aumentar permanência',
+          'Criar incentivos para alunos com maior tempo de casa',
+          'Implementar pesquisas de satisfação regulares',
+          'Personalizar experiência baseada no tempo de permanência'
+        ]
+      };
+    case 'Receita/Colaborador':
+      return {
+        trend: 'Crescimento da produtividade por colaborador',
+        analysis: 'A receita por colaborador apresentou crescimento consistente, indicando melhora na eficiência operacional e produtividade da equipe.',
+        recommendations: [
+          'Investir em treinamento e capacitação da equipe',
+          'Implementar sistema de metas e bonificação por produtividade',
+          'Otimizar processos para reduzir tempo de atividades administrativas',
+          'Analisar necessidade de expansão do quadro vs. aumento de eficiência'
+        ]
+      };
+    case 'Ticket/CAC Ratio':
+      return {
+        trend: 'Relação ticket/CAC com leve oscilação mas mantendo patamar saudável',
+        analysis: 'A relação entre ticket médio e custo de aquisição manteve-se em patamares saudáveis, com leve queda em junho que requer atenção.',
+        recommendations: [
+          'Otimizar canais de aquisição com menor CAC',
+          'Desenvolver estratégias para aumentar ticket médio',
+          'Implementar tracking detalhado de ROI por canal',
+          'Criar campanhas direcionadas para perfis de maior valor'
+        ]
+      };
     case 'Receita Total':
       return {
         trend: 'Crescimento consistente com leve queda em junho',

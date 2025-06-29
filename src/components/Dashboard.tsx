@@ -1,19 +1,23 @@
+
 import { AIInsights } from './AIInsights';
 import { KPIDetailModal } from './KPIDetailModal';
 import { ChartDetailModal } from './ChartDetailModal';
 import { QuickActionModal } from './QuickActionModal';
 import { DashboardHeader } from './dashboard/DashboardHeader';
-import { KPISections } from './dashboard/KPISections';
-import { ChartsSection } from './dashboard/ChartsSection';
+import { StrategicKPISections } from './dashboard/StrategicKPISections';
+import { StrategicCharts } from './dashboard/StrategicCharts';
+import { UnitComparisonTable } from './dashboard/UnitComparisonTable';
 import { QuickActions } from './dashboard/QuickActions';
 import { Toaster } from '@/components/ui/toaster';
 import { useState } from 'react';
 import { ReportDetailModal } from './ReportDetailModal';
 import { useReports, Report } from '@/hooks/useReports';
 
+type ChartType = 'revenue' | 'cost-center' | 'revenue-churn' | 'ltv-cac' | 'efficiency-radar';
+
 export const Dashboard = () => {
   const [selectedKPI, setSelectedKPI] = useState<any>(null);
-  const [selectedChart, setSelectedChart] = useState<'revenue' | 'cost-center' | null>(null);
+  const [selectedChart, setSelectedChart] = useState<ChartType | null>(null);
   const [selectedAction, setSelectedAction] = useState<'export-dre' | 'set-goals' | 'view-reports' | 'unit-analysis' | null>(null);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
 
@@ -21,7 +25,7 @@ export const Dashboard = () => {
     setSelectedKPI(kpi);
   };
 
-  const handleChartClick = (chartType: 'revenue' | 'cost-center') => {
+  const handleChartClick = (chartType: ChartType) => {
     setSelectedChart(chartType);
   };
 
@@ -39,11 +43,14 @@ export const Dashboard = () => {
         {/* Header */}
         <DashboardHeader />
 
-        {/* KPI Sections */}
-        <KPISections onKPIClick={handleKPIClick} />
+        {/* Strategic KPI Sections */}
+        <StrategicKPISections onKPIClick={handleKPIClick} />
 
-        {/* Charts Section */}
-        <ChartsSection onChartClick={handleChartClick} />
+        {/* Unit Comparison Table */}
+        <UnitComparisonTable />
+
+        {/* Strategic Charts Section */}
+        <StrategicCharts onChartClick={handleChartClick} />
 
         {/* AI Insights */}
         <AIInsights />
