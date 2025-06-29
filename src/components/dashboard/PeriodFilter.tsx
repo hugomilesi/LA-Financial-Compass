@@ -8,6 +8,7 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Badge } from '@/components/ui/badge';
 import { usePeriod } from '@/contexts/PeriodContext';
 import { cn } from '@/lib/utils';
+import { DateRange } from 'react-day-picker';
 
 export const PeriodFilter = () => {
   const { 
@@ -20,7 +21,7 @@ export const PeriodFilter = () => {
   } = usePeriod();
   
   const [isOpen, setIsOpen] = useState(false);
-  const [dateRange, setDateRange] = useState<{ from?: Date; to?: Date }>({});
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i);
@@ -44,21 +45,21 @@ export const PeriodFilter = () => {
     updateViewType(viewType);
     if (viewType !== 'monthly') {
       updateDateRange(undefined);
-      setDateRange({});
+      setDateRange(undefined);
     }
   };
 
-  const handleDateRangeSelect = (range: { from?: Date; to?: Date } | undefined) => {
-    if (range) {
-      setDateRange(range);
-      if (range.from && range.to) {
-        updateDateRange({ start: range.from, end: range.to });
-      }
+  const handleDateRangeSelect = (range: DateRange | undefined) => {
+    setDateRange(range);
+    if (range?.from && range?.to) {
+      updateDateRange({ start: range.from, end: range.to });
+    } else {
+      updateDateRange(undefined);
     }
   };
 
   const clearDateRange = () => {
-    setDateRange({});
+    setDateRange(undefined);
     updateDateRange(undefined);
   };
 
