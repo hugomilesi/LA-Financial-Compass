@@ -23,7 +23,7 @@ interface KPIDetailModalProps {
   onReportClick?: (report: Report) => void;
 }
 
-const getHistoricalDataFromMonthly = (monthlyData: any[], kpiTitle: string) => {
+const getHistoricalDataFromMonthly = (monthlyData: any[], kpiTitle: string, selectedUnit: string) => {
   return monthlyData.map(item => {
     const receita = item.receita;
     const despesa = item.despesa;
@@ -154,7 +154,7 @@ export const KPIDetailModal = ({ isOpen, onClose, kpi, onReportClick }: KPIDetai
 
   // Get dynamic data based on current context
   const monthlyData = getMonthlyData(selectedUnit, periodFilter);
-  const historicalData = getHistoricalDataFromMonthly(monthlyData, kpi.title);
+  const historicalData = getHistoricalDataFromMonthly(monthlyData, kpi.title, selectedUnit);
   const analysis = getAnalysis(kpi.title);
 
   const getContextKey = (title: string) => {
