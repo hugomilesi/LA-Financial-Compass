@@ -1,6 +1,6 @@
 
 import { Card } from '@/components/ui/card';
-import { DollarSign, TrendingUp, Clock, TrendingDown } from 'lucide-react';
+import { DollarSign, TrendingUp, Clock, TrendingDown, CreditCard } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { getKPIsByUnit } from '@/utils/kpiData';
 import { KPIDetailModal } from './KPIDetailModal';
@@ -8,19 +8,20 @@ import { useState } from 'react';
 import { useUnit } from '@/contexts/UnitContext';
 
 const evolutionData = [
-  { month: 'Jan', cac: 145, ltv: 2650, churnRate: 6.2 },
-  { month: 'Fev', cac: 142, ltv: 2720, churnRate: 5.8 },
-  { month: 'Mar', cac: 138, ltv: 2780, churnRate: 5.1 },
-  { month: 'Abr', cac: 135, ltv: 2850, churnRate: 4.9 },
-  { month: 'Mai', cac: 132, ltv: 2890, churnRate: 4.5 },
-  { month: 'Jun', cac: 140, ltv: 2850, churnRate: 4.6 }
+  { month: 'Jan', cac: 145, crc: 95, ltv: 2650, churnRate: 6.2 },
+  { month: 'Fev', cac: 142, crc: 92, ltv: 2720, churnRate: 5.8 },
+  { month: 'Mar', cac: 138, crc: 88, ltv: 2780, churnRate: 5.1 },
+  { month: 'Abr', cac: 135, crc: 85, ltv: 2850, churnRate: 4.9 },
+  { month: 'Mai', cac: 132, crc: 83, ltv: 2890, churnRate: 4.5 },
+  { month: 'Jun', cac: 140, crc: 87, ltv: 2850, churnRate: 4.6 }
 ];
 
 const iconMap = {
   DollarSign,
   TrendingUp,
   Clock,
-  TrendingDown
+  TrendingDown,
+  CreditCard
 };
 
 export const KPIsPage = () => {
@@ -68,8 +69,8 @@ export const KPIsPage = () => {
         </div>
       </div>
 
-      {/* Main KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Main KPIs - 5 cards in responsive grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {kpis.map((kpi) => {
           const IconComponent = iconMap[kpi.icon as keyof typeof iconMap];
           const changeColor = kpi.change > 0 ? 'text-green-600' : kpi.change < 0 ? 'text-red-600' : 'text-gray-600';
@@ -120,7 +121,7 @@ export const KPIsPage = () => {
       {/* Evolution Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">Evolução CAC vs LTV</h3>
+          <h3 className="text-lg font-semibold mb-4 text-gray-900">Evolução CAC vs CRC vs LTV</h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={evolutionData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -128,6 +129,7 @@ export const KPIsPage = () => {
               <YAxis />
               <Tooltip formatter={(value) => [`R$ ${(value as number).toLocaleString()}`, '']} />
               <Line type="monotone" dataKey="cac" stroke="#EF4444" strokeWidth={2} name="CAC" />
+              <Line type="monotone" dataKey="crc" stroke="#8B5CF6" strokeWidth={2} name="CRC" />
               <Line type="monotone" dataKey="ltv" stroke="#10B981" strokeWidth={2} name="LTV" />
             </LineChart>
           </ResponsiveContainer>
@@ -156,9 +158,10 @@ export const KPIsPage = () => {
               <tr className="border-b border-gray-200">
                 <th className="text-left py-3 px-4 font-semibold text-gray-700">Unidade</th>
                 <th className="text-right py-3 px-4 font-semibold text-gray-700">CAC</th>
+                <th className="text-right py-3 px-4 font-semibold text-gray-700">CRC</th>
                 <th className="text-right py-3 px-4 font-semibold text-gray-700">LTV</th>
-                <th className="text-right py-3 px-4 font-semibold text-gray-700">Permanência</th>
                 <th className="text-right py-3 px-4 font-semibold text-gray-700">Churn Rate</th>
+                <th className="text-right py-3 px-4 font-semibold text-gray-700">Permanência</th>
               </tr>
             </thead>
             <tbody>
@@ -175,6 +178,7 @@ export const KPIsPage = () => {
                     <td className="text-right py-3 px-4">{unitKPIs[1].value}</td>
                     <td className="text-right py-3 px-4">{unitKPIs[2].value}</td>
                     <td className="text-right py-3 px-4">{unitKPIs[3].value}</td>
+                    <td className="text-right py-3 px-4">{unitKPIs[4].value}</td>
                   </tr>
                 );
               })}

@@ -12,22 +12,25 @@ export interface KPIData {
   unit: string;
 }
 
-// Updated KPI data by unit with specific values from user requirements
+// Updated KPI data by unit with specific values including CRC
 const unitKPIData = {
   'campo-grande': {
     cac: 130.50,
+    crc: 85.20, // Cost Retention Cost
     ltv: 2850,
     permanencia: 18.5, // months
     churnRate: 4.2 // percentage
   },
   'recreio': {
     cac: 142.75,
+    crc: 92.40,
     ltv: 2650,
     permanencia: 16.2,
     churnRate: 5.8 // percentage
   },
   'barra': {
     cac: 138.90,
+    crc: 88.60,
     ltv: 2920,
     permanencia: 19.8,
     churnRate: 3.9 // percentage
@@ -41,6 +44,7 @@ const getConsolidatedKPIs = () => {
   
   return {
     cac: Math.round((units.reduce((sum, unit) => sum + unit.cac, 0) / count) * 100) / 100,
+    crc: Math.round((units.reduce((sum, unit) => sum + unit.crc, 0) / count) * 100) / 100,
     ltv: Math.round(units.reduce((sum, unit) => sum + unit.ltv, 0) / count),
     permanencia: Math.round((units.reduce((sum, unit) => sum + unit.permanencia, 0) / count) * 10) / 10,
     churnRate: Math.round((units.reduce((sum, unit) => sum + unit.churnRate, 0) / count) * 10) / 10
@@ -81,6 +85,16 @@ export const getKPIsByUnit = (unitId: string): KPIData[] => {
       unit: unitName
     },
     {
+      id: 'crc',
+      title: 'CRC',
+      value: `R$ ${data.crc.toFixed(2)}`,
+      change: generateChange(data.crc),
+      icon: 'CreditCard',
+      color: '#8B5CF6',
+      description: 'Custo de Retenção de Cliente',
+      unit: unitName
+    },
+    {
       id: 'ltv',
       title: 'LTV',
       value: `R$ ${data.ltv.toLocaleString()}`,
@@ -91,16 +105,6 @@ export const getKPIsByUnit = (unitId: string): KPIData[] => {
       unit: unitName
     },
     {
-      id: 'permanencia',
-      title: 'Tempo de Permanência',
-      value: `${data.permanencia} meses`,
-      change: generateChange(data.permanencia),
-      icon: 'Clock',
-      color: '#3B82F6',
-      description: 'Tempo médio de permanência do aluno',
-      unit: unitName
-    },
-    {
       id: 'churn-rate',
       title: 'Churn Rate',
       value: `${data.churnRate.toFixed(1)}%`,
@@ -108,6 +112,16 @@ export const getKPIsByUnit = (unitId: string): KPIData[] => {
       icon: 'TrendingDown',
       color: '#F59E0B',
       description: 'Taxa de Cancelamento de Clientes',
+      unit: unitName
+    },
+    {
+      id: 'permanencia',
+      title: 'Tempo de Permanência',
+      value: `${data.permanencia} meses`,
+      change: generateChange(data.permanencia),
+      icon: 'Clock',
+      color: '#3B82F6',
+      description: 'Tempo médio de permanência do aluno',
       unit: unitName
     }
   ];
@@ -141,6 +155,23 @@ export const getKPIDetails = (kpiId: string, unitId: string) => {
             'Focar em canais de menor custo',
             'Implementar programa de referência',
             'Melhorar taxa de conversão'
+          ]
+        };
+      
+      case 'crc':
+        return {
+          currentValue: kpi.value,
+          target: 'R$ 80,00',
+          trend: 'Crescendo',
+          factors: [
+            'Programas de fidelização',
+            'Atendimento personalizado',
+            'Benefícios exclusivos'
+          ],
+          recommendations: [
+            'Automatizar campanhas de retenção',
+            'Melhorar experiência do cliente',
+            'Oferecer incentivos direcionados'
           ]
         };
       
