@@ -1,6 +1,5 @@
-
 import { KPICard } from '@/components/KPICard';
-import { DollarSign, Users, TrendingUp, Percent, Target, CreditCard, Receipt } from 'lucide-react';
+import { DollarSign, Users, TrendingUp, Percent, Target, CreditCard, Receipt, TrendingDown } from 'lucide-react';
 import { getPrimaryKPIs, getSecondaryKPIs } from '@/utils/dashboardData';
 import { useUnit } from '@/contexts/UnitContext';
 import { useEffect } from 'react';
@@ -16,7 +15,8 @@ const iconMap = {
   Percent,
   Target,
   CreditCard,
-  Receipt
+  Receipt,
+  TrendingDown
 };
 
 export const KPISections = ({ onKPIClick }: KPISectionsProps) => {
