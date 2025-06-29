@@ -12,49 +12,42 @@ export interface KPIData {
   unit: string;
 }
 
-// Base KPI data by unit
+// Updated KPI data by unit with specific values from user requirements
 const unitKPIData = {
   'campo-grande': {
-    cac: 125,
-    crc: 89,
+    cac: 130.50,
+    crc: 89.20,
     ltv: 2850,
     permanencia: 18.5, // months
-    ltvCacRatio: 22.8
+    ltvCacRatio: 21.84 // LTV/CAC calculated as 2850/130.50
   },
   'recreio': {
-    cac: 142,
-    crc: 78,
+    cac: 142.75,
+    crc: 78.30,
     ltv: 2650,
     permanencia: 16.2,
-    ltvCacRatio: 18.7
+    ltvCacRatio: 18.56 // LTV/CAC calculated as 2650/142.75
   },
   'barra': {
-    cac: 138,
-    crc: 92,
+    cac: 138.90,
+    crc: 92.10,
     ltv: 2920,
     permanencia: 19.8,
-    ltvCacRatio: 21.2
-  },
-  'botafogo': {
-    cac: 156,
-    crc: 85,
-    ltv: 2730,
-    permanencia: 17.4,
-    ltvCacRatio: 17.5
+    ltvCacRatio: 21.02 // LTV/CAC calculated as 2920/138.90
   }
 };
 
-// Calculate consolidated data for "all" units
+// Calculate consolidated data for "all" units (average of the three units)
 const getConsolidatedKPIs = () => {
   const units = Object.values(unitKPIData);
   const count = units.length;
   
   return {
-    cac: Math.round(units.reduce((sum, unit) => sum + unit.cac, 0) / count),
-    crc: Math.round(units.reduce((sum, unit) => sum + unit.crc, 0) / count),
+    cac: Math.round((units.reduce((sum, unit) => sum + unit.cac, 0) / count) * 100) / 100,
+    crc: Math.round((units.reduce((sum, unit) => sum + unit.crc, 0) / count) * 100) / 100,
     ltv: Math.round(units.reduce((sum, unit) => sum + unit.ltv, 0) / count),
     permanencia: Math.round((units.reduce((sum, unit) => sum + unit.permanencia, 0) / count) * 10) / 10,
-    ltvCacRatio: Math.round((units.reduce((sum, unit) => sum + unit.ltvCacRatio, 0) / count) * 10) / 10
+    ltvCacRatio: Math.round((units.reduce((sum, unit) => sum + unit.ltvCacRatio, 0) / count) * 100) / 100
   };
 };
 
@@ -84,7 +77,7 @@ export const getKPIsByUnit = (unitId: string): KPIData[] => {
     {
       id: 'cac',
       title: 'CAC',
-      value: `R$ ${data.cac}`,
+      value: `R$ ${data.cac.toFixed(2)}`,
       change: generateChange(data.cac),
       icon: 'DollarSign',
       color: '#EF4444',
@@ -94,7 +87,7 @@ export const getKPIsByUnit = (unitId: string): KPIData[] => {
     {
       id: 'crc',
       title: 'CRC',
-      value: `R$ ${data.crc}`,
+      value: `R$ ${data.crc.toFixed(2)}`,
       change: generateChange(data.crc),
       icon: 'CreditCard',
       color: '#F59E0B',
@@ -124,7 +117,7 @@ export const getKPIsByUnit = (unitId: string): KPIData[] => {
     {
       id: 'ltv-cac',
       title: 'LTV/CAC',
-      value: `${data.ltvCacRatio}x`,
+      value: `${data.ltvCacRatio.toFixed(2)}x`,
       change: generateChange(data.ltvCacRatio),
       icon: 'Target',
       color: '#8B5CF6',
@@ -151,7 +144,7 @@ export const getKPIDetails = (kpiId: string, unitId: string) => {
       case 'cac':
         return {
           currentValue: kpi.value,
-          target: 'R$ 120',
+          target: 'R$ 120,00',
           trend: 'Estável',
           factors: [
             'Investimento em marketing digital',
@@ -168,7 +161,7 @@ export const getKPIDetails = (kpiId: string, unitId: string) => {
       case 'crc':
         return {
           currentValue: kpi.value,
-          target: 'R$ 75',
+          target: 'R$ 75,00',
           trend: 'Crescendo',
           factors: [
             'Programas de retenção',
@@ -219,7 +212,7 @@ export const getKPIDetails = (kpiId: string, unitId: string) => {
       case 'ltv-cac':
         return {
           currentValue: kpi.value,
-          target: '25x',
+          target: '25,00x',
           trend: 'Crescendo',
           factors: [
             'Eficiência na aquisição',

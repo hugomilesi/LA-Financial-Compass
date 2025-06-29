@@ -1,4 +1,3 @@
-
 import { Card } from '@/components/ui/card';
 import { DollarSign, CreditCard, TrendingUp, Clock, Target } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
