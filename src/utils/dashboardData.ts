@@ -108,9 +108,9 @@ export const getSecondaryKPIs = (unitId: string) => {
   const averageTicket = data.ticketMedio;
   const previousAverageTicket = Math.round(averageTicket * 0.98); // Slight growth
 
-  // Calculate occupancy rate
-  const occupancyRate = data.ocupacao;
-  const previousOccupancy = Math.round(occupancyRate * 0.96);
+  // Calculate cost per student
+  const costPerStudent = Math.round(data.despesa / data.alunos);
+  const previousCostPerStudent = Math.round(previousMonth.despesa / (currentActiveStudents * 0.95));
 
   // Calculate staff cost percentage (mock calculation)
   const staffCostPercentage = 58.3;
@@ -122,7 +122,7 @@ export const getSecondaryKPIs = (unitId: string) => {
                        unitId === 'recreio' ? '2/4' : '2/4';
 
   console.log('🎫 [dashboardData.getSecondaryKPIs] Average Ticket:', averageTicket);
-  console.log('📈 [dashboardData.getSecondaryKPIs] Occupancy Rate:', occupancyRate);
+  console.log('💰 [dashboardData.getSecondaryKPIs] Cost per Student:', costPerStudent);
   console.log('👥 [dashboardData.getSecondaryKPIs] Active Students:', currentActiveStudents);
 
   const result = [
@@ -135,12 +135,12 @@ export const getSecondaryKPIs = (unitId: string) => {
       alert: averageTicket > previousAverageTicket ? 'success' as const : 'warning' as const
     },
     {
-      title: 'Taxa de Ocupação',
-      value: `${occupancyRate}%`,
-      change: ((occupancyRate - previousOccupancy) / previousOccupancy) * 100,
-      target: 80,
-      icon: 'Percent',
-      alert: occupancyRate > previousOccupancy ? 'success' as const : 'warning' as const
+      title: 'Custo por Aluno',
+      value: `R$ ${costPerStudent}`,
+      change: ((costPerStudent - previousCostPerStudent) / previousCostPerStudent) * 100,
+      target: 70,
+      icon: 'DollarSign',
+      alert: costPerStudent < previousCostPerStudent ? 'success' as const : 'warning' as const
     },
     {
       title: 'Alunos Ativos',
