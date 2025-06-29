@@ -1,3 +1,4 @@
+
 import { getDataByUnit, getHistoricalDataByUnit, getCostCenterDataByUnit } from './unitData';
 import { PeriodFilter } from '@/contexts/PeriodContext';
 
@@ -42,36 +43,74 @@ export const getMonthlyData = (unitId: string, period?: PeriodFilter) => {
   // Filter data based on period if provided
   if (period) {
     if (period.viewType === 'monthly' && !period.dateRange) {
-      // Filter to specific month/year
-      const targetMonth = new Date(period.year, period.month - 1).toLocaleDateString('pt-BR', { month: 'short' });
-      result = result.filter(item => item.month.toLowerCase() === targetMonth.toLowerCase());
+      // For monthly view without custom date range, show all months but highlight current
+      console.log('📅 Monthly view - showing all data with focus on:', period.month, period.year);
     } else if (period.dateRange) {
       // Handle custom date range - for now, keep all data
       // In a real implementation, you would filter based on the date range
       console.log('📅 Custom date range filtering not fully implemented yet');
+    } else if (period.viewType === 'ytd') {
+      // For YTD, show data up to current month
+      console.log('📅 YTD view - showing year-to-date data for:', period.year);
     }
-    // For YTD, keep all data for the year
   }
   
   console.log('📈 [dashboardData.getMonthlyData] Result:', result);
   return result;
 };
 
+// Helper function to get data for specific month
+const getMonthlyDataPoint = (unitId: string, year: number, month: number) => {
+  const historicalData = getHistoricalDataByUnit(unitId);
+  const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Aug', 'Set', 'Out', 'Nov', 'Dez'];
+  const targetMonth = monthNames[month - 1];
+  
+  return historicalData.find(item => item.month === targetMonth) || historicalData[historicalData.length - 1];
+};
+
 // Dynamic KPI calculations based on selected unit and period
 export const getPrimaryKPIs = (unitId: string, period?: PeriodFilter) => {
   console.log('🎯 [dashboardData.getPrimaryKPIs] Starting calculation for unit:', unitId, 'Period:', period);
   
-  const data = getDataByUnit(unitId);
-  console.log('📊 [dashboardData.getPrimaryKPIs] Unit data:', data);
-  
   const historicalData = getHistoricalDataByUnit(unitId);
   console.log('📈 [dashboardData.getPrimaryKPIs] Historical data:', historicalData);
   
-  const currentMonth = historicalData[historicalData.length - 1];
-  const previousMonth = historicalData[historicalData.length - 2];
+  let currentMonth, previousMonth;
   
-  console.log('📅 [dashboardData.getPrimaryKPIs] Current month:', currentMonth);
-  console.log('📅 [dashboardData.getPrimaryKPIs] Previous month:', previousMonth);
+  if (period && period.viewType === 'monthly' && !period.dateRange) {
+    // Get data for specific month/year
+    currentMonth = getMonthlyDataPoint(unitId, period.year, period.month);
+    // Get previous month data
+    const prevMonth = period.month === 1 ? 12 : period.month - 1;
+    const prevYear = period.month === 1 ? period.year - 1 : period.year;
+    previousMonth = getMonthlyDataPoint(unitId, prevYear, prevMonth);
+    
+    console.log('📅 [getPrimaryKPIs] Specific month data - Current:', currentMonth, 'Previous:', previousMonth);
+  } else if (period && period.viewType === 'ytd') {
+    // For YTD, calculate accumulated values up to current date
+    const currentDate = new Date();
+    const currentMonthIndex = Math.min(currentDate.getMonth(), historicalData.length - 1);
+    
+    const ytdData = historicalData.slice(0, currentMonthIndex + 1);
+    const totalReceita = ytdData.reduce((sum, item) => sum + item.receita, 0);
+    const totalDespesa = ytdData.reduce((sum, item) => sum + item.despesa, 0);
+    
+    currentMonth = { receita: totalReceita, despesa: totalDespesa };
+    
+    // Previous YTD (same period previous year or previous period)
+    const prevYtdData = historicalData.slice(0, Math.max(1, currentMonthIndex));
+    const prevTotalReceita = prevYtdData.reduce((sum, item) => sum + item.receita, 0);
+    const prevTotalDespesa = prevYtdData.reduce((sum, item) => sum + item.despesa, 0);
+    
+    previousMonth = { receita: prevTotalReceita, despesa: prevTotalDespesa };
+    
+    console.log('📅 [getPrimaryKPIs] YTD data - Current:', currentMonth, 'Previous:', previousMonth);
+  } else {
+    // Default behavior - use latest month
+    currentMonth = historicalData[historicalData.length - 1];
+    previousMonth = historicalData[historicalData.length - 2];
+    console.log('📅 [getPrimaryKPIs] Default data - Current:', currentMonth, 'Previous:', previousMonth);
+  }
   
   const totalRevenue = currentMonth.receita;
   const totalExpenses = currentMonth.despesa;
@@ -139,17 +178,26 @@ export const getSecondaryKPIs = (unitId: string, period?: PeriodFilter) => {
   
   const historicalData = getHistoricalDataByUnit(unitId);
   
-  const currentMonth = historicalData[historicalData.length - 1];
-  const previousMonth = historicalData[historicalData.length - 2];
+  let currentMonth, previousMonth;
+  
+  if (period && period.viewType === 'monthly' && !period.dateRange) {
+    currentMonth = getMonthlyDataPoint(unitId, period.year, period.month);
+    const prevMonth = period.month === 1 ? 12 : period.month - 1;
+    const prevYear = period.month === 1 ? period.year - 1 : period.year;
+    previousMonth = getMonthlyDataPoint(unitId, prevYear, prevMonth);
+  } else {
+    currentMonth = historicalData[historicalData.length - 1];
+    previousMonth = historicalData[historicalData.length - 2];
+  }
   
   const currentActiveStudents = data.alunos;
   const previousActiveStudents = Math.round(currentActiveStudents * 0.95); // More realistic previous month
   const averageTicket = data.ticketMedio;
   const previousAverageTicket = Math.round(averageTicket * 0.98); // Slight growth
 
-  // Calculate cost per student
-  const costPerStudent = Math.round(data.despesa / data.alunos);
-  const previousCostPerStudent = Math.round(previousMonth.despesa / (currentActiveStudents * 0.95));
+  // Calculate cost per student based on actual period data
+  const costPerStudent = Math.round(currentMonth.despesa / currentActiveStudents);
+  const previousCostPerStudent = Math.round(previousMonth.despesa / previousActiveStudents);
 
   // Calculate delinquency rate (inadimplência)
   const getDelinquencyRate = (unitId: string) => {

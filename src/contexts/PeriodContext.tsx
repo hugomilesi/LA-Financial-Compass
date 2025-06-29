@@ -44,19 +44,39 @@ export const PeriodProvider = ({ children }: PeriodProviderProps) => {
   });
 
   const updateMonth = (month: number) => {
-    setPeriodFilter(prev => ({ ...prev, month }));
+    console.log('🔄 [PeriodContext] Updating month to:', month);
+    setPeriodFilter(prev => {
+      const newFilter = { ...prev, month };
+      console.log('🔄 [PeriodContext] New period filter:', newFilter);
+      return newFilter;
+    });
   };
 
   const updateYear = (year: number) => {
-    setPeriodFilter(prev => ({ ...prev, year }));
+    console.log('🔄 [PeriodContext] Updating year to:', year);
+    setPeriodFilter(prev => {
+      const newFilter = { ...prev, year };
+      console.log('🔄 [PeriodContext] New period filter:', newFilter);
+      return newFilter;
+    });
   };
 
   const updateViewType = (viewType: 'monthly' | 'ytd') => {
-    setPeriodFilter(prev => ({ ...prev, viewType }));
+    console.log('🔄 [PeriodContext] Updating view type to:', viewType);
+    setPeriodFilter(prev => {
+      const newFilter = { ...prev, viewType };
+      console.log('🔄 [PeriodContext] New period filter:', newFilter);
+      return newFilter;
+    });
   };
 
   const updateDateRange = (dateRange?: { start: Date; end: Date }) => {
-    setPeriodFilter(prev => ({ ...prev, dateRange }));
+    console.log('🔄 [PeriodContext] Updating date range to:', dateRange);
+    setPeriodFilter(prev => {
+      const newFilter = { ...prev, dateRange };
+      console.log('🔄 [PeriodContext] New period filter:', newFilter);
+      return newFilter;
+    });
   };
 
   const getDisplayPeriod = () => {

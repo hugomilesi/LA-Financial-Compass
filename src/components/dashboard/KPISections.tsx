@@ -4,7 +4,7 @@ import { DollarSign, Users, TrendingUp, Percent, Target, CreditCard, Receipt, Tr
 import { getPrimaryKPIs, getSecondaryKPIs } from '@/utils/dashboardData';
 import { useUnit } from '@/contexts/UnitContext';
 import { usePeriod } from '@/contexts/PeriodContext';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 interface KPISectionsProps {
   onKPIClick: (kpi: any) => void;
@@ -33,8 +33,16 @@ export const KPISections = ({ onKPIClick }: KPISectionsProps) => {
   
   console.log('🎯 [KPISections] Rendering with unit:', selectedUnit, 'and period:', periodFilter);
   
-  const primaryKPIs = getPrimaryKPIs(selectedUnit, periodFilter);
-  const secondaryKPIs = getSecondaryKPIs(selectedUnit, periodFilter);
+  // Use useMemo to recalculate KPIs when dependencies change
+  const primaryKPIs = useMemo(() => {
+    console.log('🔄 [KPISections] Recalculating primary KPIs...');
+    return getPrimaryKPIs(selectedUnit, periodFilter);
+  }, [selectedUnit, periodFilter]);
+  
+  const secondaryKPIs = useMemo(() => {
+    console.log('🔄 [KPISections] Recalculating secondary KPIs...');
+    return getSecondaryKPIs(selectedUnit, periodFilter);
+  }, [selectedUnit, periodFilter]);
 
   console.log('📊 [KPISections] Primary KPIs:', primaryKPIs);
   console.log('📊 [KPISections] Secondary KPIs:', secondaryKPIs);
@@ -44,19 +52,31 @@ export const KPISections = ({ onKPIClick }: KPISectionsProps) => {
     icon: iconMap[kpi.icon as keyof typeof iconMap]
   });
 
+  // Create unique keys that include all relevant state
+  const createKPIKey = (type: string, index: number) => 
+    `${type}-${index}-${selectedUnit}-${periodFilter.year}-${periodFilter.month}-${periodFilter.viewType}-${Date.now()}`;
+
   return (
     <>
       {/* Primary KPIs - Top 4 metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {primaryKPIs.map((kpi, index) => (
-          <KPICard key={`primary-${index}-${selectedUnit}-${periodFilter.year}-${periodFilter.month}`} {...mapKPIWithIcon(kpi)} onClick={() => onKPIClick(kpi)} />
+          <KPICard 
+            key={createKPIKey('primary', index)} 
+            {...mapKPIWithIcon(kpi)} 
+            onClick={() => onKPIClick(kpi)} 
+          />
         ))}
       </div>
 
       {/* Secondary KPIs - Additional metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {secondaryKPIs.map((kpi, index) => (
-          <KPICard key={`secondary-${index}-${selectedUnit}-${periodFilter.year}-${periodFilter.month}`} {...mapKPIWithIcon(kpi)} onClick={() => onKPIClick(kpi)} />
+          <KPICard 
+            key={createKPIKey('secondary', index)} 
+            {...mapKPIWithIcon(kpi)} 
+            onClick={() => onKPIClick(kpi)} 
+          />
         ))}
       </div>
     </>

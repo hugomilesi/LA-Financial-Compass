@@ -4,7 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { getMonthlyData, getCostCenterData } from '@/utils/dashboardData';
 import { useUnit } from '@/contexts/UnitContext';
 import { usePeriod } from '@/contexts/PeriodContext';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 interface ChartsSectionProps {
   onChartClick: (chartType: 'revenue' | 'cost-center') => void;
@@ -15,8 +15,16 @@ export const ChartsSection = ({ onChartClick }: ChartsSectionProps) => {
   const { periodFilter } = usePeriod();
   const [hoveredSlice, setHoveredSlice] = useState<number | null>(null);
   
-  const monthlyData = getMonthlyData(selectedUnit, periodFilter);
-  const costCenterData = getCostCenterData(selectedUnit, periodFilter);
+  // Use useMemo to recalculate data when dependencies change
+  const monthlyData = useMemo(() => {
+    console.log('📊 [ChartsSection] Recalculating monthly data for:', selectedUnit, periodFilter);
+    return getMonthlyData(selectedUnit, periodFilter);
+  }, [selectedUnit, periodFilter]);
+  
+  const costCenterData = useMemo(() => {
+    console.log('📊 [ChartsSection] Recalculating cost center data for:', selectedUnit, periodFilter);
+    return getCostCenterData(selectedUnit, periodFilter);
+  }, [selectedUnit, periodFilter]);
 
   const handleMouseEnter = (data: any, index: number) => {
     setHoveredSlice(index);
@@ -26,13 +34,15 @@ export const ChartsSection = ({ onChartClick }: ChartsSectionProps) => {
     setHoveredSlice(null);
   };
 
+  console.log('📈 [ChartsSection] Rendering charts with data:', { monthlyData, costCenterData });
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Revenue Evolution */}
       <Card className="p-6 cursor-pointer hover:shadow-lg transition-shadow" onClick={() => onChartClick('revenue')}>
         <h3 className="text-lg font-semibold mb-4 text-gray-900">Evolução Receita vs Despesa</h3>
         <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={monthlyData}>
+          <BarChart data={monthlyData} key={`revenue-chart-${selectedUnit}-${periodFilter.year}-${periodFilter.month}`}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="month" />
             <YAxis />
@@ -48,7 +58,7 @@ export const ChartsSection = ({ onChartClick }: ChartsSectionProps) => {
       <Card className="p-6 cursor-pointer hover:shadow-lg transition-shadow" onClick={() => onChartClick('cost-center')}>
         <h3 className="text-lg font-semibold mb-4 text-gray-900">Distribuição Centro de Custos</h3>
         <ResponsiveContainer width="100%" height={300}>
-          <PieChart>
+          <PieChart key={`cost-chart-${selectedUnit}-${periodFilter.year}-${periodFilter.month}`}>
             <Pie
               data={costCenterData}
               cx="50%"
