@@ -25,8 +25,8 @@ export const Dashboard = () => {
     setSelectedKPI(kpi);
   };
 
-  const handleChartClick = (chartType: ChartType) => {
-    setSelectedChart(chartType);
+  const handleChartClick = (chartType: string) => {
+    setSelectedChart(chartType as ChartType);
   };
 
   const handleActionClick = (actionType: 'export-dre' | 'set-goals' | 'view-reports' | 'unit-analysis') => {
