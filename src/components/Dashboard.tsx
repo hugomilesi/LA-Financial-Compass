@@ -1,23 +1,19 @@
-
 import { AIInsights } from './AIInsights';
 import { KPIDetailModal } from './KPIDetailModal';
 import { ChartDetailModal } from './ChartDetailModal';
 import { QuickActionModal } from './QuickActionModal';
 import { DashboardHeader } from './dashboard/DashboardHeader';
-import { StrategicKPISections } from './dashboard/StrategicKPISections';
-import { StrategicCharts } from './dashboard/StrategicCharts';
-import { UnitComparisonTable } from './dashboard/UnitComparisonTable';
+import { KPISections } from './dashboard/KPISections';
+import { ChartsSection } from './dashboard/ChartsSection';
 import { QuickActions } from './dashboard/QuickActions';
 import { Toaster } from '@/components/ui/toaster';
 import { useState } from 'react';
 import { ReportDetailModal } from './ReportDetailModal';
 import { useReports, Report } from '@/hooks/useReports';
 
-type ChartType = 'revenue' | 'cost-center' | 'revenue-churn' | 'ltv-cac' | 'efficiency-radar';
-
 export const Dashboard = () => {
   const [selectedKPI, setSelectedKPI] = useState<any>(null);
-  const [selectedChart, setSelectedChart] = useState<ChartType | null>(null);
+  const [selectedChart, setSelectedChart] = useState<'revenue' | 'cost-center' | null>(null);
   const [selectedAction, setSelectedAction] = useState<'export-dre' | 'set-goals' | 'view-reports' | 'unit-analysis' | null>(null);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
 
@@ -25,8 +21,8 @@ export const Dashboard = () => {
     setSelectedKPI(kpi);
   };
 
-  const handleChartClick = (chartType: string) => {
-    setSelectedChart(chartType as ChartType);
+  const handleChartClick = (chartType: 'revenue' | 'cost-center') => {
+    setSelectedChart(chartType);
   };
 
   const handleActionClick = (actionType: 'export-dre' | 'set-goals' | 'view-reports' | 'unit-analysis') => {
@@ -43,14 +39,11 @@ export const Dashboard = () => {
         {/* Header */}
         <DashboardHeader />
 
-        {/* Strategic KPI Sections */}
-        <StrategicKPISections onKPIClick={handleKPIClick} />
+        {/* KPI Sections */}
+        <KPISections onKPIClick={handleKPIClick} />
 
-        {/* Unit Comparison Table */}
-        <UnitComparisonTable />
-
-        {/* Strategic Charts Section */}
-        <StrategicCharts onChartClick={handleChartClick} />
+        {/* Charts Section */}
+        <ChartsSection onChartClick={handleChartClick} />
 
         {/* AI Insights */}
         <AIInsights />
