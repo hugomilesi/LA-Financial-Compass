@@ -6,6 +6,7 @@ import { getMonthlyData, getCostCenterData, getCostCenterDetailData } from '@/ut
 import { useReports, Report } from '@/hooks/useReports';
 import { FileText } from 'lucide-react';
 import { useUnit } from '@/contexts/UnitContext';
+import { usePeriod } from '@/contexts/PeriodContext';
 
 interface ChartDetailModalProps {
   isOpen: boolean;
@@ -14,18 +15,10 @@ interface ChartDetailModalProps {
   onReportClick?: (report: Report) => void;
 }
 
-const revenueDetailData = [
-  { month: 'Jan', receita: 220000, despesa: 180000, lucro: 40000 },
-  { month: 'Fev', receita: 235000, despesa: 185000, lucro: 50000 },
-  { month: 'Mar', receita: 245000, despesa: 190000, lucro: 55000 },
-  { month: 'Abr', receita: 238000, despesa: 188000, lucro: 50000 },
-  { month: 'Mai', receita: 260000, despesa: 195000, lucro: 65000 },
-  { month: 'Jun', receita: 245780, despesa: 192000, lucro: 53780 }
-];
-
 export const ChartDetailModal = ({ isOpen, onClose, chartType, onReportClick }: ChartDetailModalProps) => {
   const { getRelatedReports } = useReports();
   const { selectedUnit, getUnitDisplayName } = useUnit();
+  const { periodFilter, getDisplayPeriod } = usePeriod();
 
   if (!chartType) return null;
 
@@ -39,12 +32,12 @@ export const ChartDetailModal = ({ isOpen, onClose, chartType, onReportClick }: 
 
   const relatedReports = getRelatedReports(getContextKey(chartType));
 
-  // Get dynamic data based on selected unit
-  const costCenterData = getCostCenterData(selectedUnit);
-  const costCenterDetailData = getCostCenterDetailData(selectedUnit);
-  const monthlyData = getMonthlyData(selectedUnit);
+  // Get dynamic data based on selected unit and period
+  const costCenterData = getCostCenterData(selectedUnit, periodFilter);
+  const costCenterDetailData = getCostCenterDetailData(selectedUnit, periodFilter);
+  const monthlyData = getMonthlyData(selectedUnit, periodFilter);
 
-  // Calculate current month totals from monthly data
+  // Calculate current period totals from monthly data
   const currentMonth = monthlyData[monthlyData.length - 1];
   const totalRevenue = currentMonth?.receita || 0;
   const totalExpenses = currentMonth?.despesa || 0;
@@ -171,7 +164,7 @@ export const ChartDetailModal = ({ isOpen, onClose, chartType, onReportClick }: 
                     </div>
                     <div className="text-right">
                       <div className="text-xl font-bold">R$ {item.valor.toLocaleString()}</div>
-                      <div className="text-sm text-gray-600">Junho 2024</div>
+                      <div className="text-sm text-gray-600">{getDisplayPeriod()}</div>
                     </div>
                   </div>
                 </Card>
@@ -248,9 +241,9 @@ export const ChartDetailModal = ({ isOpen, onClose, chartType, onReportClick }: 
   const getModalTitle = () => {
     switch (chartType) {
       case 'revenue':
-        return `Análise Detalhada - Receita vs Despesa - ${getUnitDisplayName(selectedUnit)}`;
+        return `Análise Detalhada - Receita vs Despesa - ${getUnitDisplayName(selectedUnit)} - ${getDisplayPeriod()}`;
       case 'cost-center':
-        return `Análise Detalhada - Centro de Custos - ${getUnitDisplayName(selectedUnit)}`;
+        return `Análise Detalhada - Centro de Custos - ${getUnitDisplayName(selectedUnit)} - ${getDisplayPeriod()}`;
       default:
         return '';
     }

@@ -1,8 +1,12 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card } from '@/components/ui/card';
 import { LucideIcon, FileText } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useReports, Report } from '@/hooks/useReports';
+import { useUnit } from '@/contexts/UnitContext';
+import { usePeriod } from '@/contexts/PeriodContext';
+import { getMonthlyData, getPrimaryKPIs, getSecondaryKPIs } from '@/utils/dashboardData';
 
 interface KPIDetailModalProps {
   isOpen: boolean;
@@ -19,74 +23,44 @@ interface KPIDetailModalProps {
   onReportClick?: (report: Report) => void;
 }
 
-const getHistoricalData = (title: string) => {
-  switch (title) {
-    case 'Receita Total':
-      return [
-        { month: 'Jan', value: 220000 },
-        { month: 'Fev', value: 235000 },
-        { month: 'Mar', value: 245000 },
-        { month: 'Abr', value: 238000 },
-        { month: 'Mai', value: 260000 },
-        { month: 'Jun', value: 245780 }
-      ];
-    case 'Despesa Total':
-      return [
-        { month: 'Jan', value: 180000 },
-        { month: 'Fev', value: 185000 },
-        { month: 'Mar', value: 190000 },
-        { month: 'Abr', value: 188000 },
-        { month: 'Mai', value: 195000 },
-        { month: 'Jun', value: 192000 }
-      ];
-    case 'Geração de Caixa':
-      return [
-        { month: 'Jan', value: 40000 },
-        { month: 'Fev', value: 50000 },
-        { month: 'Mar', value: 55000 },
-        { month: 'Abr', value: 50000 },
-        { month: 'Mai', value: 65000 },
-        { month: 'Jun', value: 53780 }
-      ];
-    case 'Margem Líquida':
-      return [
-        { month: 'Jan', value: 18.2 },
-        { month: 'Fev', value: 21.3 },
-        { month: 'Mar', value: 22.4 },
-        { month: 'Abr', value: 21.0 },
-        { month: 'Mai', value: 25.0 },
-        { month: 'Jun', value: 21.9 }
-      ];
-    case 'Ticket Médio':
-      return [
-        { month: 'Jan', value: 176 },
-        { month: 'Fev', value: 187 },
-        { month: 'Mar', value: 192 },
-        { month: 'Abr', value: 184 },
-        { month: 'Mai', value: 195 },
-        { month: 'Jun', value: 197 }
-      ];
-    case 'Custo por Aluno':
-      return [
-        { month: 'Jan', value: 268 },
-        { month: 'Fev', value: 275 },
-        { month: 'Mar', value: 280 },
-        { month: 'Abr', value: 278 },
-        { month: 'Mai', value: 282 },
-        { month: 'Jun', value: 285 }
-      ];
-    case 'Inadimplência (%)':
-      return [
-        { month: 'Jan', value: 5.2 },
-        { month: 'Fev', value: 4.8 },
-        { month: 'Mar', value: 4.5 },
-        { month: 'Abr', value: 4.7 },
-        { month: 'Mai', value: 4.3 },
-        { month: 'Jun', value: 4.4 }
-      ];
-    default:
-      return [];
-  }
+const getHistoricalDataFromMonthly = (monthlyData: any[], kpiTitle: string) => {
+  return monthlyData.map(item => {
+    const receita = item.receita;
+    const despesa = item.despesa;
+    const cashGeneration = receita - despesa;
+    const netMargin = ((cashGeneration / receita) * 100);
+    
+    switch (kpiTitle) {
+      case 'Receita Total':
+        return { month: item.month, value: receita };
+      case 'Despesa Total':
+        return { month: item.month, value: despesa };
+      case 'Geração de Caixa':
+        return { month: item.month, value: cashGeneration };
+      case 'Margem Líquida':
+        return { month: item.month, value: netMargin };
+      case 'Ticket Médio':
+        // Simulate ticket médio evolution based on revenue trends
+        const baseTicket = 185;
+        const variation = (receita / 245000) * 12; // Scale based on revenue
+        return { month: item.month, value: Math.round(baseTicket + variation) };
+      case 'Custo por Aluno':
+        // Simulate cost per student based on expenses
+        const baseStudents = selectedUnit === 'all' ? 1000 : 
+                           selectedUnit === 'campo-grande' ? 465 :
+                           selectedUnit === 'recreio' ? 315 : 220;
+        return { month: item.month, value: Math.round(despesa / baseStudents) };
+      case 'Inadimplência (%)':
+        // Simulate delinquency rate with some variation
+        const baseRate = selectedUnit === 'campo-grande' ? 4.2 :
+                        selectedUnit === 'recreio' ? 3.8 :
+                        selectedUnit === 'barra' ? 5.1 : 4.3;
+        const variation2 = Math.sin(monthlyData.indexOf(item) * 0.5) * 0.5;
+        return { month: item.month, value: Math.max(3.0, baseRate + variation2) };
+      default:
+        return { month: item.month, value: 0 };
+    }
+  });
 };
 
 const getAnalysis = (title: string) => {
@@ -174,9 +148,14 @@ const getAnalysis = (title: string) => {
 
 export const KPIDetailModal = ({ isOpen, onClose, kpi, onReportClick }: KPIDetailModalProps) => {
   const Icon = kpi.icon;
-  const historicalData = getHistoricalData(kpi.title);
-  const analysis = getAnalysis(kpi.title);
   const { getRelatedReports } = useReports();
+  const { selectedUnit, getUnitDisplayName } = useUnit();
+  const { periodFilter, getDisplayPeriod } = usePeriod();
+
+  // Get dynamic data based on current context
+  const monthlyData = getMonthlyData(selectedUnit, periodFilter);
+  const historicalData = getHistoricalDataFromMonthly(monthlyData, kpi.title);
+  const analysis = getAnalysis(kpi.title);
 
   const getContextKey = (title: string) => {
     switch (title) {
@@ -199,7 +178,7 @@ export const KPIDetailModal = ({ isOpen, onClose, kpi, onReportClick }: KPIDetai
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Icon className="w-6 h-6 text-primary-600" />
-            {kpi.title} - Análise Detalhada
+            {kpi.title} - Análise Detalhada - {getUnitDisplayName(selectedUnit)} - {getDisplayPeriod()}
           </DialogTitle>
         </DialogHeader>
 
@@ -247,7 +226,7 @@ export const KPIDetailModal = ({ isOpen, onClose, kpi, onReportClick }: KPIDetai
                   <Tooltip 
                     formatter={(value) => [
                       kpi.title.includes('Margem') || kpi.title.includes('%') 
-                        ? `${value}%` 
+                        ? `${(value as number).toFixed(1)}%` 
                         : `R$ ${(value as number).toLocaleString()}`, 
                       kpi.title
                     ]}
