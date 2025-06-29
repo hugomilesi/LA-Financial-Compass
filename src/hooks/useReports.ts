@@ -139,6 +139,8 @@ export const useReports = () => {
       'despesa-total': ['custos', 'dre', 'kpi'],
       'geracao-caixa': ['fluxo-caixa', 'dre', 'rentabilidade'],
       'ticket-medio': ['alunos', 'benchmark', 'rentabilidade'],
+      'custo-aluno': ['custos', 'kpi', 'benchmark'],
+      'inadimplencia': ['inadimplencia', 'fluxo-caixa', 'alunos'],
       'revenue-chart': ['dre', 'rentabilidade', 'benchmark'],
       'cost-center-chart': ['custos', 'dre', 'kpi']
     };

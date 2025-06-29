@@ -11,6 +11,7 @@ interface KPICardProps {
   icon: LucideIcon;
   format?: 'currency' | 'percentage' | 'number';
   alert?: 'success' | 'warning' | 'danger';
+  subtitle?: string;
   onClick?: () => void;
 }
 
@@ -23,6 +24,7 @@ export const KPICard = ({
   icon: Icon, 
   format = 'number',
   alert,
+  subtitle,
   onClick
 }: KPICardProps) => {
   const getAlertColor = () => {
@@ -67,6 +69,16 @@ export const KPICard = ({
           <div className="space-y-1">
             <p className="text-2xl font-bold text-gray-900">{value}</p>
             
+            {subtitle && (
+              <p className={cn("text-sm font-medium", 
+                alert === 'success' ? 'text-success-600' :
+                alert === 'warning' ? 'text-warning-600' : 
+                alert === 'danger' ? 'text-danger-600' : 'text-gray-600'
+              )}>
+                {subtitle}
+              </p>
+            )}
+            
             {change !== undefined && (
               <p className={cn("text-sm font-medium", getChangeColor())}>
                 {change > 0 ? '+' : ''}{change.toFixed(1)}% vs anterior
@@ -75,7 +87,10 @@ export const KPICard = ({
             
             {target && (
               <div className="space-y-1">
-                <p className="text-xs text-gray-500">Meta: {target.toFixed(1)}%</p>
+                <p className="text-xs text-gray-500">
+                  {title === 'Inadimplência (%)' ? 'Meta máxima: ' : 'Meta: '}
+                  {target.toFixed(1)}%
+                </p>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div 
                     className={cn(
@@ -83,7 +98,11 @@ export const KPICard = ({
                       alert === 'success' ? 'bg-success-500' : 
                       alert === 'warning' ? 'bg-warning-500' : 'bg-danger-500'
                     )}
-                    style={{ width: `${Math.min(target, 100)}%` }}
+                    style={{ 
+                      width: title === 'Inadimplência (%)' 
+                        ? `${Math.min(100, (parseFloat(value) / 8) * 100)}%`
+                        : `${Math.min(target, 100)}%` 
+                    }}
                   />
                 </div>
               </div>

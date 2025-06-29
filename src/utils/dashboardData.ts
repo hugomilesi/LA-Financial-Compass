@@ -112,18 +112,36 @@ export const getSecondaryKPIs = (unitId: string) => {
   const costPerStudent = Math.round(data.despesa / data.alunos);
   const previousCostPerStudent = Math.round(previousMonth.despesa / (currentActiveStudents * 0.95));
 
-  // Calculate staff cost percentage (mock calculation)
-  const staffCostPercentage = 58.3;
-  const previousStaffCost = 56.8;
+  // Calculate delinquency rate (inadimplência)
+  const getDelinquencyRate = (unitId: string) => {
+    // Realistic delinquency rates by unit
+    const baseRates = {
+      'campo-grande': 4.2,
+      'recreio': 3.8,
+      'barra': 5.1
+    };
+    
+    if (unitId === 'all') {
+      // Weighted average for consolidated view
+      const totalStudents = 465 + 315 + 220;
+      return (
+        (baseRates['campo-grande'] * 465 + 
+         baseRates['recreio'] * 315 + 
+         baseRates['barra'] * 220) / totalStudents
+      );
+    }
+    
+    return baseRates[unitId as keyof typeof baseRates] || 4.0;
+  };
 
-  // Calculate goals met (mock calculation based on unit)
-  const goalsMetValue = unitId === 'all' ? '7/12' : 
-                       unitId === 'campo-grande' ? '3/4' :
-                       unitId === 'recreio' ? '2/4' : '2/4';
+  const currentDelinquency = getDelinquencyRate(unitId);
+  const previousDelinquency = currentDelinquency + 0.3; // Previous month was slightly higher
+  const delinquencyChange = currentDelinquency - previousDelinquency;
 
   console.log('🎫 [dashboardData.getSecondaryKPIs] Average Ticket:', averageTicket);
   console.log('💰 [dashboardData.getSecondaryKPIs] Cost per Student:', costPerStudent);
   console.log('👥 [dashboardData.getSecondaryKPIs] Active Students:', currentActiveStudents);
+  console.log('⚠️ [dashboardData.getSecondaryKPIs] Delinquency Rate:', currentDelinquency);
 
   const result = [
     {
@@ -151,12 +169,15 @@ export const getSecondaryKPIs = (unitId: string) => {
       alert: 'success' as const
     },
     {
-      title: 'Metas Batidas',
-      value: goalsMetValue,
-      change: 0,
-      target: 58,
-      icon: 'Target',
-      alert: 'warning' as const
+      title: 'Inadimplência (%)',
+      value: `${currentDelinquency.toFixed(1)}%`,
+      change: delinquencyChange,
+      target: 3.0, // Target of 3.0% or lower
+      icon: 'TrendingDown',
+      alert: currentDelinquency <= 3.0 ? 'success' as const : 
+             currentDelinquency <= 5.0 ? 'warning' as const : 'danger' as const,
+      subtitle: currentDelinquency <= 3.0 ? 'Excelente controle' :
+                currentDelinquency <= 5.0 ? 'Dentro do aceitável' : 'Atenção necessária'
     }
   ];
 

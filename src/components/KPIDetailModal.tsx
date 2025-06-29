@@ -1,5 +1,3 @@
-
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card } from '@/components/ui/card';
 import { LucideIcon, FileText } from 'lucide-react';
@@ -16,6 +14,7 @@ interface KPIDetailModalProps {
     target?: number;
     icon: LucideIcon;
     alert?: 'success' | 'warning' | 'danger';
+    subtitle?: string;
   };
   onReportClick?: (report: Report) => void;
 }
@@ -75,6 +74,15 @@ const getHistoricalData = (title: string) => {
         { month: 'Abr', value: 278 },
         { month: 'Mai', value: 282 },
         { month: 'Jun', value: 285 }
+      ];
+    case 'Inadimplência (%)':
+      return [
+        { month: 'Jan', value: 5.2 },
+        { month: 'Fev', value: 4.8 },
+        { month: 'Mar', value: 4.5 },
+        { month: 'Abr', value: 4.7 },
+        { month: 'Mai', value: 4.3 },
+        { month: 'Jun', value: 4.4 }
       ];
     default:
       return [];
@@ -144,6 +152,17 @@ const getAnalysis = (title: string) => {
           'Negociar melhores condições com fornecedores'
         ]
       };
+    case 'Inadimplência (%)':
+      return {
+        trend: 'Redução consistente da inadimplência com leve alta em junho',
+        analysis: 'A taxa de inadimplência apresentou tendência de queda nos primeiros meses, com pequeno aumento em junho ainda dentro dos padrões aceitáveis. O controle rigoroso das cobranças tem se mostrado eficaz.',
+        recommendations: [
+          'Implementar sistema de cobrança automatizada',
+          'Criar programa de renegociação para inadimplentes',
+          'Estabelecer política de desconto para pagamento antecipado',
+          'Monitorar indicadores de inadimplência por unidade semanalmente'
+        ]
+      };
     default:
       return {
         trend: 'Análise não disponível',
@@ -167,6 +186,7 @@ export const KPIDetailModal = ({ isOpen, onClose, kpi, onReportClick }: KPIDetai
       case 'Margem Líquida': return 'margem-liquida';
       case 'Ticket Médio': return 'ticket-medio';
       case 'Custo por Aluno': return 'custo-aluno';
+      case 'Inadimplência (%)': return 'inadimplencia';
       default: return 'receita-total';
     }
   };
@@ -190,13 +210,21 @@ export const KPIDetailModal = ({ isOpen, onClose, kpi, onReportClick }: KPIDetai
               <div>
                 <p className="text-sm text-gray-600">Valor Atual</p>
                 <p className="text-3xl font-bold text-gray-900">{kpi.value}</p>
+                {kpi.subtitle && (
+                  <p className={`text-sm font-medium mt-1 ${
+                    kpi.alert === 'success' ? 'text-success-600' :
+                    kpi.alert === 'warning' ? 'text-warning-600' : 'text-danger-600'
+                  }`}>
+                    {kpi.subtitle}
+                  </p>
+                )}
               </div>
               {kpi.change !== undefined && (
                 <div className="text-right">
                   <p className="text-sm text-gray-600">Variação</p>
                   <p className={`text-xl font-semibold ${
-                    // Special handling for cost-based metrics - negative change is good (green)
-                    kpi.title === 'Custo por Aluno' || kpi.title === 'Despesa Total'
+                    // Special handling for cost-based metrics and delinquency - negative change is good (green)
+                    kpi.title === 'Custo por Aluno' || kpi.title === 'Despesa Total' || kpi.title === 'Inadimplência (%)'
                       ? kpi.change < 0 ? 'text-success-600' : 'text-danger-600'
                       : kpi.change > 0 ? 'text-success-600' : 'text-danger-600'
                   }`}>
@@ -262,18 +290,37 @@ export const KPIDetailModal = ({ isOpen, onClose, kpi, onReportClick }: KPIDetai
           {/* Target Progress */}
           {kpi.target && (
             <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-3">Progresso da Meta</h3>
+              <h3 className="text-lg font-semibold mb-3">
+                {kpi.title === 'Inadimplência (%)' ? 'Meta de Controle' : 'Progresso da Meta'}
+              </h3>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span>Meta: {kpi.target}%</span>
-                  <span>Atual: {kpi.target}%</span>
+                  <span>
+                    {kpi.title === 'Inadimplência (%)' ? 'Meta máxima: ' : 'Meta: '}
+                    {kpi.target}%
+                  </span>
+                  <span>Atual: {kpi.value}</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-3">
-                  <div 
-                    className="bg-primary-500 h-3 rounded-full transition-all duration-300"
-                    style={{ width: `${Math.min(kpi.target || 0, 100)}%` }}
-                  />
-                </div>
+                {kpi.title === 'Inadimplência (%)' ? (
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div 
+                      className={`h-3 rounded-full transition-all duration-300 ${
+                        parseFloat(kpi.value) <= kpi.target ? 'bg-success-500' : 
+                        parseFloat(kpi.value) <= 5.0 ? 'bg-warning-500' : 'bg-danger-500'
+                      }`}
+                      style={{ 
+                        width: `${Math.min(100, (parseFloat(kpi.value) / 8) * 100)}%` 
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div 
+                      className="bg-primary-500 h-3 rounded-full transition-all duration-300"
+                      style={{ width: `${Math.min(kpi.target || 0, 100)}%` }}
+                    />
+                  </div>
+                )}
               </div>
             </Card>
           )}
@@ -302,4 +349,3 @@ export const KPIDetailModal = ({ isOpen, onClose, kpi, onReportClick }: KPIDetai
     </Dialog>
   );
 };
-
