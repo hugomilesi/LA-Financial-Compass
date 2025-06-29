@@ -1,4 +1,3 @@
-
 import { getDataByUnit, getHistoricalDataByUnit, getCostCenterDataByUnit } from './unitData';
 import { PeriodFilter } from '@/contexts/PeriodContext';
 
@@ -198,6 +197,48 @@ const calculateCustoAlunoMelhorado = (currentMonth: any, unitData: any, previous
     subtitle: custoAluno <= 250 ? 'Custo otimizado' :
               custoAluno <= 300 ? 'Custo aceitável' : 'Custo elevado'
   };
+};
+
+// New function for Unit Performance data
+export const getUnitPerformanceData = () => {
+  return [
+    {
+      unidade: 'Campo Grande',
+      receita: 145320,
+      lucro: 31390,
+      cac: 125,
+      ltv: 6534,
+      ocupacao: 49,
+      alunos: 465,
+      ticketMedio: 362,
+      margemLiquida: 21.6,
+      custoAluno: 245
+    },
+    {
+      unidade: 'Recreio',
+      receita: 128544,
+      lucro: 26970,
+      cac: 142,
+      ltv: 8383,
+      ocupacao: 36,
+      alunos: 315,
+      ticketMedio: 415,
+      margemLiquida: 21.0,
+      custoAluno: 322
+    },
+    {
+      unidade: 'Barra',
+      receita: 117591,
+      lucro: 47720,
+      cac: 138,
+      ltv: 8484,
+      ocupacao: 22,
+      alunos: 220,
+      ticketMedio: 420,
+      margemLiquida: 40.6,
+      custoAluno: 317
+    }
+  ];
 };
 
 // Strategic comparisons between units
