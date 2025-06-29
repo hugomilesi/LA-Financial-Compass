@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { getMonthlyData, getCostCenterData } from '@/utils/dashboardData';
 import { useUnit } from '@/contexts/UnitContext';
+import { usePeriod } from '@/contexts/PeriodContext';
 import { useState } from 'react';
 
 interface ChartsSectionProps {
@@ -11,10 +12,11 @@ interface ChartsSectionProps {
 
 export const ChartsSection = ({ onChartClick }: ChartsSectionProps) => {
   const { selectedUnit } = useUnit();
+  const { periodFilter } = usePeriod();
   const [hoveredSlice, setHoveredSlice] = useState<number | null>(null);
   
-  const monthlyData = getMonthlyData(selectedUnit);
-  const costCenterData = getCostCenterData(selectedUnit);
+  const monthlyData = getMonthlyData(selectedUnit, periodFilter);
+  const costCenterData = getCostCenterData(selectedUnit, periodFilter);
 
   const handleMouseEnter = (data: any, index: number) => {
     setHoveredSlice(index);
