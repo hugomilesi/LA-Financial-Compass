@@ -1,3 +1,4 @@
+
 import { AIInsights } from './AIInsights';
 import { KPIDetailModal } from './KPIDetailModal';
 import { ChartDetailModal } from './ChartDetailModal';
@@ -10,15 +11,17 @@ import { Toaster } from '@/components/ui/toaster';
 import { useState } from 'react';
 import { ReportDetailModal } from './ReportDetailModal';
 import { useReports, Report } from '@/hooks/useReports';
+import { useUnit } from '@/contexts/UnitContext';
 
 export const Dashboard = () => {
-  const [selectedKPI, setSelectedKPI] = useState<any>(null);
+  const [selectedKPIId, setSelectedKPIId] = useState<string | null>(null);
   const [selectedChart, setSelectedChart] = useState<'revenue' | 'cost-center' | null>(null);
   const [selectedAction, setSelectedAction] = useState<'export-dre' | 'set-goals' | 'view-reports' | 'unit-analysis' | null>(null);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+  const { selectedUnit } = useUnit();
 
   const handleKPIClick = (kpi: any) => {
-    setSelectedKPI(kpi);
+    setSelectedKPIId(kpi.id);
   };
 
   const handleChartClick = (chartType: 'revenue' | 'cost-center') => {
@@ -53,14 +56,12 @@ export const Dashboard = () => {
       </div>
 
       {/* KPI Detail Modal */}
-      {selectedKPI && (
-        <KPIDetailModal
-          isOpen={!!selectedKPI}
-          onClose={() => setSelectedKPI(null)}
-          kpi={selectedKPI}
-          onReportClick={handleReportClick}
-        />
-      )}
+      <KPIDetailModal
+        isOpen={!!selectedKPIId}
+        onClose={() => setSelectedKPIId(null)}
+        kpiId={selectedKPIId}
+        unitId={selectedUnit}
+      />
 
       {/* Chart Detail Modal */}
       <ChartDetailModal
