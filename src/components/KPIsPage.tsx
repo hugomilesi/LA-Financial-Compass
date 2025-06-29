@@ -1,67 +1,63 @@
 
 import { Card } from '@/components/ui/card';
-import { TrendingUp, Users, DollarSign, Clock, Target, Percent } from 'lucide-react';
+import { DollarSign, CreditCard, TrendingUp, Clock, Target } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
-
-const unitKPIs = [
-  {
-    unit: 'Campo Grande',
-    cac: 125,
-    crc: 89,
-    ltv: 2850,
-    ticketMedio: 380,
-    retencao: 85,
-    color: '#10B981'
-  },
-  {
-    unit: 'Recreio',
-    cac: 142,
-    crc: 78,
-    ltv: 2650,
-    ticketMedio: 365,
-    retencao: 82,
-    color: '#3B82F6'
-  },
-  {
-    unit: 'Barra',
-    cac: 138,
-    crc: 92,
-    ltv: 2920,
-    ticketMedio: 395,
-    retencao: 88,
-    color: '#F59E0B'
-  },
-  {
-    unit: 'Botafogo',
-    cac: 156,
-    crc: 85,
-    ltv: 2730,
-    ticketMedio: 375,
-    retencao: 83,
-    color: '#EF4444'
-  }
-];
+import { getKPIsByUnit } from '@/utils/kpiData';
+import { KPIDetailModal } from './KPIDetailModal';
+import { useState } from 'react';
+import { useUnit } from '@/contexts/UnitContext';
 
 const evolutionData = [
-  { month: 'Jan', cac: 145, ltv: 2650, ticketMedio: 360 },
-  { month: 'Fev', cac: 142, ltv: 2720, ticketMedio: 365 },
-  { month: 'Mar', cac: 138, ltv: 2780, ticketMedio: 370 },
-  { month: 'Abr', cac: 135, ltv: 2850, ticketMedio: 375 },
-  { month: 'Mai', cac: 132, ltv: 2890, ticketMedio: 380 },
-  { month: 'Jun', cac: 140, ltv: 2850, ticketMedio: 378 }
+  { month: 'Jan', cac: 145, ltv: 2650, ltvCacRatio: 18.3 },
+  { month: 'Fev', cac: 142, ltv: 2720, ltvCacRatio: 19.2 },
+  { month: 'Mar', cac: 138, ltv: 2780, ltvCacRatio: 20.1 },
+  { month: 'Abr', cac: 135, ltv: 2850, ltvCacRatio: 21.1 },
+  { month: 'Mai', cac: 132, ltv: 2890, ltvCacRatio: 21.9 },
+  { month: 'Jun', cac: 140, ltv: 2850, ltvCacRatio: 20.4 }
 ];
 
+const iconMap = {
+  DollarSign,
+  CreditCard,
+  TrendingUp,
+  Clock,
+  Target
+};
+
 export const KPIsPage = () => {
+  const { selectedUnit, setSelectedUnit, getUnitDisplayName } = useUnit();
+  const [selectedKPI, setSelectedKPI] = useState<string | null>(null);
+  
+  const kpis = getKPIsByUnit(selectedUnit);
+  
+  const handleKPIClick = (kpiId: string) => {
+    setSelectedKPI(kpiId);
+  };
+  
+  const handleCloseModal = () => {
+    setSelectedKPI(null);
+  };
+
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">KPIs Estratégicos</h1>
-          <p className="text-gray-600 mt-1">Indicadores de Performance por Unidade e Consolidado</p>
+          <p className="text-gray-600 mt-1">Indicadores de Performance - {getUnitDisplayName(selectedUnit)}</p>
         </div>
         
         <div className="flex gap-2">
+          <select 
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            value={selectedUnit}
+            onChange={(e) => setSelectedUnit(e.target.value)}
+          >
+            <option value="all">Todas as Unidades</option>
+            <option value="campo-grande">Campo Grande</option>
+            <option value="recreio">Recreio</option>
+            <option value="barra">Barra</option>
+          </select>
           <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
             <option>Junho 2024</option>
             <option>Maio 2024</option>
@@ -73,102 +69,54 @@ export const KPIsPage = () => {
         </div>
       </div>
 
-      {/* Consolidated KPIs */}
+      {/* Main KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <Card className="p-6 bg-gradient-to-br from-primary-50 to-primary-100 border-primary-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-primary-700 font-medium">CAC Médio</p>
-              <p className="text-2xl font-bold text-primary-900">R$ 140</p>
-              <p className="text-xs text-primary-600">-3.5% vs anterior</p>
-            </div>
-            <DollarSign className="w-8 h-8 text-primary-600" />
-          </div>
-        </Card>
-
-        <Card className="p-6 bg-gradient-to-br from-success-50 to-success-100 border-success-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-success-700 font-medium">LTV Médio</p>
-              <p className="text-2xl font-bold text-success-900">R$ 2.763</p>
-              <p className="text-xs text-success-600">+5.2% vs anterior</p>
-            </div>
-            <TrendingUp className="w-8 h-8 text-success-600" />
-          </div>
-        </Card>
-
-        <Card className="p-6 bg-gradient-to-br from-warning-50 to-warning-100 border-warning-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-warning-700 font-medium">Ticket Médio</p>
-              <p className="text-2xl font-bold text-warning-900">R$ 378</p>
-              <p className="text-xs text-warning-600">+2.1% vs anterior</p>
-            </div>
-            <Target className="w-8 h-8 text-warning-600" />
-          </div>
-        </Card>
-
-        <Card className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-blue-700 font-medium">Retenção</p>
-              <p className="text-2xl font-bold text-blue-900">84.5%</p>
-              <p className="text-xs text-blue-600">+1.2% vs anterior</p>
-            </div>
-            <Clock className="w-8 h-8 text-blue-600" />
-          </div>
-        </Card>
-
-        <Card className="p-6 bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-purple-700 font-medium">CRC Médio</p>
-              <p className="text-2xl font-bold text-purple-900">R$ 86</p>
-              <p className="text-xs text-purple-600">-1.8% vs anterior</p>
-            </div>
-            <Percent className="w-8 h-8 text-purple-600" />
-          </div>
-        </Card>
+        {kpis.map((kpi) => {
+          const IconComponent = iconMap[kpi.icon as keyof typeof iconMap];
+          const changeColor = kpi.change > 0 ? 'text-green-600' : kpi.change < 0 ? 'text-red-600' : 'text-gray-600';
+          
+          return (
+            <Card 
+              key={kpi.id} 
+              className="p-6 cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-105"
+              onClick={() => handleKPIClick(kpi.id)}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-700">{kpi.title}</p>
+                  <p className="text-2xl font-bold text-gray-900">{kpi.value}</p>
+                  {kpi.change !== 0 && (
+                    <p className={`text-xs ${changeColor} font-medium`}>
+                      {kpi.change > 0 ? '+' : ''}{kpi.change.toFixed(1)}% vs anterior
+                    </p>
+                  )}
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                  <IconComponent 
+                    className="w-8 h-8"
+                    style={{ color: kpi.color }}
+                  />
+                  <div className="text-xs text-gray-400 font-medium">
+                    Clique para detalhes
+                  </div>
+                </div>
+              </div>
+              <div 
+                className="w-full h-1 rounded-full"
+                style={{ backgroundColor: `${kpi.color}20` }}
+              >
+                <div 
+                  className="h-1 rounded-full transition-all duration-300"
+                  style={{ 
+                    backgroundColor: kpi.color,
+                    width: '75%' // Placeholder progress
+                  }}
+                />
+              </div>
+            </Card>
+          );
+        })}
       </div>
-
-      {/* KPIs by Unit */}
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4 text-gray-900">Performance por Unidade</h3>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">Unidade</th>
-                <th className="text-right py-3 px-4 font-semibold text-gray-700">CAC</th>
-                <th className="text-right py-3 px-4 font-semibold text-gray-700">CRC</th>
-                <th className="text-right py-3 px-4 font-semibold text-gray-700">LTV</th>
-                <th className="text-right py-3 px-4 font-semibold text-gray-700">Ticket Médio</th>
-                <th className="text-right py-3 px-4 font-semibold text-gray-700">Retenção</th>
-              </tr>
-            </thead>
-            <tbody>
-              {unitKPIs.map((unit, index) => (
-                <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
-                  <td className="py-3 px-4">
-                    <div className="flex items-center gap-2">
-                      <div 
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: unit.color }}
-                      />
-                      <span className="font-medium">{unit.unit}</span>
-                    </div>
-                  </td>
-                  <td className="text-right py-3 px-4">R$ {unit.cac}</td>
-                  <td className="text-right py-3 px-4">R$ {unit.crc}</td>
-                  <td className="text-right py-3 px-4">R$ {unit.ltv.toLocaleString()}</td>
-                  <td className="text-right py-3 px-4">R$ {unit.ticketMedio}</td>
-                  <td className="text-right py-3 px-4">{unit.retencao}%</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
 
       {/* Evolution Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -179,7 +127,7 @@ export const KPIsPage = () => {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis />
-              <Tooltip />
+              <Tooltip formatter={(value) => [`R$ ${(value as number).toLocaleString()}`, '']} />
               <Line type="monotone" dataKey="cac" stroke="#EF4444" strokeWidth={2} name="CAC" />
               <Line type="monotone" dataKey="ltv" stroke="#10B981" strokeWidth={2} name="LTV" />
             </LineChart>
@@ -187,54 +135,64 @@ export const KPIsPage = () => {
         </Card>
 
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">Comparativo por Unidade - CAC</h3>
+          <h3 className="text-lg font-semibold mb-4 text-gray-900">Evolução LTV/CAC Ratio</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={unitKPIs}>
+            <BarChart data={evolutionData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="unit" />
+              <XAxis dataKey="month" />
               <YAxis />
-              <Tooltip />
-              <Bar dataKey="cac" fill="#3B82F6" />
+              <Tooltip formatter={(value) => [`${(value as number).toFixed(1)}x`, 'LTV/CAC']} />
+              <Bar dataKey="ltvCacRatio" fill="#8B5CF6" />
             </BarChart>
           </ResponsiveContainer>
         </Card>
       </div>
 
-      {/* Goals Section */}
+      {/* KPI Comparison Table */}
       <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4 text-gray-900">Metas vs Realizado</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>CAC Target: R$ 130</span>
-              <span className="text-danger-600">R$ 140 (108%)</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div className="bg-danger-500 h-2 rounded-full" style={{ width: '108%' }} />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>LTV Target: R$ 2.800</span>
-              <span className="text-success-600">R$ 2.763 (99%)</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div className="bg-success-500 h-2 rounded-full" style={{ width: '99%' }} />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>Retenção Target: 85%</span>
-              <span className="text-success-600">84.5% (99%)</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div className="bg-warning-500 h-2 rounded-full" style={{ width: '99%' }} />
-            </div>
-          </div>
+        <h3 className="text-lg font-semibold mb-4 text-gray-900">Comparativo por Unidade</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-gray-200">
+                <th className="text-left py-3 px-4 font-semibold text-gray-700">Unidade</th>
+                <th className="text-right py-3 px-4 font-semibold text-gray-700">CAC</th>
+                <th className="text-right py-3 px-4 font-semibold text-gray-700">CRC</th>
+                <th className="text-right py-3 px-4 font-semibold text-gray-700">LTV</th>
+                <th className="text-right py-3 px-4 font-semibold text-gray-700">Permanência</th>
+                <th className="text-right py-3 px-4 font-semibold text-gray-700">LTV/CAC</th>
+              </tr>
+            </thead>
+            <tbody>
+              {['campo-grande', 'recreio', 'barra'].map((unitId) => {
+                const unitKPIs = getKPIsByUnit(unitId);
+                const unitName = getUnitDisplayName(unitId);
+                
+                return (
+                  <tr key={unitId} className="border-b border-gray-100 hover:bg-gray-50">
+                    <td className="py-3 px-4">
+                      <span className="font-medium">{unitName}</span>
+                    </td>
+                    <td className="text-right py-3 px-4">{unitKPIs[0].value}</td>
+                    <td className="text-right py-3 px-4">{unitKPIs[1].value}</td>
+                    <td className="text-right py-3 px-4">{unitKPIs[2].value}</td>
+                    <td className="text-right py-3 px-4">{unitKPIs[3].value}</td>
+                    <td className="text-right py-3 px-4">{unitKPIs[4].value}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       </Card>
+
+      {/* KPI Detail Modal */}
+      <KPIDetailModal
+        isOpen={!!selectedKPI}
+        onClose={handleCloseModal}
+        kpiId={selectedKPI}
+        unitId={selectedUnit}
+      />
     </div>
   );
 };

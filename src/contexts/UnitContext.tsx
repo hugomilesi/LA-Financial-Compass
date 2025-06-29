@@ -11,7 +11,8 @@ export const UNITS: Unit[] = [
   { id: 'all', name: 'all', displayName: 'Todas as Unidades' },
   { id: 'campo-grande', name: 'campo-grande', displayName: 'Campo Grande' },
   { id: 'recreio', name: 'recreio', displayName: 'Recreio' },
-  { id: 'barra', name: 'barra', displayName: 'Barra' }
+  { id: 'barra', name: 'barra', displayName: 'Barra' },
+  { id: 'botafogo', name: 'botafogo', displayName: 'Botafogo' }
 ];
 
 interface UnitContextType {
