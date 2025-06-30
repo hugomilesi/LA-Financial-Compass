@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -93,11 +94,7 @@ export const AccountForm = ({ account, accounts, onSave, onCancel }: AccountForm
       ...formData,
       parentId: actualParentId,
       level,
-      hasChildren: false,
-      status: 'active',
-      priority: 0,
-      tags: [],
-      notes: ''
+      hasChildren: false
     });
   };
 

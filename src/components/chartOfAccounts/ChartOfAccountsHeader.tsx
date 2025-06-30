@@ -1,13 +1,12 @@
 
 import { Button } from '@/components/ui/button';
-import { Plus, BookOpen, Download } from 'lucide-react';
+import { Plus, BookOpen } from 'lucide-react';
 
 interface ChartOfAccountsHeaderProps {
   onAddAccount: () => void;
-  onExportExcel: () => void;
 }
 
-export const ChartOfAccountsHeader = ({ onAddAccount, onExportExcel }: ChartOfAccountsHeaderProps) => {
+export const ChartOfAccountsHeader = ({ onAddAccount }: ChartOfAccountsHeaderProps) => {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-3">
@@ -17,16 +16,10 @@ export const ChartOfAccountsHeader = ({ onAddAccount, onExportExcel }: ChartOfAc
           <p className="text-gray-600">Gerencie a estrutura contábil da LA Music</p>
         </div>
       </div>
-      <div className="flex gap-2">
-        <Button variant="outline" onClick={onExportExcel} className="flex items-center gap-2">
-          <Download className="h-4 w-4" />
-          Exportar Excel
-        </Button>
-        <Button onClick={onAddAccount} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Nova Conta
-        </Button>
-      </div>
+      <Button onClick={onAddAccount} className="flex items-center gap-2">
+        <Plus className="h-4 w-4" />
+        Nova Conta
+      </Button>
     </div>
   );
 };

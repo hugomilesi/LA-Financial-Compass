@@ -5,18 +5,14 @@ import { useChartOfAccounts } from '@/hooks/useChartOfAccounts';
 import { ChartOfAccountsHeader } from '@/components/chartOfAccounts/ChartOfAccountsHeader';
 import { ChartOfAccountsFilters } from '@/components/chartOfAccounts/ChartOfAccountsFilters';
 import { ChartOfAccountsContent } from '@/components/chartOfAccounts/ChartOfAccountsContent';
-import { AccountAlerts } from '@/components/chartOfAccounts/AccountAlerts';
-import { exportAccountsToExcel, generateAccountAlerts } from '@/utils/excelExport';
-import { useToast } from '@/hooks/use-toast';
 
 export const ChartOfAccountsPage = () => {
-  const { accounts, addAccount, updateAccount, updateAccountNotes, deleteAccount, reorderAccounts } = useChartOfAccounts();
+  const { accounts, addAccount, updateAccount, deleteAccount } = useChartOfAccounts();
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [expandedAccounts, setExpandedAccounts] = useState<Set<string>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUnit, setSelectedUnit] = useState('all');
-  const { toast } = useToast();
 
   const toggleExpanded = (accountId: string) => {
     const newExpanded = new Set(expandedAccounts);
@@ -32,35 +28,15 @@ export const ChartOfAccountsPage = () => {
     if (editingAccount) {
       updateAccount(editingAccount.id, accountData);
       setEditingAccount(null);
-      toast({
-        title: "Conta atualizada",
-        description: "A conta foi atualizada com sucesso.",
-      });
     } else {
       addAccount(accountData);
       setShowAddForm(false);
-      toast({
-        title: "Conta criada",
-        description: "A nova conta foi criada com sucesso.",
-      });
     }
   };
 
   const handleCancelForm = () => {
     setEditingAccount(null);
     setShowAddForm(false);
-  };
-
-  const handleExportExcel = () => {
-    const unitName = selectedUnit === 'all' ? 'Todas as Unidades' : 
-      selectedUnit === 'campo-grande' ? 'Campo Grande' :
-      selectedUnit === 'recreio' ? 'Recreio' : 'Barra';
-    
-    exportAccountsToExcel(filteredAccounts, unitName);
-    toast({
-      title: "Exportação concluída",
-      description: "O arquivo Excel foi baixado com sucesso.",
-    });
   };
 
   const filterAccountsByUnit = (accounts: Account[]) => {
@@ -89,14 +65,9 @@ export const ChartOfAccountsPage = () => {
     )
   );
 
-  const alerts = generateAccountAlerts(accounts);
-
   return (
     <div className="p-6 space-y-6">
-      <ChartOfAccountsHeader 
-        onAddAccount={() => setShowAddForm(true)} 
-        onExportExcel={handleExportExcel}
-      />
+      <ChartOfAccountsHeader onAddAccount={() => setShowAddForm(true)} />
       
       <ChartOfAccountsFilters
         searchTerm={searchTerm}
@@ -105,10 +76,6 @@ export const ChartOfAccountsPage = () => {
         onUnitChange={setSelectedUnit}
         accountCount={filteredAccounts.length}
       />
-
-      {alerts.length > 0 && (
-        <AccountAlerts alerts={alerts} />
-      )}
 
       <ChartOfAccountsContent
         accounts={accounts}
@@ -121,10 +88,8 @@ export const ChartOfAccountsPage = () => {
         onToggleExpanded={toggleExpanded}
         onEdit={setEditingAccount}
         onDelete={deleteAccount}
-        onUpdateNotes={updateAccountNotes}
         onSaveAccount={handleSaveAccount}
         onCancelForm={handleCancelForm}
-        alerts={alerts}
       />
     </div>
   );
