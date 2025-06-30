@@ -5,6 +5,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { getKPIsByUnit, getHistoricalDataByUnit } from '@/utils/kpiData';
 import { KPIDetailModal } from './KPIDetailModal';
 import { CustomTooltip } from './kpi/CustomTooltip';
+import { StrategicTooltip } from './kpi/StrategicTooltip';
 import { useState } from 'react';
 import { useUnit } from '@/contexts/UnitContext';
 
@@ -123,7 +124,10 @@ export const KPIsPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* CAC vs LTV Chart */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">Relação CAC vs LTV</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Relação CAC vs LTV</h3>
+            <StrategicTooltip type="ltv-cac" data={historicalData} />
+          </div>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={historicalData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -173,7 +177,10 @@ export const KPIsPage = () => {
 
         {/* CRC vs Churn Rate Chart */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">CRC vs Taxa de Churn</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">CRC vs Taxa de Churn</h3>
+            <StrategicTooltip type="crc-churn" data={historicalData} />
+          </div>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={historicalData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
