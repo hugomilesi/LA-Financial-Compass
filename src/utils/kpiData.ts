@@ -29,11 +29,11 @@ const unitKPIData = {
     churnRate: 3.5 // percentage
   },
   'barra': {
-    cac: 298.50,
-    crc: 156.90,
-    ltv: 4650,
-    permanencia: 25.1,
-    churnRate: 2.8 // percentage
+    cac: 408.00,
+    crc: 78.25,
+    ltv: 5410,
+    permanencia: 13,
+    churnRate: 4.9 // percentage
   }
 };
 
@@ -56,12 +56,12 @@ const unitHistoricalData = {
     { month: 'Jun', cac: 527.68, crc: 95.35, ltv: 6205, churnRate: 3.5, ltvCacRatio: 11.8 }
   ],
   'barra': [
-    { month: 'Jan', cac: 305.80, crc: 162.40, ltv: 4480, churnRate: 3.2, ltvCacRatio: 14.6 },
-    { month: 'Fev', cac: 304.20, crc: 161.80, ltv: 4520, churnRate: 3.1, ltvCacRatio: 14.9 },
-    { month: 'Mar', cac: 302.10, crc: 160.90, ltv: 4560, churnRate: 3.0, ltvCacRatio: 15.1 },
-    { month: 'Abr', cac: 300.50, crc: 159.80, ltv: 4590, churnRate: 2.9, ltvCacRatio: 15.3 },
-    { month: 'Mai', cac: 299.40, crc: 158.20, ltv: 4620, churnRate: 2.8, ltvCacRatio: 15.4 },
-    { month: 'Jun', cac: 298.50, crc: 156.90, ltv: 4650, churnRate: 2.8, ltvCacRatio: 15.6 }
+    { month: 'Jan', cac: 420.80, crc: 82.40, ltv: 5250, churnRate: 5.4, ltvCacRatio: 12.5 },
+    { month: 'Fev', cac: 418.20, crc: 81.80, ltv: 5280, churnRate: 5.2, ltvCacRatio: 12.6 },
+    { month: 'Mar', cac: 415.10, crc: 81.10, ltv: 5320, churnRate: 5.1, ltvCacRatio: 12.8 },
+    { month: 'Abr', cac: 412.50, crc: 80.30, ltv: 5350, churnRate: 5.0, ltvCacRatio: 13.0 },
+    { month: 'Mai', cac: 410.40, crc: 79.20, ltv: 5380, churnRate: 4.9, ltvCacRatio: 13.1 },
+    { month: 'Jun', cac: 408.00, crc: 78.25, ltv: 5410, churnRate: 4.9, ltvCacRatio: 13.3 }
   ]
 };
 
