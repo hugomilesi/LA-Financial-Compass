@@ -1,20 +1,12 @@
 
 import { Card } from '@/components/ui/card';
 import { DollarSign, TrendingUp, Clock, TrendingDown, CreditCard } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
-import { getKPIsByUnit } from '@/utils/kpiData';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { getKPIsByUnit, getHistoricalDataByUnit } from '@/utils/kpiData';
 import { KPIDetailModal } from './KPIDetailModal';
+import { CustomTooltip } from './kpi/CustomTooltip';
 import { useState } from 'react';
 import { useUnit } from '@/contexts/UnitContext';
-
-const evolutionData = [
-  { month: 'Jan', cac: 145, crc: 95, ltv: 2650, churnRate: 6.2 },
-  { month: 'Fev', cac: 142, crc: 92, ltv: 2720, churnRate: 5.8 },
-  { month: 'Mar', cac: 138, crc: 88, ltv: 2780, churnRate: 5.1 },
-  { month: 'Abr', cac: 135, crc: 85, ltv: 2850, churnRate: 4.9 },
-  { month: 'Mai', cac: 132, crc: 83, ltv: 2890, churnRate: 4.5 },
-  { month: 'Jun', cac: 140, crc: 87, ltv: 2850, churnRate: 4.6 }
-];
 
 const iconMap = {
   DollarSign,
@@ -29,6 +21,7 @@ export const KPIsPage = () => {
   const [selectedKPI, setSelectedKPI] = useState<string | null>(null);
   
   const kpis = getKPIsByUnit(selectedUnit);
+  const historicalData = getHistoricalDataByUnit(selectedUnit);
   
   const handleKPIClick = (kpiId: string) => {
     setSelectedKPI(kpiId);
@@ -36,6 +29,11 @@ export const KPIsPage = () => {
   
   const handleCloseModal = () => {
     setSelectedKPI(null);
+  };
+
+  const handleExportReport = () => {
+    // TODO: Implementar exportação de PDF incluindo os novos gráficos
+    console.log('Exportando relatório com gráficos atualizados...');
   };
 
   return (
@@ -63,7 +61,10 @@ export const KPIsPage = () => {
             <option>Maio 2024</option>
             <option>Abril 2024</option>
           </select>
-          <button className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+          <button 
+            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+            onClick={handleExportReport}
+          >
             Exportar Relatório
           </button>
         </div>
@@ -118,34 +119,106 @@ export const KPIsPage = () => {
         })}
       </div>
 
-      {/* Evolution Charts */}
+      {/* New Analytics Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* CAC vs LTV Chart */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">Evolução CAC vs CRC vs LTV</h3>
+          <h3 className="text-lg font-semibold mb-4 text-gray-900">Relação CAC vs LTV</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={evolutionData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip formatter={(value) => [`R$ ${(value as number).toLocaleString()}`, '']} />
-              <Line type="monotone" dataKey="cac" stroke="#EF4444" strokeWidth={2} name="CAC" />
-              <Line type="monotone" dataKey="crc" stroke="#8B5CF6" strokeWidth={2} name="CRC" />
-              <Line type="monotone" dataKey="ltv" stroke="#10B981" strokeWidth={2} name="LTV" />
+            <LineChart data={historicalData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis 
+                dataKey="month" 
+                tick={{ fontSize: 12 }}
+                stroke="#666"
+              />
+              <YAxis 
+                tick={{ fontSize: 12 }}
+                stroke="#666"
+              />
+              <Tooltip 
+                content={<CustomTooltip type="ltv-cac" />}
+              />
+              <Line 
+                type="monotone" 
+                dataKey="cac" 
+                stroke="#EF4444" 
+                strokeWidth={3} 
+                name="CAC"
+                dot={{ fill: '#EF4444', strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6, fill: '#EF4444' }}
+              />
+              <Line 
+                type="monotone" 
+                dataKey="ltv" 
+                stroke="#10B981" 
+                strokeWidth={3} 
+                name="LTV"
+                dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6, fill: '#10B981' }}
+              />
             </LineChart>
           </ResponsiveContainer>
+          <div className="mt-4 flex items-center justify-center gap-6 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-red-500"></div>
+              <span className="text-gray-600">CAC</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              <span className="text-gray-600">LTV</span>
+            </div>
+          </div>
         </Card>
 
+        {/* CRC vs Churn Rate Chart */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">Evolução Churn Rate</h3>
+          <h3 className="text-lg font-semibold mb-4 text-gray-900">CRC vs Taxa de Churn</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={evolutionData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip formatter={(value) => [`${(value as number).toFixed(1)}%`, 'Churn Rate']} />
-              <Bar dataKey="churnRate" fill="#F59E0B" />
-            </BarChart>
+            <LineChart data={historicalData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis 
+                dataKey="month" 
+                tick={{ fontSize: 12 }}
+                stroke="#666"
+              />
+              <YAxis 
+                tick={{ fontSize: 12 }}
+                stroke="#666"
+              />
+              <Tooltip 
+                content={<CustomTooltip type="crc-churn" />}
+              />
+              <Line 
+                type="monotone" 
+                dataKey="crc" 
+                stroke="#8B5CF6" 
+                strokeWidth={3} 
+                name="CRC"
+                dot={{ fill: '#8B5CF6', strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6, fill: '#8B5CF6' }}
+              />
+              <Line 
+                type="monotone" 
+                dataKey="churnRate" 
+                stroke="#F59E0B" 
+                strokeWidth={3} 
+                name="Churn Rate"
+                dot={{ fill: '#F59E0B', strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6, fill: '#F59E0B' }}
+              />
+            </LineChart>
           </ResponsiveContainer>
+          <div className="mt-4 flex items-center justify-center gap-6 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+              <span className="text-gray-600">CRC</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+              <span className="text-gray-600">Churn Rate</span>
+            </div>
+          </div>
         </Card>
       </div>
 

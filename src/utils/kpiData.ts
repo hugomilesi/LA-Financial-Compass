@@ -37,6 +37,60 @@ const unitKPIData = {
   }
 };
 
+// Historical data by unit for charts
+const unitHistoricalData = {
+  'campo-grande': [
+    { month: 'Jan', cac: 135, crc: 88, ltv: 2750, churnRate: 4.8, ltvCacRatio: 20.4 },
+    { month: 'Fev', cac: 132, crc: 86, ltv: 2780, churnRate: 4.6, ltvCacRatio: 21.1 },
+    { month: 'Mar', cac: 128, crc: 84, ltv: 2820, churnRate: 4.4, ltvCacRatio: 22.0 },
+    { month: 'Abr', cac: 130, crc: 85, ltv: 2840, churnRate: 4.3, ltvCacRatio: 21.8 },
+    { month: 'Mai', cac: 129, crc: 84, ltv: 2860, churnRate: 4.1, ltvCacRatio: 22.2 },
+    { month: 'Jun', cac: 130.5, crc: 85.2, ltv: 2850, churnRate: 4.2, ltvCacRatio: 21.8 }
+  ],
+  'recreio': [
+    { month: 'Jan', cac: 148, crc: 95, ltv: 2580, churnRate: 6.5, ltvCacRatio: 17.4 },
+    { month: 'Fev', cac: 145, crc: 94, ltv: 2600, churnRate: 6.2, ltvCacRatio: 17.9 },
+    { month: 'Mar', cac: 144, crc: 93, ltv: 2620, churnRate: 6.0, ltvCacRatio: 18.2 },
+    { month: 'Abr', cac: 143, crc: 92, ltv: 2630, churnRate: 5.9, ltvCacRatio: 18.4 },
+    { month: 'Mai', cac: 142, crc: 91, ltv: 2640, churnRate: 5.8, ltvCacRatio: 18.6 },
+    { month: 'Jun', cac: 142.75, crc: 92.4, ltv: 2650, churnRate: 5.8, ltvCacRatio: 18.6 }
+  ],
+  'barra': [
+    { month: 'Jan', cac: 142, crc: 90, ltv: 2880, churnRate: 4.3, ltvCacRatio: 20.3 },
+    { month: 'Fev', cac: 140, crc: 89, ltv: 2900, churnRate: 4.1, ltvCacRatio: 20.7 },
+    { month: 'Mar', cac: 139, crc: 88, ltv: 2910, churnRate: 4.0, ltvCacRatio: 20.9 },
+    { month: 'Abr', cac: 138, crc: 87, ltv: 2915, churnRate: 3.9, ltvCacRatio: 21.1 },
+    { month: 'Mai', cac: 137, crc: 87, ltv: 2918, churnRate: 3.8, ltvCacRatio: 21.3 },
+    { month: 'Jun', cac: 138.9, crc: 88.6, ltv: 2920, churnRate: 3.9, ltvCacRatio: 21.0 }
+  ]
+};
+
+// Calculate consolidated historical data for "all" units
+const getConsolidatedHistoricalData = () => {
+  const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'];
+  return months.map(month => {
+    const monthData = Object.values(unitHistoricalData).map(unitData => 
+      unitData.find(data => data.month === month)!
+    );
+    
+    const avgCac = monthData.reduce((sum, data) => sum + data.cac, 0) / monthData.length;
+    const avgCrc = monthData.reduce((sum, data) => sum + data.crc, 0) / monthData.length;
+    const avgLtv = monthData.reduce((sum, data) => sum + data.ltv, 0) / monthData.length;
+    const avgChurnRate = monthData.reduce((sum, data) => sum + data.churnRate, 0) / monthData.length;
+    
+    return {
+      month,
+      cac: Math.round(avgCac * 100) / 100,
+      crc: Math.round(avgCrc * 100) / 100,
+      ltv: Math.round(avgLtv),
+      churnRate: Math.round(avgChurnRate * 10) / 10,
+      ltvCacRatio: Math.round((avgLtv / avgCac) * 10) / 10
+    };
+  });
+};
+
+const allUnitsHistoricalData = getConsolidatedHistoricalData();
+
 // Calculate consolidated data for "all" units (average of the three units)
 const getConsolidatedKPIs = () => {
   const units = Object.values(unitKPIData);
@@ -128,6 +182,16 @@ export const getKPIsByUnit = (unitId: string): KPIData[] => {
   
   console.log('📈 [kpiData.getKPIsByUnit] Generated KPIs:', kpis);
   return kpis;
+};
+
+export const getHistoricalDataByUnit = (unitId: string) => {
+  console.log('📊 [kpiData.getHistoricalDataByUnit] Getting historical data for unit:', unitId);
+  
+  if (unitId === 'all') {
+    return allUnitsHistoricalData;
+  }
+  
+  return unitHistoricalData[unitId as keyof typeof unitHistoricalData] || unitHistoricalData['campo-grande'];
 };
 
 export const getKPIDetails = (kpiId: string, unitId: string) => {
