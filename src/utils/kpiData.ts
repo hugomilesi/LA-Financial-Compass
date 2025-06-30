@@ -1,4 +1,3 @@
-
 import { UNITS } from '@/contexts/UnitContext';
 
 export interface KPIData {
@@ -12,56 +11,56 @@ export interface KPIData {
   unit: string;
 }
 
-// Updated KPI data by unit with specific values including CRC
+// Updated KPI data by unit with new real-world values
 const unitKPIData = {
   'campo-grande': {
-    cac: 130.50,
-    crc: 85.20, // Cost Retention Cost
-    ltv: 2850,
-    permanencia: 18.5, // months
-    churnRate: 4.2 // percentage
+    cac: 245.80,
+    crc: 128.50,
+    ltv: 4200,
+    permanencia: 22.3, // months
+    churnRate: 3.1 // percentage
   },
   'recreio': {
-    cac: 142.75,
-    crc: 92.40,
-    ltv: 2650,
-    permanencia: 16.2,
-    churnRate: 5.8 // percentage
+    cac: 280.20,
+    crc: 145.75,
+    ltv: 3850,
+    permanencia: 19.8,
+    churnRate: 4.7 // percentage
   },
   'barra': {
-    cac: 138.90,
-    crc: 88.60,
-    ltv: 2920,
-    permanencia: 19.8,
-    churnRate: 3.9 // percentage
+    cac: 298.50,
+    crc: 156.90,
+    ltv: 4650,
+    permanencia: 25.1,
+    churnRate: 2.8 // percentage
   }
 };
 
-// Historical data by unit for charts
+// Updated historical data by unit for charts with new realistic trends
 const unitHistoricalData = {
   'campo-grande': [
-    { month: 'Jan', cac: 135, crc: 88, ltv: 2750, churnRate: 4.8, ltvCacRatio: 20.4 },
-    { month: 'Fev', cac: 132, crc: 86, ltv: 2780, churnRate: 4.6, ltvCacRatio: 21.1 },
-    { month: 'Mar', cac: 128, crc: 84, ltv: 2820, churnRate: 4.4, ltvCacRatio: 22.0 },
-    { month: 'Abr', cac: 130, crc: 85, ltv: 2840, churnRate: 4.3, ltvCacRatio: 21.8 },
-    { month: 'Mai', cac: 129, crc: 84, ltv: 2860, churnRate: 4.1, ltvCacRatio: 22.2 },
-    { month: 'Jun', cac: 130.5, crc: 85.2, ltv: 2850, churnRate: 4.2, ltvCacRatio: 21.8 }
+    { month: 'Jan', cac: 250.20, crc: 132.40, ltv: 4050, churnRate: 3.5, ltvCacRatio: 16.2 },
+    { month: 'Fev', cac: 248.90, crc: 130.80, ltv: 4100, churnRate: 3.4, ltvCacRatio: 16.5 },
+    { month: 'Mar', cac: 247.30, cac: 129.20, ltv: 4150, churnRate: 3.3, ltvCacRatio: 16.8 },
+    { month: 'Abr', cac: 246.10, crc: 128.90, ltv: 4180, churnRate: 3.2, ltvCacRatio: 17.0 },
+    { month: 'Mai', cac: 245.50, crc: 128.70, ltv: 4190, churnRate: 3.1, ltvCacRatio: 17.1 },
+    { month: 'Jun', cac: 245.80, crc: 128.50, ltv: 4200, churnRate: 3.1, ltvCacRatio: 17.1 }
   ],
   'recreio': [
-    { month: 'Jan', cac: 148, crc: 95, ltv: 2580, churnRate: 6.5, ltvCacRatio: 17.4 },
-    { month: 'Fev', cac: 145, crc: 94, ltv: 2600, churnRate: 6.2, ltvCacRatio: 17.9 },
-    { month: 'Mar', cac: 144, crc: 93, ltv: 2620, churnRate: 6.0, ltvCacRatio: 18.2 },
-    { month: 'Abr', cac: 143, crc: 92, ltv: 2630, churnRate: 5.9, ltvCacRatio: 18.4 },
-    { month: 'Mai', cac: 142, crc: 91, ltv: 2640, churnRate: 5.8, ltvCacRatio: 18.6 },
-    { month: 'Jun', cac: 142.75, crc: 92.4, ltv: 2650, churnRate: 5.8, ltvCacRatio: 18.6 }
+    { month: 'Jan', cac: 285.40, crc: 148.30, ltv: 3720, churnRate: 5.2, ltvCacRatio: 13.0 },
+    { month: 'Fev', cac: 284.10, crc: 147.80, ltv: 3750, churnRate: 5.0, ltvCacRatio: 13.2 },
+    { month: 'Mar', cac: 282.80, crc: 147.20, ltv: 3780, churnRate: 4.9, ltvCacRatio: 13.4 },
+    { month: 'Abr', cac: 281.60, crc: 146.50, ltv: 3810, churnRate: 4.8, ltvCacRatio: 13.5 },
+    { month: 'Mai', cac: 280.90, crc: 146.10, ltv: 3830, churnRate: 4.7, ltvCacRatio: 13.6 },
+    { month: 'Jun', cac: 280.20, crc: 145.75, ltv: 3850, churnRate: 4.7, ltvCacRatio: 13.7 }
   ],
   'barra': [
-    { month: 'Jan', cac: 142, crc: 90, ltv: 2880, churnRate: 4.3, ltvCacRatio: 20.3 },
-    { month: 'Fev', cac: 140, crc: 89, ltv: 2900, churnRate: 4.1, ltvCacRatio: 20.7 },
-    { month: 'Mar', cac: 139, crc: 88, ltv: 2910, churnRate: 4.0, ltvCacRatio: 20.9 },
-    { month: 'Abr', cac: 138, crc: 87, ltv: 2915, churnRate: 3.9, ltvCacRatio: 21.1 },
-    { month: 'Mai', cac: 137, crc: 87, ltv: 2918, churnRate: 3.8, ltvCacRatio: 21.3 },
-    { month: 'Jun', cac: 138.9, crc: 88.6, ltv: 2920, churnRate: 3.9, ltvCacRatio: 21.0 }
+    { month: 'Jan', cac: 305.80, crc: 162.40, ltv: 4480, churnRate: 3.2, ltvCacRatio: 14.6 },
+    { month: 'Fev', cac: 304.20, crc: 161.80, ltv: 4520, churnRate: 3.1, ltvCacRatio: 14.9 },
+    { month: 'Mar', cac: 302.10, crc: 160.90, ltv: 4560, churnRate: 3.0, ltvCacRatio: 15.1 },
+    { month: 'Abr', cac: 300.50, crc: 159.80, ltv: 4590, churnRate: 2.9, ltvCacRatio: 15.3 },
+    { month: 'Mai', cac: 299.40, crc: 158.20, ltv: 4620, churnRate: 2.8, ltvCacRatio: 15.4 },
+    { month: 'Jun', cac: 298.50, crc: 156.90, ltv: 4650, churnRate: 2.8, ltvCacRatio: 15.6 }
   ]
 };
 
@@ -208,7 +207,7 @@ export const getKPIDetails = (kpiId: string, unitId: string) => {
       case 'cac':
         return {
           currentValue: kpi.value,
-          target: 'R$ 120,00',
+          target: 'R$ 220,00',
           trend: 'Estável',
           factors: [
             'Investimento em marketing digital',
@@ -225,7 +224,7 @@ export const getKPIDetails = (kpiId: string, unitId: string) => {
       case 'crc':
         return {
           currentValue: kpi.value,
-          target: 'R$ 80,00',
+          target: 'R$ 120,00',
           trend: 'Crescendo',
           factors: [
             'Programas de fidelização',
@@ -242,7 +241,7 @@ export const getKPIDetails = (kpiId: string, unitId: string) => {
       case 'ltv':
         return {
           currentValue: kpi.value,
-          target: 'R$ 3.000',
+          target: 'R$ 4.500',
           trend: 'Crescendo',
           factors: [
             'Retenção de alunos',
@@ -259,7 +258,7 @@ export const getKPIDetails = (kpiId: string, unitId: string) => {
       case 'permanencia':
         return {
           currentValue: kpi.value,
-          target: '20 meses',
+          target: '24 meses',
           trend: 'Estável',
           factors: [
             'Qualidade do ensino',
@@ -276,7 +275,7 @@ export const getKPIDetails = (kpiId: string, unitId: string) => {
       case 'churn-rate':
         return {
           currentValue: kpi.value,
-          target: '3,0%',
+          target: '2,5%',
           trend: 'Decrescendo',
           factors: [
             'Satisfação do cliente',
