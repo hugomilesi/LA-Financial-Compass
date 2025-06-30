@@ -1,5 +1,3 @@
-
-
 import { UNITS } from '@/contexts/UnitContext';
 
 export interface KPIData {
@@ -16,11 +14,11 @@ export interface KPIData {
 // Updated KPI data by unit with new real-world values
 const unitKPIData = {
   'campo-grande': {
-    cac: 220.50,
-    crc: 95.30,
-    ltv: 3850,
-    permanencia: 18.5, // months
-    churnRate: 4.1 // percentage
+    cac: 290.07,
+    crc: 83.55,
+    ltv: 5406,
+    permanencia: 19, // months
+    churnRate: 4.5 // percentage
   },
   'recreio': {
     cac: 280.20,
@@ -41,12 +39,12 @@ const unitKPIData = {
 // Updated historical data by unit for charts with new realistic trends
 const unitHistoricalData = {
   'campo-grande': [
-    { month: 'Jan', cac: 235.80, crc: 102.10, ltv: 3720, churnRate: 4.8, ltvCacRatio: 15.8 },
-    { month: 'Fev', cac: 230.20, crc: 100.50, ltv: 3750, churnRate: 4.6, ltvCacRatio: 16.3 },
-    { month: 'Mar', cac: 226.90, crc: 98.80, ltv: 3780, churnRate: 4.4, ltvCacRatio: 16.7 },
-    { month: 'Abr', cac: 224.10, crc: 97.20, ltv: 3810, churnRate: 4.3, ltvCacRatio: 17.0 },
-    { month: 'Mai', cac: 222.30, crc: 96.10, ltv: 3830, churnRate: 4.2, ltvCacRatio: 17.2 },
-    { month: 'Jun', cac: 220.50, crc: 95.30, ltv: 3850, churnRate: 4.1, ltvCacRatio: 17.5 }
+    { month: 'Jan', cac: 305.20, crc: 89.30, ltv: 5200, churnRate: 4.9, ltvCacRatio: 17.0 },
+    { month: 'Fev', cac: 302.15, crc: 87.80, ltv: 5250, churnRate: 4.8, ltvCacRatio: 17.4 },
+    { month: 'Mar', cac: 298.50, crc: 86.20, ltv: 5300, churnRate: 4.7, ltvCacRatio: 17.7 },
+    { month: 'Abr', cac: 295.80, crc: 85.10, ltv: 5350, churnRate: 4.6, ltvCacRatio: 18.1 },
+    { month: 'Mai', cac: 292.90, crc: 84.30, ltv: 5380, churnRate: 4.5, ltvCacRatio: 18.4 },
+    { month: 'Jun', cac: 290.07, crc: 83.55, ltv: 5406, churnRate: 4.5, ltvCacRatio: 18.6 }
   ],
   'recreio': [
     { month: 'Jan', cac: 285.40, crc: 148.30, ltv: 3720, churnRate: 5.2, ltvCacRatio: 13.0 },
