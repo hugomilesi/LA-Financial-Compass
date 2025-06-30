@@ -1,3 +1,4 @@
+
 import { UNITS } from '@/contexts/UnitContext';
 
 export interface KPIData {
@@ -41,7 +42,7 @@ const unitHistoricalData = {
   'campo-grande': [
     { month: 'Jan', cac: 250.20, crc: 132.40, ltv: 4050, churnRate: 3.5, ltvCacRatio: 16.2 },
     { month: 'Fev', cac: 248.90, crc: 130.80, ltv: 4100, churnRate: 3.4, ltvCacRatio: 16.5 },
-    { month: 'Mar', cac: 247.30, cac: 129.20, ltv: 4150, churnRate: 3.3, ltvCacRatio: 16.8 },
+    { month: 'Mar', cac: 247.30, crc: 129.20, ltv: 4150, churnRate: 3.3, ltvCacRatio: 16.8 },
     { month: 'Abr', cac: 246.10, crc: 128.90, ltv: 4180, churnRate: 3.2, ltvCacRatio: 17.0 },
     { month: 'Mai', cac: 245.50, crc: 128.70, ltv: 4190, churnRate: 3.1, ltvCacRatio: 17.1 },
     { month: 'Jun', cac: 245.80, crc: 128.50, ltv: 4200, churnRate: 3.1, ltvCacRatio: 17.1 }
