@@ -4,11 +4,11 @@ import { Account, AccountType } from '@/types/chartOfAccounts';
 const STORAGE_KEY = 'la-music-chart-of-accounts';
 
 const defaultAccounts: Account[] = [
-  // RECEITAS (REVENUE)
-  // Receitas Operacionais
+  // RECEITAS (REVENUE) - NOVA ESTRUTURA HIERÁRQUICA
+  // 3 - RECEITAS OPERACIONAIS
   {
-    id: 'rev-1',
-    code: '3.1',
+    id: 'rev-3',
+    code: '3',
     name: 'Receitas Operacionais',
     type: 'revenue',
     isActive: true,
@@ -17,84 +17,220 @@ const defaultAccounts: Account[] = [
     createdAt: new Date(),
     updatedAt: new Date()
   },
+
+  // 3.1 - CURSOS
   {
-    id: 'rev-1.1',
+    id: 'rev-3.1',
+    code: '3.1',
+    name: 'Cursos',
+    type: 'revenue',
+    parentId: 'rev-3',
+    isActive: true,
+    level: 1,
+    hasChildren: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-3.1.1',
     code: '3.1.1',
     name: 'Mensalidades',
     type: 'revenue',
-    parentId: 'rev-1',
+    parentId: 'rev-3.1',
     isActive: true,
-    level: 1,
+    level: 2,
     hasChildren: true,
     createdAt: new Date(),
     updatedAt: new Date()
   },
   {
-    id: 'rev-1.1.1',
+    id: 'rev-3.1.1.1',
     code: '3.1.1.1',
     name: 'Mensalidades - Campo Grande',
     type: 'revenue',
-    parentId: 'rev-1.1',
+    parentId: 'rev-3.1.1',
     isActive: true,
-    level: 2,
+    level: 3,
     hasChildren: false,
     createdAt: new Date(),
     updatedAt: new Date()
   },
   {
-    id: 'rev-1.1.2',
+    id: 'rev-3.1.1.2',
     code: '3.1.1.2',
     name: 'Mensalidades - Recreio',
     type: 'revenue',
-    parentId: 'rev-1.1',
+    parentId: 'rev-3.1.1',
     isActive: true,
-    level: 2,
+    level: 3,
     hasChildren: false,
     createdAt: new Date(),
     updatedAt: new Date()
   },
   {
-    id: 'rev-1.2',
+    id: 'rev-3.1.1.3',
+    code: '3.1.1.3',
+    name: 'Mensalidades - Barra',
+    type: 'revenue',
+    parentId: 'rev-3.1.1',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-3.1.2',
     code: '3.1.2',
     name: 'Taxas de Matrícula',
     type: 'revenue',
-    parentId: 'rev-1',
+    parentId: 'rev-3.1',
     isActive: true,
-    level: 1,
+    level: 2,
     hasChildren: true,
     createdAt: new Date(),
     updatedAt: new Date()
   },
   {
-    id: 'rev-1.2.1',
+    id: 'rev-3.1.2.1',
     code: '3.1.2.1',
     name: 'Matrícula - Campo Grande',
     type: 'revenue',
-    parentId: 'rev-1.2',
+    parentId: 'rev-3.1.2',
     isActive: true,
-    level: 2,
+    level: 3,
     hasChildren: false,
     createdAt: new Date(),
     updatedAt: new Date()
   },
   {
-    id: 'rev-1.2.2',
+    id: 'rev-3.1.2.2',
     code: '3.1.2.2',
     name: 'Matrícula - Recreio',
     type: 'revenue',
-    parentId: 'rev-1.2',
+    parentId: 'rev-3.1.2',
     isActive: true,
-    level: 2,
+    level: 3,
     hasChildren: false,
     createdAt: new Date(),
     updatedAt: new Date()
   },
   {
-    id: 'rev-1.3',
+    id: 'rev-3.1.2.3',
+    code: '3.1.2.3',
+    name: 'Matrícula - Barra',
+    type: 'revenue',
+    parentId: 'rev-3.1.2',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-3.1.3',
     code: '3.1.3',
     name: 'Aulas Particulares',
     type: 'revenue',
-    parentId: 'rev-1',
+    parentId: 'rev-3.1',
+    isActive: true,
+    level: 2,
+    hasChildren: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-3.1.3.1',
+    code: '3.1.3.1',
+    name: 'Aulas Particulares - Campo Grande',
+    type: 'revenue',
+    parentId: 'rev-3.1.3',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-3.1.3.2',
+    code: '3.1.3.2',
+    name: 'Aulas Particulares - Recreio',
+    type: 'revenue',
+    parentId: 'rev-3.1.3',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-3.1.3.3',
+    code: '3.1.3.3',
+    name: 'Aulas Particulares - Barra',
+    type: 'revenue',
+    parentId: 'rev-3.1.3',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-3.1.4',
+    code: '3.1.4',
+    name: 'Workshops e Cursos Livres',
+    type: 'revenue',
+    parentId: 'rev-3.1',
+    isActive: true,
+    level: 2,
+    hasChildren: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-3.1.4.1',
+    code: '3.1.4.1',
+    name: 'Workshops - Campo Grande',
+    type: 'revenue',
+    parentId: 'rev-3.1.4',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-3.1.4.2',
+    code: '3.1.4.2',
+    name: 'Workshops - Recreio',
+    type: 'revenue',
+    parentId: 'rev-3.1.4',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-3.1.4.3',
+    code: '3.1.4.3',
+    name: 'Workshops - Barra',
+    type: 'revenue',
+    parentId: 'rev-3.1.4',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+
+  // 3.2 - LOJINHA
+  {
+    id: 'rev-3.2',
+    code: '3.2',
+    name: 'Lojinha',
+    type: 'revenue',
+    parentId: 'rev-3',
     isActive: true,
     level: 1,
     hasChildren: true,
@@ -102,11 +238,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'rev-1.3.1',
-    code: '3.1.3.1',
-    name: 'Aulas Particulares - Campo Grande',
+    id: 'rev-3.2.1',
+    code: '3.2.1',
+    name: 'Instrumentos Musicais',
     type: 'revenue',
-    parentId: 'rev-1.3',
+    parentId: 'rev-3.2',
     isActive: true,
     level: 2,
     hasChildren: false,
@@ -114,11 +250,35 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'rev-1.3.2',
-    code: '3.1.3.2',
-    name: 'Aulas Particulares - Recreio',
+    id: 'rev-3.2.2',
+    code: '3.2.2',
+    name: 'Acessórios',
     type: 'revenue',
-    parentId: 'rev-1.3',
+    parentId: 'rev-3.2',
+    isActive: true,
+    level: 2,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-3.2.3',
+    code: '3.2.3',
+    name: 'Partituras e Métodos',
+    type: 'revenue',
+    parentId: 'rev-3.2',
+    isActive: true,
+    level: 2,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-3.2.4',
+    code: '3.2.4',
+    name: 'Merchandise',
+    type: 'revenue',
+    parentId: 'rev-3.2',
     isActive: true,
     level: 2,
     hasChildren: false,
@@ -126,8 +286,282 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
 
-  // DESPESAS (EXPENSES) - NOVA ESTRUTURA HIERÁRQUICA
-  // 4.1 - DESPESAS OPERACIONAIS
+  // 3.3 - LA PRODUÇÕES
+  {
+    id: 'rev-3.3',
+    code: '3.3',
+    name: 'LA Produções',
+    type: 'revenue',
+    parentId: 'rev-3',
+    isActive: true,
+    level: 1,
+    hasChildren: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-3.3.1',
+    code: '3.3.1',
+    name: 'Shows e Apresentações',
+    type: 'revenue',
+    parentId: 'rev-3.3',
+    isActive: true,
+    level: 2,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-3.3.2',
+    code: '3.3.2',
+    name: 'Eventos Corporativos',
+    type: 'revenue',
+    parentId: 'rev-3.3',
+    isActive: true,
+    level: 2,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-3.3.3',
+    code: '3.3.3',
+    name: 'Produção Musical',
+    type: 'revenue',
+    parentId: 'rev-3.3',
+    isActive: true,
+    level: 2,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-3.3.4',
+    code: '3.3.4',
+    name: 'Locação de Equipamentos',
+    type: 'revenue',
+    parentId: 'rev-3.3',
+    isActive: true,
+    level: 2,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+
+  // 3.4 - OUTRAS VENDAS OPERACIONAIS
+  {
+    id: 'rev-3.4',
+    code: '3.4',
+    name: 'Outras Vendas Operacionais',
+    type: 'revenue',
+    parentId: 'rev-3',
+    isActive: true,
+    level: 1,
+    hasChildren: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-3.4.1',
+    code: '3.4.1',
+    name: 'Parcerias Educacionais',
+    type: 'revenue',
+    parentId: 'rev-3.4',
+    isActive: true,
+    level: 2,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-3.4.2',
+    code: '3.4.2',
+    name: 'Consultoria Musical',
+    type: 'revenue',
+    parentId: 'rev-3.4',
+    isActive: true,
+    level: 2,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-3.4.3',
+    code: '3.4.3',
+    name: 'Outras Receitas',
+    type: 'revenue',
+    parentId: 'rev-3.4',
+    isActive: true,
+    level: 2,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+
+  // 7 - RECEITAS NÃO OPERACIONAIS
+  {
+    id: 'rev-7',
+    code: '7',
+    name: 'Receitas Não Operacionais',
+    type: 'revenue',
+    isActive: true,
+    level: 0,
+    hasChildren: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+
+  // 7.1 - RECEITAS FINANCEIRAS
+  {
+    id: 'rev-7.1',
+    code: '7.1',
+    name: 'Receitas Financeiras',
+    type: 'revenue',
+    parentId: 'rev-7',
+    isActive: true,
+    level: 1,
+    hasChildren: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-7.1.1',
+    code: '7.1.1',
+    name: 'Juros de Aplicações Financeiras',
+    type: 'revenue',
+    parentId: 'rev-7.1',
+    isActive: true,
+    level: 2,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-7.1.2',
+    code: '7.1.2',
+    name: 'Rendimento de Poupança',
+    type: 'revenue',
+    parentId: 'rev-7.1',
+    isActive: true,
+    level: 2,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-7.1.3',
+    code: '7.1.3',
+    name: 'Descontos Obtidos',
+    type: 'revenue',
+    parentId: 'rev-7.1',
+    isActive: true,
+    level: 2,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+
+  // 7.2 - RECEITAS EXTRAORDINÁRIAS
+  {
+    id: 'rev-7.2',
+    code: '7.2',
+    name: 'Receitas Extraordinárias',
+    type: 'revenue',
+    parentId: 'rev-7',
+    isActive: true,
+    level: 1,
+    hasChildren: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-7.2.1',
+    code: '7.2.1',
+    name: 'Venda de Ativo Imobilizado',
+    type: 'revenue',
+    parentId: 'rev-7.2',
+    isActive: true,
+    level: 2,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-7.2.2',
+    code: '7.2.2',
+    name: 'Recuperação de Créditos',
+    type: 'revenue',
+    parentId: 'rev-7.2',
+    isActive: true,
+    level: 2,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-7.2.3',
+    code: '7.2.3',
+    name: 'Doações Recebidas',
+    type: 'revenue',
+    parentId: 'rev-7.2',
+    isActive: true,
+    level: 2,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+
+  // 7.3 - OUTRAS RECEITAS NÃO OPERACIONAIS
+  {
+    id: 'rev-7.3',
+    code: '7.3',
+    name: 'Outras Receitas Não Operacionais',
+    type: 'revenue',
+    parentId: 'rev-7',
+    isActive: true,
+    level: 1,
+    hasChildren: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-7.3.1',
+    code: '7.3.1',
+    name: 'Subvenções Governamentais',
+    type: 'revenue',
+    parentId: 'rev-7.3',
+    isActive: true,
+    level: 2,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-7.3.2',
+    code: '7.3.2',
+    name: 'Royalties e Licenças',
+    type: 'revenue',
+    parentId: 'rev-7.3',
+    isActive: true,
+    level: 2,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'rev-7.3.3',
+    code: '7.3.3',
+    name: 'Receitas Eventuais',
+    type: 'revenue',
+    parentId: 'rev-7.3',
+    isActive: true,
+    level: 2,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+
+  // DESPESAS (EXPENSE) - Mantidas da estrutura original
   {
     id: 'exp-4.1',
     code: '4.1',
@@ -862,7 +1296,7 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
 
-  // INVESTIMENTOS (ASSETS) - Mantidos da estrutura original
+  // ASSETS (INVESTIMENTOS) - Mantidos da estrutura original
   {
     id: 'inv-1',
     code: '1.1',
@@ -1011,55 +1445,6 @@ const defaultAccounts: Account[] = [
     name: 'Móveis e Utensílios',
     type: 'asset',
     parentId: 'inv-2.1',
-    isActive: true,
-    level: 2,
-    hasChildren: false,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-
-  // RECEITAS NÃO OPERACIONAIS (REVENUE) - Mantidas da estrutura original
-  {
-    id: 'rev-2',
-    code: '3.2',
-    name: 'Receitas Não Operacionais',
-    type: 'revenue',
-    isActive: true,
-    level: 0,
-    hasChildren: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: 'rev-2.1',
-    code: '3.2.1',
-    name: 'Receitas Financeiras',
-    type: 'revenue',
-    parentId: 'rev-2',
-    isActive: true,
-    level: 1,
-    hasChildren: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: 'rev-2.1.1',
-    code: '3.2.1.1',
-    name: 'Juros de Aplicações',
-    type: 'revenue',
-    parentId: 'rev-2.1',
-    isActive: true,
-    level: 2,
-    hasChildren: false,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: 'rev-2.1.2',
-    code: '3.2.1.2',
-    name: 'Descontos Obtidos',
-    type: 'revenue',
-    parentId: 'rev-2.1',
     isActive: true,
     level: 2,
     hasChildren: false,
