@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Lightbulb } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -139,8 +138,13 @@ export const StrategicTooltip: React.FC<StrategicTooltipProps> = ({ type, data }
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <button className="p-1 hover:bg-gray-100 rounded-full transition-colors">
-            <Lightbulb className="w-4 h-4 text-yellow-500 hover:text-yellow-600" />
+          <button 
+            className="group relative p-2 bg-gradient-to-r from-yellow-50 to-amber-50 hover:from-yellow-100 hover:to-amber-100 rounded-full shadow-sm hover:shadow-md transition-all duration-200 hover:scale-110 border border-yellow-200 hover:border-yellow-300"
+            aria-label={`Ver análise estratégica ${type === 'ltv-cac' ? 'da relação LTV/CAC' : 'de retenção'}`}
+            title={`Clique para ver insights estratégicos ${type === 'ltv-cac' ? 'da relação LTV/CAC' : 'de retenção'}`}
+          >
+            <Lightbulb className="w-6 h-6 text-yellow-600 group-hover:text-yellow-700 transition-colors duration-200 animate-pulse-glow" />
+            <div className="absolute inset-0 rounded-full ring-2 ring-yellow-300 opacity-0 group-hover:opacity-30 transition-opacity duration-200"></div>
           </button>
         </TooltipTrigger>
         <TooltipContent className="w-80 p-4">
