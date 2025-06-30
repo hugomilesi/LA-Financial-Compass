@@ -15,8 +15,10 @@ interface ChartOfAccountsContentProps {
   onToggleExpanded: (accountId: string) => void;
   onEdit: (account: Account) => void;
   onDelete: (accountId: string) => void;
+  onUpdateNotes: (accountId: string, notes: string) => void;
   onSaveAccount: (accountData: Omit<Account, 'id'>) => void;
   onCancelForm: () => void;
+  alerts: any[];
 }
 
 const accountTypes: { type: AccountType; label: string; description: string }[] = [
@@ -38,8 +40,10 @@ export const ChartOfAccountsContent = ({
   onToggleExpanded,
   onEdit,
   onDelete,
+  onUpdateNotes,
   onSaveAccount,
-  onCancelForm
+  onCancelForm,
+  alerts
 }: ChartOfAccountsContentProps) => {
   const getUnitDisplayName = () => {
     switch (selectedUnit) {
@@ -83,6 +87,8 @@ export const ChartOfAccountsContent = ({
             onToggleExpanded={onToggleExpanded}
             onEdit={onEdit}
             onDelete={onDelete}
+            onUpdateNotes={onUpdateNotes}
+            alerts={alerts}
           />
         ))}
       </div>

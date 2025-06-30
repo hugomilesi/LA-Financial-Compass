@@ -14,6 +14,8 @@ interface AccountTypeSectionProps {
   onToggleExpanded: (accountId: string) => void;
   onEdit: (account: Account) => void;
   onDelete: (accountId: string) => void;
+  onUpdateNotes: (accountId: string, notes: string) => void;
+  alerts: any[];
 }
 
 export const AccountTypeSection = ({
@@ -25,7 +27,9 @@ export const AccountTypeSection = ({
   expandedAccounts,
   onToggleExpanded,
   onEdit,
-  onDelete
+  onDelete,
+  onUpdateNotes,
+  alerts
 }: AccountTypeSectionProps) => {
   const typeAccounts = filteredAccounts.filter(account => account.type === type && !account.parentId);
   
@@ -55,7 +59,9 @@ export const AccountTypeSection = ({
               onToggleExpanded={onToggleExpanded}
               onEdit={onEdit}
               onDelete={onDelete}
+              onUpdateNotes={onUpdateNotes}
               level={0}
+              alerts={alerts}
             />
           ))}
         </div>

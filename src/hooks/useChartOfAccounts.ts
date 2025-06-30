@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Account, AccountType } from '@/types/chartOfAccounts';
 
@@ -742,15 +743,32 @@ export const useChartOfAccounts = () => {
         const parsed = JSON.parse(storedAccounts);
         setAccounts(parsed.map((account: any) => ({
           ...account,
+          status: account.status || 'active',
+          priority: account.priority || 0,
+          tags: account.tags || [],
+          notes: account.notes || '',
           createdAt: new Date(account.createdAt),
-          updatedAt: new Date(account.updatedAt)
+          updatedAt: new Date(account.updatedAt),
+          lastUsed: account.lastUsed ? new Date(account.lastUsed) : undefined
         })));
       } catch (error) {
         console.error('Error parsing stored accounts:', error);
-        setAccounts(defaultAccounts);
+        setAccounts(defaultAccounts.map(acc => ({
+          ...acc,
+          status: 'active',
+          priority: 0,
+          tags: [],
+          notes: ''
+        })));
       }
     } else {
-      setAccounts(defaultAccounts);
+      setAccounts(defaultAccounts.map(acc => ({
+        ...acc,
+        status: 'active',
+        priority: 0,
+        tags: [],
+        notes: ''
+      })));
     }
   }, []);
 
@@ -767,6 +785,10 @@ export const useChartOfAccounts = () => {
     const newAccount: Account = {
       ...accountData,
       id: generateId(),
+      status: accountData.status || 'active',
+      priority: accountData.priority || 0,
+      tags: accountData.tags || [],
+      notes: accountData.notes || '',
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -791,6 +813,10 @@ export const useChartOfAccounts = () => {
         : account
     );
     saveToStorage(updatedAccounts);
+  };
+
+  const updateAccountNotes = (id: string, notes: string) => {
+    updateAccount(id, { notes });
   };
 
   const deleteAccount = (id: string) => {
@@ -823,6 +849,16 @@ export const useChartOfAccounts = () => {
     saveToStorage(updatedAccounts);
   };
 
+  const reorderAccounts = (accountIds: string[]) => {
+    const reorderedAccounts = accountIds.map((id, index) => {
+      const account = accounts.find(acc => acc.id === id);
+      return account ? { ...account, priority: index } : null;
+    }).filter(Boolean) as Account[];
+    
+    const otherAccounts = accounts.filter(acc => !accountIds.includes(acc.id));
+    saveToStorage([...reorderedAccounts, ...otherAccounts]);
+  };
+
   const getChildAccounts = (parentId: string) => {
     return accounts.filter(account => account.parentId === parentId);
   };
@@ -845,7 +881,9 @@ export const useChartOfAccounts = () => {
     accounts,
     addAccount,
     updateAccount,
+    updateAccountNotes,
     deleteAccount,
+    reorderAccounts,
     getChildAccounts,
     getAccountPath
   };
