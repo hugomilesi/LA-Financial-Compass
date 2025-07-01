@@ -169,7 +169,7 @@ export const AIInsightsModal = ({ isOpen, onClose, performanceData, selectedUnit
             <TabsTrigger value="comparative">Comparativo</TabsTrigger>
             <TabsTrigger value="strategic">Estratégico</TabsTrigger>
             <TabsTrigger value="operational">Operacional</TabsTrigger>
-          </Tabs>
+          </TabsList>
 
           <div className="mt-6">
             <TabsContent value="overview" className="space-y-4">
