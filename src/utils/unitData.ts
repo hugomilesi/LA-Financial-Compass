@@ -17,6 +17,14 @@ export interface UnitCostCenterData {
   amount: number;
 }
 
+// Historical data structure
+export interface UnitHistoricalData {
+  month: string;
+  receita: number;
+  despesa: number;
+  alunos: number;
+}
+
 export const UNIT_DATA: Record<string, UnitFinancialData> = {
   'campo-grande': {
     receita: 145320,
@@ -72,31 +80,31 @@ export const UNIT_COST_CENTER_DATA: Record<string, UnitCostCenterData[]> = {
   ]
 };
 
-// Historical data by unit - updated to match new expense values with proportional adjustments
-export const UNIT_HISTORICAL_DATA: Record<string, Array<{month: string, receita: number, despesa: number}>> = {
+// Historical data by unit - updated to include alunos data
+export const UNIT_HISTORICAL_DATA: Record<string, UnitHistoricalData[]> = {
   'campo-grande': [
-    { month: 'Jan', receita: 129800, despesa: 106964 },
-    { month: 'Fev', receita: 135600, despesa: 109716 },
-    { month: 'Mar', receita: 140100, despesa: 112242 },
-    { month: 'Abr', receita: 138700, despesa: 111304 },
-    { month: 'Mai', receita: 141500, despesa: 112681 },
-    { month: 'Jun', receita: 145320, despesa: 113930 }
+    { month: 'Jan', receita: 129800, despesa: 106964, alunos: 440 },
+    { month: 'Fev', receita: 135600, despesa: 109716, alunos: 450 },
+    { month: 'Mar', receita: 140100, despesa: 112242, alunos: 455 },
+    { month: 'Abr', receita: 138700, despesa: 111304, alunos: 460 },
+    { month: 'Mai', receita: 141500, despesa: 112681, alunos: 462 },
+    { month: 'Jun', receita: 145320, despesa: 113930, alunos: 465 }
   ],
   'recreio': [
-    { month: 'Jan', receita: 114900, despesa: 95366 },
-    { month: 'Fev', receita: 120900, despesa: 97925 },
-    { month: 'Mar', receita: 125400, despesa: 99807 },
-    { month: 'Abr', receita: 122400, despesa: 98867 },
-    { month: 'Mai', receita: 125400, despesa: 100286 },
-    { month: 'Jun', receita: 128544, despesa: 101574 }
+    { month: 'Jan', receita: 114900, despesa: 95366, alunos: 290 },
+    { month: 'Fev', receita: 120900, despesa: 97925, alunos: 300 },
+    { month: 'Mar', receita: 125400, despesa: 99807, alunos: 305 },
+    { month: 'Abr', receita: 122400, despesa: 98867, alunos: 308 },
+    { month: 'Mai', receita: 125400, despesa: 100286, alunos: 312 },
+    { month: 'Jun', receita: 128544, despesa: 101574, alunos: 315 }
   ],
   'barra': [
-    { month: 'Jan', receita: 104600, despesa: 65473 },
-    { month: 'Fev', receita: 109900, despesa: 67007 },
-    { month: 'Mar', receita: 113600, despesa: 68252 },
-    { month: 'Abr', receita: 111800, despesa: 67714 },
-    { month: 'Mai', receita: 115400, despesa: 68851 },
-    { month: 'Jun', receita: 117591, despesa: 69871 }
+    { month: 'Jan', receita: 104600, despesa: 65473, alunos: 200 },
+    { month: 'Fev', receita: 109900, despesa: 67007, alunos: 205 },
+    { month: 'Mar', receita: 113600, despesa: 68252, alunos: 210 },
+    { month: 'Abr', receita: 111800, despesa: 67714, alunos: 215 },
+    { month: 'Mai', receita: 115400, despesa: 68851, alunos: 218 },
+    { month: 'Jun', receita: 117591, despesa: 69871, alunos: 220 }
   ]
 };
 
@@ -168,8 +176,8 @@ export const getConsolidatedCostCenterData = (): UnitCostCenterData[] => {
   return result;
 };
 
-// Function to get consolidated historical data
-export const getConsolidatedHistoricalData = () => {
+// Function to get consolidated historical data - updated to include alunos
+export const getConsolidatedHistoricalData = (): UnitHistoricalData[] => {
   console.log('📈 [getConsolidatedHistoricalData] Starting calculation...');
   
   const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'];
@@ -181,7 +189,8 @@ export const getConsolidatedHistoricalData = () => {
     const monthResult = {
       month,
       receita: monthData.reduce((sum, data) => sum + (data?.receita || 0), 0),
-      despesa: monthData.reduce((sum, data) => sum + (data?.despesa || 0), 0)
+      despesa: monthData.reduce((sum, data) => sum + (data?.despesa || 0), 0),
+      alunos: monthData.reduce((sum, data) => sum + (data?.alunos || 0), 0)
     };
     
     console.log(`📊 [getConsolidatedHistoricalData] ${month}:`, monthResult);
@@ -230,8 +239,8 @@ export const getCostCenterDataByUnit = (unitId: string): UnitCostCenterData[] =>
   return getConsolidatedCostCenterData();
 };
 
-// Function to get historical data by unit (or consolidated if 'all')
-export const getHistoricalDataByUnit = (unitId: string) => {
+// Function to get historical data by unit (or consolidated if 'all') - updated return type
+export const getHistoricalDataByUnit = (unitId: string): UnitHistoricalData[] => {
   console.log('📈 [getHistoricalDataByUnit] Requested unit:', unitId);
   
   if (unitId === 'all') {
