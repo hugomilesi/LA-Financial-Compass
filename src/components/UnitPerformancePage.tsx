@@ -4,9 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Building, TrendingUp, Users, DollarSign, Download, RefreshCw, BarChart3 } from 'lucide-react';
+import { Building, TrendingUp, Users, DollarSign, Download, RefreshCw, BarChart3, Percent } from 'lucide-react';
 import { useUnitPerformance } from '@/hooks/useUnitPerformance';
 import { usePeriod } from '@/contexts/PeriodContext';
+import { useUnit } from '@/contexts/UnitContext';
 import { UnitHighlights } from './unitPerformance/UnitHighlights';
 import { ComparativeCharts } from './unitPerformance/ComparativeCharts';
 import { UnitRankings } from './unitPerformance/UnitRankings';
@@ -32,6 +33,7 @@ export const UnitPerformancePage = () => {
   });
   
   const { getDisplayPeriod } = usePeriod();
+  const { selectedUnit, setSelectedUnit, getUnitDisplayName } = useUnit();
   
   const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('highlights');
@@ -39,12 +41,30 @@ export const UnitPerformancePage = () => {
 
   const selectedUnitData = selectedUnitId ? getUnitPerformance(selectedUnitId) : null;
 
+  // Filter data based on selected unit
+  const filteredData = selectedUnit === 'all' 
+    ? performanceData 
+    : performanceData.filter(unit => unit.unitId === selectedUnit);
+
+  // Filter comparisons and rankings based on selected unit  
+  const filteredComparisons = selectedUnit === 'all'
+    ? comparisons
+    : comparisons.map(comp => ({
+        ...comp,
+        units: comp.units.filter(unit => unit.unitId === selectedUnit)
+      })).filter(comp => comp.units.length > 0);
+
+  const filteredRankings = selectedUnit === 'all'
+    ? rankings
+    : rankings.filter(rank => rank.unitId === selectedUnit);
+
   const handleExportData = () => {
     console.log('📤 [UnitPerformancePage] Exporting data...');
     try {
+      const dataToExport = filteredData;
       const csvContent = [
         ['Unidade', 'Receita', 'Despesa', 'Lucro', 'Margem %', 'Alunos', 'Ocupação %', 'Ticket Médio', 'Satisfação %'],
-        ...performanceData.map(unit => [
+        ...dataToExport.map(unit => [
           unit.unitName,
           unit.financial.revenue.toLocaleString('pt-BR'),
           unit.financial.expenses.toLocaleString('pt-BR'),
@@ -60,7 +80,7 @@ export const UnitPerformancePage = () => {
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = `desempenho-unidades-${new Date().toISOString().split('T')[0]}.csv`;
+      link.download = `desempenho-unidades-${selectedUnit}-${new Date().toISOString().split('T')[0]}.csv`;
       link.click();
     } catch (error) {
       console.error('❌ [UnitPerformancePage] Export error:', error);
@@ -86,30 +106,30 @@ export const UnitPerformancePage = () => {
   console.log('📈 [UnitPerformancePage] Calculating summary metrics...');
 
   // Calculate summary metrics with error handling
-  const totalRevenue = performanceData?.reduce((sum, unit) => {
+  const totalRevenue = filteredData?.reduce((sum, unit) => {
     const revenue = unit?.financial?.revenue || 0;
     return sum + revenue;
   }, 0) || 0;
   
-  const totalStudents = performanceData?.reduce((sum, unit) => {
+  const totalStudents = filteredData?.reduce((sum, unit) => {
     const students = unit?.operational?.students || 0;
     return sum + students;
   }, 0) || 0;
   
-  const averageOccupancy = performanceData?.length > 0 
-    ? (performanceData.reduce((sum, unit) => sum + (unit?.operational?.occupancy || 0), 0) / performanceData.length)
+  const averageProfitMargin = filteredData?.length > 0 
+    ? (filteredData.reduce((sum, unit) => sum + (unit?.financial?.profitMargin || 0), 0) / filteredData.length)
     : 0;
     
-  const averageSatisfaction = performanceData?.length > 0
-    ? (performanceData.reduce((sum, unit) => sum + (unit?.strategic?.customerSatisfaction || 0), 0) / performanceData.length)
+  const averageRevenueGrowth = filteredData?.length > 0
+    ? (filteredData.reduce((sum, unit) => sum + (unit?.financial?.revenueGrowth || 0), 0) / filteredData.length)
     : 0;
 
   console.log('💰 [UnitPerformancePage] Summary metrics:', {
     totalRevenue,
     totalStudents,
-    averageOccupancy,
-    averageSatisfaction,
-    unitsCount: performanceData?.length || 0
+    averageProfitMargin,
+    averageRevenueGrowth,
+    unitsCount: filteredData?.length || 0
   });
 
   // Error fallback
@@ -132,7 +152,7 @@ export const UnitPerformancePage = () => {
     );
   }
 
-  console.log('✅ [UnitPerformancePage] Rendering main content with', performanceData.length, 'units');
+  console.log('✅ [UnitPerformancePage] Rendering main content with', filteredData.length, 'units');
 
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
@@ -141,11 +161,23 @@ export const UnitPerformancePage = () => {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Desempenho por Unidade</h1>
           <p className="text-gray-600 mt-1">
-            Análise comparativa das unidades • {getDisplayPeriod()}
+            Análise comparativa das unidades • {getDisplayPeriod()} • {getUnitDisplayName(selectedUnit)}
           </p>
         </div>
         
         <div className="flex flex-wrap gap-2 items-center">
+          <Select value={selectedUnit} onValueChange={setSelectedUnit}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Selecionar unidade" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas as Unidades</SelectItem>
+              <SelectItem value="campo-grande">Campo Grande</SelectItem>
+              <SelectItem value="recreio">Recreio</SelectItem>
+              <SelectItem value="barra">Barra</SelectItem>
+            </SelectContent>
+          </Select>
+
           <Select value={viewMode} onValueChange={(value: any) => setViewMode(value)}>
             <SelectTrigger className="w-[160px]">
               <SelectValue placeholder="Filtrar por" />
@@ -194,7 +226,8 @@ export const UnitPerformancePage = () => {
               })}
             </div>
             <div className="text-xs text-gray-500 mt-1">
-              {performanceData.length} unidades ativas
+              {filteredData.length} unidade{filteredData.length !== 1 ? 's' : ''} 
+              {selectedUnit !== 'all' ? '' : ' ativas'}
             </div>
           </CardContent>
         </Card>
@@ -207,7 +240,7 @@ export const UnitPerformancePage = () => {
             </div>
             <div className="text-2xl font-bold">{totalStudents.toLocaleString('pt-BR')}</div>
             <div className="text-xs text-gray-500 mt-1">
-              {averageOccupancy.toFixed(1)}% ocupação média
+              Base de estudantes
             </div>
           </CardContent>
         </Card>
@@ -215,12 +248,12 @@ export const UnitPerformancePage = () => {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-2">
-              <TrendingUp className="w-4 h-4 text-purple-600" />
-              <span className="text-sm font-medium text-gray-600">Ocupação Média</span>
+              <Percent className="w-4 h-4 text-purple-600" />
+              <span className="text-sm font-medium text-gray-600">Margem de Lucro Média</span>
             </div>
-            <div className="text-2xl font-bold">{averageOccupancy.toFixed(1)}%</div>
+            <div className="text-2xl font-bold">{averageProfitMargin.toFixed(1)}%</div>
             <div className="text-xs text-gray-500 mt-1">
-              Meta: 60%
+              Meta: 20%
             </div>
           </CardContent>
         </Card>
@@ -228,12 +261,14 @@ export const UnitPerformancePage = () => {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-2">
-              <Building className="w-4 h-4 text-orange-600" />
-              <span className="text-sm font-medium text-gray-600">Satisfação Média</span>
+              <TrendingUp className="w-4 h-4 text-orange-600" />
+              <span className="text-sm font-medium text-gray-600">Crescimento Médio</span>
             </div>
-            <div className="text-2xl font-bold">{averageSatisfaction.toFixed(1)}%</div>
+            <div className="text-2xl font-bold">
+              {averageRevenueGrowth >= 0 ? '+' : ''}{averageRevenueGrowth.toFixed(1)}%
+            </div>
             <div className="text-xs text-gray-500 mt-1">
-              Meta: 90%
+              Receita vs período anterior
             </div>
           </CardContent>
         </Card>
@@ -249,22 +284,22 @@ export const UnitPerformancePage = () => {
 
         <TabsContent value="highlights" className="space-y-6">
           <UnitHighlights 
-            data={performanceData}
+            data={filteredData}
             onUnitClick={setSelectedUnitId}
           />
         </TabsContent>
 
         <TabsContent value="charts" className="space-y-6">
           <ComparativeCharts 
-            data={performanceData}
-            comparisons={comparisons}
+            data={filteredData}
+            comparisons={filteredComparisons}
             onChartClick={(metric, unitId) => setSelectedUnitId(unitId)}
           />
         </TabsContent>
 
         <TabsContent value="rankings" className="space-y-6">
           <UnitRankings 
-            rankings={rankings}
+            rankings={filteredRankings}
             onUnitClick={setSelectedUnitId}
           />
         </TabsContent>
