@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,29 +11,35 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar, Settings, Play, Download, TrendingUp, AlertCircle } from 'lucide-react';
 import { DRETemplate, DREConfiguration, DREData } from '@/types/dre';
-import { DREUnitFilter } from './DREUnitFilter';
 import { DREUnitConfiguration } from './DREUnitConfiguration';
 import { useDREState } from '@/hooks/useDREState';
 import { DateRange } from 'react-day-picker';
 
 interface DREGeneratorProps {
   templates: DRETemplate[];
+  selectedUnits: string[];
   onGenerate: (config: DREConfiguration) => Promise<DREData>;
   onExport: (data: DREData, format: 'pdf' | 'excel' | 'csv') => void;
 }
 
 export const DREGenerator = ({
   templates,
+  selectedUnits,
   onGenerate,
   onExport
 }: DREGeneratorProps) => {
   const { state, actions, validateConfiguration } = useDREState();
   const [unitConfigs, setUnitConfigs] = useState<Record<string, any>>({});
-  const [showUnitSpecificTemplates, setShowUnitSpecificTemplates] = useState(false);
   
-  // Initialize templates in state
+  // Initialize templates and units in state
   useState(() => {
     actions.updateTemplates(templates);
+    actions.updateFilters({ units: selectedUnits });
+  });
+
+  // Update units when prop changes
+  useState(() => {
+    actions.updateFilters({ units: selectedUnits });
   });
 
   const handleGenerate = async () => {
@@ -62,7 +67,7 @@ export const DREGenerator = ({
             to: state.filters.comparisonRange.to
           } : undefined
         },
-        units: state.filters.units,
+        units: selectedUnits,
         costCenters: [],
         filters: {
           includeInactive: state.filters.includeInactive,
@@ -141,17 +146,6 @@ export const DREGenerator = ({
                     {selectedTemplateData.description} • {selectedTemplateData.structure.length} itens
                   </p>
                 )}
-              </div>
-
-              {/* Unit Selection */}
-              <div>
-                <Label className="text-base font-medium mb-3 block">Seleção de Unidades</Label>
-                <DREUnitFilter
-                  selectedUnits={state.filters.units}
-                  onUnitsChange={(units) => actions.updateFilters({ units })}
-                  showUnitSpecificTemplates={showUnitSpecificTemplates}
-                  onToggleUnitTemplates={setShowUnitSpecificTemplates}
-                />
               </div>
 
               {/* Date Ranges */}
@@ -233,9 +227,9 @@ export const DREGenerator = ({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {state.filters.units.some(id => id !== 'all') ? (
+              {selectedUnits.some(id => id !== 'all') ? (
                 <DREUnitConfiguration
-                  selectedUnits={state.filters.units}
+                  selectedUnits={selectedUnits}
                   unitConfigs={unitConfigs}
                   onConfigChange={(unitId, config) => 
                     setUnitConfigs(prev => ({ ...prev, [unitId]: config }))
@@ -251,7 +245,7 @@ export const DREGenerator = ({
                   <Settings className="w-12 h-12 mx-auto mb-3 opacity-50" />
                   <p className="text-lg font-medium mb-2">Nenhuma unidade específica selecionada</p>
                   <p className="text-sm">
-                    Selecione unidades específicas na aba "Configuração Básica" para configurar parâmetros individuais.
+                    Selecione unidades específicas usando o seletor no cabeçalho da página para configurar parâmetros individuais.
                   </p>
                 </div>
               )}

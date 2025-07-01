@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -15,6 +14,7 @@ import { DREStructureBuilder } from '@/components/reports/DREStructureBuilder';
 import { DRETemplateManager } from '@/components/reports/DRETemplateManager';
 import { DREGenerator } from '@/components/reports/DREGenerator';
 import { DREInsightsAnalyzer } from '@/components/reports/DREInsightsAnalyzer';
+import { UnitSelector } from '@/components/reports/UnitSelector';
 import { useToast } from '@/hooks/use-toast';
 import { DRETemplate, DREConfiguration, DREData, DREAnalysis } from '@/types/dre';
 import { Account } from '@/types/chartOfAccounts';
@@ -23,6 +23,7 @@ import { CostCenterCategory } from '@/types/costCenter';
 export const ReportsDREPage = () => {
   const { toast } = useToast();
   const [selectedPeriod, setSelectedPeriod] = useState('2024');
+  const [selectedUnits, setSelectedUnits] = useState<string[]>(['all']);
   
   // DRE Templates State
   const [dreTemplates, setDreTemplates] = useState<DRETemplate[]>([
@@ -290,7 +291,6 @@ export const ReportsDREPage = () => {
     };
   };
 
-  // Report Builder handlers
   const handleSaveReportTemplate = (template: any) => {
     console.log('Saving template:', template);
     toast({
@@ -307,7 +307,6 @@ export const ReportsDREPage = () => {
     });
   };
 
-  // Saved Reports handlers
   const handleEditReport = (report: any) => {
     console.log('Editing report:', report);
     toast({
@@ -348,7 +347,6 @@ export const ReportsDREPage = () => {
     });
   };
 
-  // Scheduler handlers
   const handleScheduleReport = (schedule: any) => {
     const newSchedule = {
       ...schedule,
@@ -389,7 +387,6 @@ export const ReportsDREPage = () => {
     });
   };
 
-  // Export handlers
   const handleExport = (options: any) => {
     console.log('Exporting with options:', options);
     // Implementation would call the enhanced fileDownload utility
@@ -412,7 +409,11 @@ export const ReportsDREPage = () => {
           <h1 className="text-3xl font-bold text-gray-900">Relatórios & DRE</h1>
           <p className="text-gray-600 mt-2">Sistema completo de relatórios financeiros</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-4">
+          <UnitSelector
+            selectedUnits={selectedUnits}
+            onUnitsChange={setSelectedUnits}
+          />
           <Button variant="outline" className="flex items-center gap-2">
             <Calendar className="w-4 h-4" />
             {selectedPeriod}
@@ -528,6 +529,7 @@ export const ReportsDREPage = () => {
         <TabsContent value="generator" className="space-y-6">
           <DREGenerator
             templates={dreTemplates}
+            selectedUnits={selectedUnits}
             onGenerate={handleGenerateDRE}
             onExport={(data, format) => {
               toast({
