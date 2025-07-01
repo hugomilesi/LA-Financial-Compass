@@ -1,7 +1,8 @@
 
 import { useState, useCallback } from 'react';
-import { DRETemplate, DREConfiguration, DREData } from '@/types/dre';
+import { DRETemplate, DREConfiguration, DREData, DREDateRange } from '@/types/dre';
 import { useUnit } from '@/contexts/UnitContext';
+import { DateRange } from 'react-day-picker';
 
 export interface DREState {
   templates: DRETemplate[];
@@ -11,8 +12,8 @@ export interface DREState {
   isGenerating: boolean;
   filters: {
     units: string[];
-    dateRange?: { from: Date; to: Date };
-    comparisonRange?: { from: Date; to: Date };
+    dateRange?: DateRange;
+    comparisonRange?: DateRange;
     includeInactive: boolean;
     excludeZeroValues: boolean;
     minimumAmount: number;
@@ -129,7 +130,8 @@ export const useDREState = (): UseDREStateReturn => {
     }
 
     if (state.filters.dateRange && state.filters.comparisonRange) {
-      if (state.filters.comparisonRange.from >= state.filters.dateRange.from) {
+      if (state.filters.comparisonRange.from && state.filters.dateRange.from && 
+          state.filters.comparisonRange.from >= state.filters.dateRange.from) {
         errors.push('O período de comparação deve ser anterior ao período principal');
       }
     }

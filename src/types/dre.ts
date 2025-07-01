@@ -35,15 +35,17 @@ export interface DRETemplate {
   tags: string[];
 }
 
+export interface DREDateRange {
+  from: Date;
+  to: Date;
+}
+
 export interface DREConfiguration {
   templateId: string;
   period: {
     startDate: Date;
     endDate: Date;
-    comparisonPeriod?: {
-      startDate: Date;
-      endDate: Date;
-    };
+    comparisonPeriod?: DREDateRange;
   };
   units: string[];
   costCenters: string[];

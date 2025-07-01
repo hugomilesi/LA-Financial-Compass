@@ -43,14 +43,20 @@ export const DREGenerator = ({
       return;
     }
 
+    // Validate that we have complete date ranges
+    if (!state.filters.dateRange?.from || !state.filters.dateRange?.to) {
+      console.error('Invalid date range');
+      return;
+    }
+
     actions.setIsGenerating(true);
     try {
       const config: DREConfiguration = {
         templateId: state.selectedTemplate,
         period: {
-          startDate: state.filters.dateRange!.from,
-          endDate: state.filters.dateRange!.to,
-          comparisonPeriod: state.filters.comparisonRange ? {
+          startDate: state.filters.dateRange.from,
+          endDate: state.filters.dateRange.to,
+          comparisonPeriod: state.filters.comparisonRange?.from && state.filters.comparisonRange?.to ? {
             startDate: state.filters.comparisonRange.from,
             endDate: state.filters.comparisonRange.to
           } : undefined
