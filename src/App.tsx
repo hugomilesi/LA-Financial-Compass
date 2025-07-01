@@ -8,6 +8,7 @@ import { UnitProvider } from "@/contexts/UnitContext";
 import { PeriodProvider } from "@/contexts/PeriodContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import { CostCenterCategoriesPage } from "./components/CostCenterCategoriesPage";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/cost-center-categories" element={<CostCenterCategoriesPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
