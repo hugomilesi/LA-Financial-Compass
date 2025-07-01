@@ -1,15 +1,58 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Download, FileText, TrendingUp, DollarSign, Calendar } from 'lucide-react';
+import { Download, FileText, TrendingUp, DollarSign, Calendar, Settings } from 'lucide-react';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import { ReportBuilder } from '@/components/reports/ReportBuilder';
+import { SavedReportsManager } from '@/components/reports/SavedReportsManager';
+import { ReportScheduler } from '@/components/reports/ReportScheduler';
+import { AdvancedExportOptions } from '@/components/reports/AdvancedExportOptions';
+import { useToast } from '@/hooks/use-toast';
 
 export const ReportsDREPage = () => {
+  const { toast } = useToast();
   const [selectedPeriod, setSelectedPeriod] = useState('2024');
+  const [savedReports, setSavedReports] = useState([
+    {
+      id: '1',
+      name: 'DRE Mensal Completo',
+      description: 'Relatório completo com todas as contas',
+      type: 'dre' as const,
+      createdAt: new Date('2024-01-15'),
+      lastUsed: new Date('2024-06-28'),
+      usageCount: 12,
+      isTemplate: true
+    },
+    {
+      id: '2',
+      name: 'Análise de Custos por Unidade',
+      description: 'Breakdown detalhado de custos',
+      type: 'custos' as const,
+      createdAt: new Date('2024-02-10'),
+      lastUsed: null,
+      usageCount: 5,
+      isTemplate: false
+    }
+  ]);
+
+  const [scheduledReports, setScheduledReports] = useState([
+    {
+      id: '1',
+      name: 'DRE Mensal Automático',
+      reportId: '1',
+      frequency: 'monthly' as const,
+      dayOfMonth: 5,
+      time: '09:00',
+      recipients: ['gerencia@empresa.com', 'diretoria@empresa.com'],
+      format: 'pdf' as const,
+      isActive: true,
+      nextRun: new Date('2024-07-05'),
+      lastRun: new Date('2024-06-05')
+    }
+  ]);
 
   // Mock data for demonstrations
   const dreData = [
@@ -58,30 +101,150 @@ export const ReportsDREPage = () => {
     }).format(value);
   };
 
+  // Report Builder handlers
+  const handleSaveTemplate = (template: any) => {
+    console.log('Saving template:', template);
+    toast({
+      title: "Template salvo",
+      description: "O template foi salvo com sucesso"
+    });
+  };
+
+  const handlePreviewReport = (template: any) => {
+    console.log('Previewing report:', template);
+    toast({
+      title: "Visualização gerada",
+      description: "Confira a prévia do seu relatório"
+    });
+  };
+
+  // Saved Reports handlers
+  const handleEditReport = (report: any) => {
+    console.log('Editing report:', report);
+    toast({
+      title: "Editando relatório",
+      description: `Abrindo editor para ${report.name}`
+    });
+  };
+
+  const handleDeleteReport = (reportId: string) => {
+    setSavedReports(prev => prev.filter(r => r.id !== reportId));
+    toast({
+      title: "Relatório excluído",
+      description: "O relatório foi removido com sucesso"
+    });
+  };
+
+  const handleDuplicateReport = (report: any) => {
+    const newReport = {
+      ...report,
+      id: Date.now().toString(),
+      name: `${report.name} (Cópia)`,
+      createdAt: new Date(),
+      lastUsed: null,
+      usageCount: 0
+    };
+    setSavedReports(prev => [...prev, newReport]);
+    toast({
+      title: "Relatório duplicado",
+      description: `Criada cópia: ${newReport.name}`
+    });
+  };
+
+  const handleGenerateReport = (report: any) => {
+    console.log('Generating report:', report);
+    toast({
+      title: "Gerando relatório",
+      description: `Processando ${report.name}...`
+    });
+  };
+
+  // Scheduler handlers
+  const handleScheduleReport = (schedule: any) => {
+    const newSchedule = {
+      ...schedule,
+      id: Date.now().toString(),
+      nextRun: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
+      lastRun: undefined
+    };
+    setScheduledReports(prev => [...prev, newSchedule]);
+    toast({
+      title: "Agendamento criado",
+      description: "O relatório foi agendado com sucesso"
+    });
+  };
+
+  const handleUpdateSchedule = (schedule: any) => {
+    setScheduledReports(prev => prev.map(s => s.id === schedule.id ? schedule : s));
+    toast({
+      title: "Agendamento atualizado",
+      description: "As configurações foram salvas"
+    });
+  };
+
+  const handleDeleteSchedule = (scheduleId: string) => {
+    setScheduledReports(prev => prev.filter(s => s.id !== scheduleId));
+    toast({
+      title: "Agendamento removido",
+      description: "O agendamento foi cancelado"
+    });
+  };
+
+  const handleToggleScheduleActive = (scheduleId: string) => {
+    setScheduledReports(prev => prev.map(s => 
+      s.id === scheduleId ? { ...s, isActive: !s.isActive } : s
+    ));
+    toast({
+      title: "Status atualizado",
+      description: "O agendamento foi atualizado"
+    });
+  };
+
+  // Export handlers
+  const handleExport = (options: any) => {
+    console.log('Exporting with options:', options);
+    // Implementation would call the enhanced fileDownload utility
+  };
+
+  const handleWhatsAppShare = (whatsappOptions: any, exportOptions: any) => {
+    console.log('WhatsApp share:', { whatsappOptions, exportOptions });
+    // Implementation would integrate with WhatsApp Business API
+  };
+
+  const handleEmailShare = (emailOptions: any, exportOptions: any) => {
+    console.log('Email share:', { emailOptions, exportOptions });
+    // Implementation would use email service
+  };
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Relatórios & DRE</h1>
-          <p className="text-gray-600 mt-2">Demonstrativos financeiros e relatórios de gestão</p>
+          <p className="text-gray-600 mt-2">Sistema completo de relatórios financeiros</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" className="flex items-center gap-2">
             <Calendar className="w-4 h-4" />
             {selectedPeriod}
           </Button>
-          <Button className="flex items-center gap-2">
-            <Download className="w-4 h-4" />
-            Exportar
-          </Button>
+          <AdvancedExportOptions
+            reportData={dreData}
+            reportTitle="DRE Gerencial"
+            onExport={handleExport}
+            onWhatsAppShare={handleWhatsAppShare}
+            onEmailShare={handleEmailShare}
+          />
         </div>
       </div>
 
       <Tabs defaultValue="dre" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="dre">DRE Gerencial</TabsTrigger>
-          <TabsTrigger value="reports">Relatórios</TabsTrigger>
-          <TabsTrigger value="costs">Centro de Custos</TabsTrigger>
+          <TabsTrigger value="builder">Construtor</TabsTrigger>
+          <TabsTrigger value="saved">Salvos</TabsTrigger>
+          <TabsTrigger value="scheduler">Agendamentos</TabsTrigger>
+          <TabsTrigger value="costs">Custos</TabsTrigger>
           <TabsTrigger value="analytics">Análises</TabsTrigger>
         </TabsList>
 
@@ -149,82 +312,32 @@ export const ReportsDREPage = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="reports" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total de Relatórios</CardTitle>
-                <FileText className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">24</div>
-                <p className="text-xs text-muted-foreground">+2 desde o mês passado</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Em Análise</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">3</div>
-                <p className="text-xs text-muted-foreground">Aguardando revisão</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Valor Total</CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{formatCurrency(342750)}</div>
-                <p className="text-xs text-muted-foreground">Período atual</p>
-              </CardContent>
-            </Card>
-          </div>
+        <TabsContent value="builder" className="space-y-6">
+          <ReportBuilder 
+            onSave={handleSaveTemplate}
+            onPreview={handlePreviewReport}
+          />
+        </TabsContent>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Relatórios de Despesas</CardTitle>
-              <CardDescription>Lista de relatórios por categoria</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Tipo de Relatório</TableHead>
-                    <TableHead>Período</TableHead>
-                    <TableHead className="text-right">Valor</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {expenseReports.map((report) => (
-                    <TableRow key={report.id}>
-                      <TableCell className="font-medium">{report.tipo}</TableCell>
-                      <TableCell>{report.periodo}</TableCell>
-                      <TableCell className="text-right">{formatCurrency(report.valor)}</TableCell>
-                      <TableCell>
-                        <span className={`px-2 py-1 rounded-full text-xs ${
-                          report.status === 'Finalizado' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {report.status}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="sm">
-                          <Download className="w-4 h-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+        <TabsContent value="saved" className="space-y-6">
+          <SavedReportsManager
+            reports={savedReports}
+            onEdit={handleEditReport}
+            onDelete={handleDeleteReport}
+            onDuplicate={handleDuplicateReport}
+            onGenerate={handleGenerateReport}
+          />
+        </TabsContent>
+
+        <TabsContent value="scheduler" className="space-y-6">
+          <ReportScheduler
+            scheduledReports={scheduledReports}
+            availableReports={savedReports.map(r => ({ id: r.id, name: r.name }))}
+            onSchedule={handleScheduleReport}
+            onUpdate={handleUpdateSchedule}
+            onDelete={handleDeleteSchedule}
+            onToggleActive={handleToggleScheduleActive}
+          />
         </TabsContent>
 
         <TabsContent value="costs" className="space-y-6">
