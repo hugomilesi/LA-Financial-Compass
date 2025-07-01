@@ -6,6 +6,7 @@ import { KPIsPage } from '@/components/KPIsPage';
 import { ReportsDREPage } from '@/components/ReportsDREPage';
 import { PlanningPage } from '@/components/PlanningPage';
 import { ChartOfAccountsPage } from '@/components/ChartOfAccountsPage';
+import { CostCenterCategoriesPage } from '@/components/CostCenterCategoriesPage';
 
 const Index = () => {
   const [currentPage, setCurrentPage] = useState('dashboard');
@@ -23,7 +24,7 @@ const Index = () => {
       case 'planning':
         return <PlanningPage />;
       case 'costs':
-        return <div className="p-6"><h1 className="text-2xl font-bold">Centro de Custos</h1><p>Em desenvolvimento...</p></div>;
+        return <CostCenterCategoriesPage />;
       case 'units':
         return <div className="p-6"><h1 className="text-2xl font-bold">Desempenho por Unidade</h1><p>Em desenvolvimento...</p></div>;
       case 'settings':
