@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -551,7 +552,7 @@ export const ReportsDREPage = () => {
                 <p className="text-gray-600 mb-4">
                   Para visualizar insights inteligentes, você precisa gerar um DRE usando o Gerador.
                 </p>
-                <Button onClick={() => document.querySelector('[value="generator"]')?.click()}>
+                <Button onClick={() => (document.querySelector('[value="generator"]') as HTMLElement)?.click()}>
                   <Wrench className="w-4 h-4 mr-2" />
                   Ir para o Gerador
                 </Button>
