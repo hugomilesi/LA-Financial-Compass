@@ -1,4 +1,3 @@
-
 import { AIInsights } from './AIInsights';
 import { KPIDetailModal } from './KPIDetailModal';
 import { ChartDetailModal } from './ChartDetailModal';
@@ -16,24 +15,32 @@ import { RevenueDetailModal } from './kpi/RevenueDetailModal';
 import { ExpenseDetailModal } from './kpi/ExpenseDetailModal';
 import { CashFlowDetailModal } from './kpi/CashFlowDetailModal';
 import { MarginDetailModal } from './kpi/MarginDetailModal';
+import { TicketMedioDetailModal } from './kpi/TicketMedioDetailModal';
+import { CustoPorAlunoDetailModal } from './kpi/CustoPorAlunoDetailModal';
+import { AlunosAtivosDetailModal } from './kpi/AlunosAtivosDetailModal';
+import { InadimplenciaDetailModal } from './kpi/InadimplenciaDetailModal';
 
 export const Dashboard = () => {
   const [selectedKPIId, setSelectedKPIId] = useState<string | null>(null);
   const [selectedChart, setSelectedChart] = useState<'revenue' | 'cost-center' | null>(null);
   const [selectedAction, setSelectedAction] = useState<'export-dre' | 'set-goals' | 'view-reports' | 'unit-analysis' | null>(null);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
-  const [selectedKPIType, setSelectedKPIType] = useState<'revenue' | 'expense' | 'cashflow' | 'margin' | null>(null);
+  const [selectedKPIType, setSelectedKPIType] = useState<'revenue' | 'expense' | 'cashflow' | 'margin' | 'ticket-medio' | 'custo-por-aluno' | 'alunos-ativos' | 'inadimplencia' | null>(null);
   const { selectedUnit } = useUnit();
 
   const handleKPIClick = (kpi: any) => {
     console.log('🎯 [Dashboard] KPI clicked:', kpi);
     
     // Map KPI titles to modal types
-    const kpiTypeMap: Record<string, 'revenue' | 'expense' | 'cashflow' | 'margin'> = {
+    const kpiTypeMap: Record<string, 'revenue' | 'expense' | 'cashflow' | 'margin' | 'ticket-medio' | 'custo-por-aluno' | 'alunos-ativos' | 'inadimplencia'> = {
       'Receita Total': 'revenue',
       'Despesa Total': 'expense',
       'Geração de Caixa': 'cashflow',
-      'Margem Líquida': 'margin'
+      'Margem Líquida': 'margin',
+      'Ticket Médio': 'ticket-medio',
+      'Custo por Aluno': 'custo-por-aluno',
+      'Alunos Ativos': 'alunos-ativos',
+      'Inadimplência (%)': 'inadimplencia'
     };
     
     const kpiType = kpiTypeMap[kpi.title];
@@ -95,7 +102,7 @@ export const Dashboard = () => {
         unitId={selectedUnit}
       />
 
-      {/* New Detailed KPI Modals */}
+      {/* Primary KPI Modals */}
       <RevenueDetailModal
         isOpen={selectedKPIType === 'revenue'}
         onClose={() => setSelectedKPIType(null)}
@@ -113,6 +120,27 @@ export const Dashboard = () => {
 
       <MarginDetailModal
         isOpen={selectedKPIType === 'margin'}
+        onClose={() => setSelectedKPIType(null)}
+      />
+
+      {/* Secondary KPI Modals */}
+      <TicketMedioDetailModal
+        isOpen={selectedKPIType === 'ticket-medio'}
+        onClose={() => setSelectedKPIType(null)}
+      />
+
+      <CustoPorAlunoDetailModal
+        isOpen={selectedKPIType === 'custo-por-aluno'}
+        onClose={() => setSelectedKPIType(null)}
+      />
+
+      <AlunosAtivosDetailModal
+        isOpen={selectedKPIType === 'alunos-ativos'}
+        onClose={() => setSelectedKPIType(null)}
+      />
+
+      <InadimplenciaDetailModal
+        isOpen={selectedKPIType === 'inadimplencia'}
         onClose={() => setSelectedKPIType(null)}
       />
 
