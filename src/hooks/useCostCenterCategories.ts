@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { CostCenterCategory, CostCenterMetrics } from '@/types/costCenter';
 import { DEFAULT_COST_CENTER_CATEGORIES, CostCenterAlert, generateSmartAlerts } from '@/utils/costCenterData';
+import { getCostCenterDataByUnit, getDataByUnit } from '@/utils/unitData';
 
 const STORAGE_KEY = 'la-music-cost-center-categories';
 const ALERTS_STORAGE_KEY = 'la-music-cost-center-alerts';
@@ -96,13 +97,22 @@ export const useCostCenterCategories = () => {
     saveToStorage(updatedCategories);
   };
 
-  const getCategoryMetrics = (): CostCenterMetrics => {
-    const totalExpenses = categories.reduce((sum, cat) => sum + cat.totalAmount, 0);
-    const activeCategories = categories.filter(cat => cat.isActive);
+  const getCategoryMetrics = (unitId: string = 'all'): CostCenterMetrics => {
+    console.log('🔍 [getCategoryMetrics] Calculating metrics for unit:', unitId);
+    
+    // Get unit-specific financial data
+    const unitData = getDataByUnit(unitId);
+    const totalExpenses = unitData.despesa;
+    
+    console.log('💸 [getCategoryMetrics] Total expenses from unit data:', totalExpenses);
+    
+    // Get unit-specific categories
+    const unitCategories = getCategoriesByUnit(unitId);
+    const activeCategories = unitCategories.filter(cat => cat.isActive);
     
     const sortedByAmount = [...activeCategories].sort((a, b) => b.totalAmount - a.totalAmount);
     
-    return {
+    const metrics = {
       totalExpenses,
       categoryCount: activeCategories.length,
       averagePerCategory: totalExpenses / activeCategories.length,
@@ -118,18 +128,58 @@ export const useCostCenterCategories = () => {
       },
       monthlyGrowth: 2.3 // This would come from historical data in a real app
     };
+    
+    console.log('📊 [getCategoryMetrics] Final metrics:', metrics);
+    return metrics;
   };
 
   const getCategoriesByUnit = (unitId: string) => {
-    if (unitId === 'all') {
-      return categories;
-    }
+    console.log('🔍 [getCategoriesByUnit] Getting categories for unit:', unitId);
     
-    return categories.map(category => ({
-      ...category,
-      totalAmount: category.unitBreakdown.find(u => u.unitId === unitId)?.amount || 0,
-      percentage: category.unitBreakdown.find(u => u.unitId === unitId)?.percentage || 0
-    }));
+    // Get dynamic cost center data for the unit
+    const unitCostData = getCostCenterDataByUnit(unitId);
+    console.log('📊 [getCategoriesByUnit] Unit cost data:', unitCostData);
+    
+    // Map the categories to match the cost center data
+    const updatedCategories = categories.map(category => {
+      // Find matching cost center data by name
+      const matchingCostData = unitCostData.find(cost => {
+        // Handle mapping between category names and cost center names
+        const categoryNameMap: { [key: string]: string } = {
+          'Pessoal': 'Pessoal',
+          'Aluguel e Ocupação': 'Aluguel',
+          'Marketing e Comunicação': 'Marketing',
+          'Tecnologia': 'Operacional', // Map technology to operational for now
+          'Manutenção': 'Operacional', // Map maintenance to operational for now
+          'Administrativa': 'Outros', // Map administrative to others for now
+          'Despesas Operacionais': 'Operacional',
+          'Outros': 'Outros'
+        };
+        
+        const mappedName = categoryNameMap[category.name] || category.name;
+        return cost.name === mappedName;
+      });
+      
+      if (matchingCostData) {
+        console.log(`✅ [getCategoriesByUnit] Found match for ${category.name}:`, matchingCostData);
+        return {
+          ...category,
+          totalAmount: matchingCostData.amount,
+          percentage: matchingCostData.value
+        };
+      }
+      
+      // If no match found, return with zero values for this unit
+      console.log(`❌ [getCategoriesByUnit] No match found for ${category.name}`);
+      return {
+        ...category,
+        totalAmount: 0,
+        percentage: 0
+      };
+    });
+    
+    console.log('🏁 [getCategoriesByUnit] Final categories:', updatedCategories);
+    return updatedCategories;
   };
 
   const markAlertAsRead = (alertId: string) => {

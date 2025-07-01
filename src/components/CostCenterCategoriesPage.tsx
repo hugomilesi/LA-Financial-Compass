@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -44,7 +43,7 @@ export const CostCenterCategoriesPage = () => {
   const [activeTab, setActiveTab] = useState('categories');
 
   const displayCategories = getCategoriesByUnit(selectedUnit);
-  const metrics = getCategoryMetrics();
+  const metrics = getCategoryMetrics(selectedUnit);
 
   const filteredCategories = displayCategories
     .filter(category => {
