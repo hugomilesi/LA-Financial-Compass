@@ -160,7 +160,7 @@ export const CostCenterDetailsModal = ({
                       ]}
                     />
                     <Legend 
-                      formatter={(value, entry) => entry.payload.name}
+                      formatter={(value) => value}
                     />
                   </PieChart>
                 </ResponsiveContainer>
