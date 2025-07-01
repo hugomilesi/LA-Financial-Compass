@@ -189,15 +189,6 @@ export const UnitPerformancePage = () => {
               <SelectItem value="strategic">Estratégico</SelectItem>
             </SelectContent>
           </Select>
-
-          <Button
-            onClick={refreshData}
-            variant="outline"
-            className="gap-2"
-          >
-            <RefreshCw className="h-4 w-4" />
-            Atualizar
-          </Button>
           
           <Button
             onClick={handleExportData}
