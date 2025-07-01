@@ -57,8 +57,8 @@ export const DREGenerator = ({
           startDate: state.filters.dateRange.from,
           endDate: state.filters.dateRange.to,
           comparisonPeriod: state.filters.comparisonRange?.from && state.filters.comparisonRange?.to ? {
-            startDate: state.filters.comparisonRange.from,
-            endDate: state.filters.comparisonRange.to
+            from: state.filters.comparisonRange.from,
+            to: state.filters.comparisonRange.to
           } : undefined
         },
         units: state.filters.units,
