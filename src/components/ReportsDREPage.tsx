@@ -3,18 +3,71 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Download, FileText, TrendingUp, DollarSign, Calendar, Settings } from 'lucide-react';
+import { Download, FileText, TrendingUp, DollarSign, Calendar, Settings, Brain, Wrench } from 'lucide-react';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { ReportBuilder } from '@/components/reports/ReportBuilder';
 import { SavedReportsManager } from '@/components/reports/SavedReportsManager';
 import { ReportScheduler } from '@/components/reports/ReportScheduler';
 import { AdvancedExportOptions } from '@/components/reports/AdvancedExportOptions';
+import { DREStructureBuilder } from '@/components/reports/DREStructureBuilder';
+import { DRETemplateManager } from '@/components/reports/DRETemplateManager';
+import { DREGenerator } from '@/components/reports/DREGenerator';
+import { DREInsightsAnalyzer } from '@/components/reports/DREInsightsAnalyzer';
 import { useToast } from '@/hooks/use-toast';
+import { DRETemplate, DREConfiguration, DREData, DREAnalysis } from '@/types/dre';
+import { Account } from '@/types/chartOfAccounts';
+import { CostCenterCategory } from '@/types/costCenter';
 
 export const ReportsDREPage = () => {
   const { toast } = useToast();
   const [selectedPeriod, setSelectedPeriod] = useState('2024');
+  
+  // DRE Templates State
+  const [dreTemplates, setDreTemplates] = useState<DRETemplate[]>([
+    {
+      id: '1',
+      name: 'DRE Padrão',
+      description: 'Estrutura padrão do DRE gerencial',
+      structure: [
+        {
+          id: '1',
+          code: '3.01',
+          name: 'Receita Bruta',
+          type: 'revenue',
+          level: 0,
+          accounts: [],
+          costCenters: [],
+          isCalculated: false,
+          isVisible: true,
+          order: 0
+        },
+        {
+          id: '2',
+          code: '3.02',
+          name: 'Deduções',
+          type: 'expense',
+          level: 0,
+          accounts: [],
+          costCenters: [],
+          isCalculated: false,
+          isVisible: true,
+          order: 1
+        }
+      ],
+      isDefault: true,
+      isPublic: true,
+      createdBy: 'system',
+      createdAt: new Date('2024-01-01'),
+      updatedAt: new Date('2024-01-01'),
+      tags: ['padrão', 'gerencial']
+    }
+  ]);
+
+  const [currentTemplate, setCurrentTemplate] = useState<DRETemplate | null>(null);
+  const [generatedDRE, setGeneratedDRE] = useState<DREData | null>(null);
+  
+  // Mock data for existing components
   const [savedReports, setSavedReports] = useState([
     {
       id: '1',
@@ -54,7 +107,7 @@ export const ReportsDREPage = () => {
     }
   ]);
 
-  // Mock data for demonstrations
+  // Mock data for charts
   const dreData = [
     { item: 'Receita Bruta', valor: 850000, percentual: 100 },
     { item: 'Deduções', valor: -85000, percentual: -10 },
@@ -87,13 +140,6 @@ export const ReportsDREPage = () => {
     { centro: 'Operacional', valor: 110000, cor: '#ff7300' }
   ];
 
-  const expenseReports = [
-    { id: 1, tipo: 'Despesas Administrativas', periodo: 'Jun/2024', valor: 95000, status: 'Finalizado' },
-    { id: 2, tipo: 'Custos Operacionais', periodo: 'Jun/2024', valor: 110000, status: 'Finalizado' },
-    { id: 3, tipo: 'Despesas de Vendas', periodo: 'Jun/2024', valor: 125000, status: 'Em Análise' },
-    { id: 4, tipo: 'Despesas Financeiras', periodo: 'Jun/2024', valor: 12750, status: 'Finalizado' }
-  ];
-
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -101,8 +147,150 @@ export const ReportsDREPage = () => {
     }).format(value);
   };
 
+  // DRE Template handlers
+  const handleSaveTemplate = (template: Omit<DRETemplate, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newTemplate: DRETemplate = {
+      ...template,
+      id: Date.now().toString(),
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    setDreTemplates(prev => [...prev, newTemplate]);
+    toast({
+      title: "Template salvo",
+      description: "O template DRE foi salvo com sucesso"
+    });
+  };
+
+  const handleEditTemplate = (template: DRETemplate) => {
+    setCurrentTemplate(template);
+    toast({
+      title: "Editando template",
+      description: `Abrindo editor para ${template.name}`
+    });
+  };
+
+  const handleDeleteTemplate = (templateId: string) => {
+    setDreTemplates(prev => prev.filter(t => t.id !== templateId));
+    toast({
+      title: "Template excluído",
+      description: "O template foi removido com sucesso"
+    });
+  };
+
+  const handleDuplicateTemplate = (template: DRETemplate) => {
+    const newTemplate: DRETemplate = {
+      ...template,
+      id: Date.now().toString(),
+      name: `${template.name} (Cópia)`,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      isDefault: false
+    };
+    setDreTemplates(prev => [...prev, newTemplate]);
+    toast({
+      title: "Template duplicado",
+      description: `Criada cópia: ${newTemplate.name}`
+    });
+  };
+
+  const handleSetDefaultTemplate = (templateId: string) => {
+    setDreTemplates(prev => prev.map(t => ({
+      ...t,
+      isDefault: t.id === templateId
+    })));
+    toast({
+      title: "Template padrão definido",
+      description: "O template foi definido como padrão"
+    });
+  };
+
+  const handleImportTemplate = (file: File) => {
+    // Implementation would parse JSON file and add template
+    toast({
+      title: "Template importado",
+      description: "O template foi importado com sucesso"
+    });
+  };
+
+  const handleExportTemplate = (template: DRETemplate) => {
+    const dataStr = JSON.stringify(template, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    const exportFileDefaultName = `${template.name.replace(/\s+/g, '_')}.json`;
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+  };
+
+  // DRE Generation handlers
+  const handleGenerateDRE = async (config: DREConfiguration): Promise<DREData> => {
+    // Mock DRE generation
+    const mockData: DREData = {
+      configuration: config,
+      lineItems: dreTemplates.find(t => t.id === config.templateId)?.structure.map(item => ({
+        ...item,
+        value: Math.random() * 100000 - 50000,
+        percentageOfRevenue: Math.random() * 100,
+        variance: Math.random() * 10000 - 5000,
+        variancePercentage: Math.random() * 20 - 10
+      })) || [],
+      totals: {
+        totalRevenue: 850000,
+        totalExpenses: 650000,
+        grossProfit: 459000,
+        netProfit: 124312.5,
+        ebitda: 204000,
+        margins: {
+          gross: 54,
+          net: 14.6,
+          ebitda: 24
+        }
+      },
+      metadata: {
+        generatedAt: new Date(),
+        generatedBy: 'current-user',
+        dataSource: 'sistema'
+      }
+    };
+    
+    setGeneratedDRE(mockData);
+    return mockData;
+  };
+
+  const handleGenerateInsights = async (data: DREData): Promise<DREAnalysis> => {
+    // Mock AI analysis
+    return {
+      trends: {
+        revenueGrowth: 8.5,
+        expenseGrowth: 5.2,
+        marginTrend: 'improving'
+      },
+      insights: [
+        {
+          type: 'positive',
+          title: 'Crescimento Sustentável da Receita',
+          description: 'A receita apresentou crescimento de 8.5% no período, superando as expectativas.',
+          impact: 'high'
+        },
+        {
+          type: 'negative',
+          title: 'Aumento dos Custos Operacionais',
+          description: 'Os custos operacionais cresceram 5.2%, requerendo atenção para otimização.',
+          impact: 'medium'
+        }
+      ],
+      recommendations: [
+        'Implementar controles mais rigorosos sobre custos operacionais',
+        'Analisar oportunidades de otimização de processos',
+        'Considerar automação de atividades repetitivas'
+      ]
+    };
+  };
+
   // Report Builder handlers
-  const handleSaveTemplate = (template: any) => {
+  const handleSaveReportTemplate = (template: any) => {
     console.log('Saving template:', template);
     toast({
       title: "Template salvo",
@@ -239,12 +427,14 @@ export const ReportsDREPage = () => {
       </div>
 
       <Tabs defaultValue="dre" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="dre">DRE Gerencial</TabsTrigger>
           <TabsTrigger value="builder">Construtor</TabsTrigger>
+          <TabsTrigger value="templates">Templates</TabsTrigger>
+          <TabsTrigger value="generator">Gerador</TabsTrigger>
+          <TabsTrigger value="insights">Insights IA</TabsTrigger>
           <TabsTrigger value="saved">Salvos</TabsTrigger>
           <TabsTrigger value="scheduler">Agendamentos</TabsTrigger>
-          <TabsTrigger value="costs">Custos</TabsTrigger>
           <TabsTrigger value="analytics">Análises</TabsTrigger>
         </TabsList>
 
@@ -313,10 +503,61 @@ export const ReportsDREPage = () => {
         </TabsContent>
 
         <TabsContent value="builder" className="space-y-6">
-          <ReportBuilder 
-            onSave={handleSaveTemplate}
-            onPreview={handlePreviewReport}
+          <DREStructureBuilder
+            template={currentTemplate}
+            accounts={[]} // Would be populated from useChartOfAccounts
+            costCenters={[]} // Would be populated from useCostCenterCategories
+            onSaveTemplate={handleSaveTemplate}
           />
+        </TabsContent>
+
+        <TabsContent value="templates" className="space-y-6">
+          <DRETemplateManager
+            templates={dreTemplates}
+            onCreateTemplate={() => setCurrentTemplate(null)}
+            onEditTemplate={handleEditTemplate}
+            onDeleteTemplate={handleDeleteTemplate}
+            onDuplicateTemplate={handleDuplicateTemplate}
+            onSetDefault={handleSetDefaultTemplate}
+            onImportTemplate={handleImportTemplate}
+            onExportTemplate={handleExportTemplate}
+          />
+        </TabsContent>
+
+        <TabsContent value="generator" className="space-y-6">
+          <DREGenerator
+            templates={dreTemplates}
+            onGenerate={handleGenerateDRE}
+            onExport={(data, format) => {
+              toast({
+                title: "Exportando DRE",
+                description: `Gerando arquivo ${format.toUpperCase()}...`
+              });
+            }}
+          />
+        </TabsContent>
+
+        <TabsContent value="insights" className="space-y-6">
+          {generatedDRE ? (
+            <DREInsightsAnalyzer
+              dreData={generatedDRE}
+              onGenerateInsights={handleGenerateInsights}
+            />
+          ) : (
+            <Card>
+              <CardContent className="text-center py-12">
+                <Brain className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                <h3 className="text-lg font-semibold mb-2">Gere um DRE primeiro</h3>
+                <p className="text-gray-600 mb-4">
+                  Para visualizar insights inteligentes, você precisa gerar um DRE usando o Gerador.
+                </p>
+                <Button onClick={() => document.querySelector('[value="generator"]')?.click()}>
+                  <Wrench className="w-4 h-4 mr-2" />
+                  Ir para o Gerador
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="saved" className="space-y-6">
@@ -338,88 +579,6 @@ export const ReportsDREPage = () => {
             onDelete={handleDeleteSchedule}
             onToggleActive={handleToggleScheduleActive}
           />
-        </TabsContent>
-
-        <TabsContent value="costs" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Distribuição por Centro de Custo</CardTitle>
-                <CardDescription>Análise de custos por departamento</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ChartContainer
-                  config={{
-                    vendas: { label: "Vendas", color: "#8884d8" },
-                    marketing: { label: "Marketing", color: "#82ca9d" },
-                    administrativo: { label: "Administrativo", color: "#ffc658" },
-                    operacional: { label: "Operacional", color: "#ff7300" }
-                  }}
-                  className="h-[300px]"
-                >
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={costCenterData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ centro, valor }) => `${centro}: ${formatCurrency(valor)}`}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="valor"
-                      >
-                        {costCenterData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.cor} />
-                        ))}
-                      </Pie>
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Detalhamento de Custos</CardTitle>
-                <CardDescription>Valores por centro de custo</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Centro de Custo</TableHead>
-                      <TableHead className="text-right">Valor</TableHead>
-                      <TableHead className="text-right">% Total</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {costCenterData.map((item, index) => {
-                      const total = costCenterData.reduce((sum, item) => sum + item.valor, 0);
-                      const percentage = ((item.valor / total) * 100).toFixed(1);
-                      
-                      return (
-                        <TableRow key={index}>
-                          <TableCell className="font-medium">
-                            <div className="flex items-center gap-2">
-                              <div 
-                                className="w-3 h-3 rounded-full" 
-                                style={{ backgroundColor: item.cor }}
-                              />
-                              {item.centro}
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">{formatCurrency(item.valor)}</TableCell>
-                          <TableCell className="text-right">{percentage}%</TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </div>
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-6">
