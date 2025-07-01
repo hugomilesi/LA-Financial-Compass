@@ -2,10 +2,11 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Filter, Download, BarChart3, Bell, Target } from 'lucide-react';
+import { Plus, Filter, Download, BarChart3, Bell, Target, Building } from 'lucide-react';
 import { useCostCenterCategories } from '@/hooks/useCostCenterCategories';
-import { useUnit } from '@/contexts/UnitContext';
+import { useUnit, UNITS } from '@/contexts/UnitContext';
 import { usePeriod } from '@/contexts/PeriodContext';
 import { CostCenterCategoryCard } from './costCenter/CostCenterCategoryCard';
 import { CostCenterMetrics } from './costCenter/CostCenterMetrics';
@@ -30,7 +31,7 @@ export const CostCenterCategoriesPage = () => {
     dismissAlert,
     refreshAlerts
   } = useCostCenterCategories();
-  const { selectedUnit, getUnitDisplayName } = useUnit();
+  const { selectedUnit, setSelectedUnit, getUnitDisplayName } = useUnit();
   const { getDisplayPeriod } = usePeriod();
 
   const [showAddForm, setShowAddForm] = useState(false);
@@ -111,7 +112,24 @@ export const CostCenterCategoriesPage = () => {
           </p>
         </div>
         
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 items-center">
+          {/* Unit Selector */}
+          <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow">
+            <Building className="w-4 h-4 text-gray-500" />
+            <Select value={selectedUnit} onValueChange={setSelectedUnit}>
+              <SelectTrigger className="w-[180px] border-none shadow-none">
+                <SelectValue placeholder="Selecionar unidade" />
+              </SelectTrigger>
+              <SelectContent>
+                {UNITS.map((unit) => (
+                  <SelectItem key={unit.id} value={unit.id}>
+                    {unit.displayName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           <Button
             onClick={() => setShowChartModal(true)}
             variant="outline"
