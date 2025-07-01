@@ -7,6 +7,7 @@ import { ReportsDREPage } from '@/components/ReportsDREPage';
 import { PlanningPage } from '@/components/PlanningPage';
 import { ChartOfAccountsPage } from '@/components/ChartOfAccountsPage';
 import { CostCenterCategoriesPage } from '@/components/CostCenterCategoriesPage';
+import { UnitPerformancePage } from '@/components/UnitPerformancePage';
 
 const Index = () => {
   const [currentPage, setCurrentPage] = useState('dashboard');
@@ -26,7 +27,7 @@ const Index = () => {
       case 'costs':
         return <CostCenterCategoriesPage />;
       case 'units':
-        return <div className="p-6"><h1 className="text-2xl font-bold">Desempenho por Unidade</h1><p>Em desenvolvimento...</p></div>;
+        return <UnitPerformancePage />;
       case 'settings':
         return <div className="p-6"><h1 className="text-2xl font-bold">Configurações</h1><p>Em desenvolvimento...</p></div>;
       default:
