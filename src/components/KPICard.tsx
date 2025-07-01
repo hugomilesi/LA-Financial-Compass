@@ -50,14 +50,29 @@ export const KPICard = ({
     return change > 0 ? 'text-success-600' : 'text-danger-600';
   };
 
+  const handleClick = () => {
+    if (onClick) {
+      console.log('🎯 [KPICard] Card clicked:', title);
+      onClick();
+    }
+  };
+
   return (
     <div 
       className={cn(
         "p-6 rounded-xl border-2 shadow-sm transition-all duration-200",
         getAlertColor(),
-        onClick ? "cursor-pointer hover:shadow-lg hover:scale-105" : "hover:shadow-md"
+        onClick ? "cursor-pointer hover:shadow-lg hover:scale-105 active:scale-95" : "hover:shadow-md"
       )}
-      onClick={onClick}
+      onClick={handleClick}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={(e) => {
+        if (onClick && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
     >
       <div className="flex items-start justify-between">
         <div className="flex-1">
@@ -120,7 +135,7 @@ export const KPICard = ({
           )}
           
           {onClick && (
-            <div className="text-xs text-gray-400 font-medium">
+            <div className="text-xs text-gray-400 font-medium hover:text-gray-600 transition-colors">
               Clique para detalhes
             </div>
           )}
