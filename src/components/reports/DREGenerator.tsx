@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -98,8 +99,8 @@ export const DREGenerator = ({
       <Tabs defaultValue="basic" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="basic">Configuração Básica</TabsTrigger>
-          <TabsTrigger value="units">Filtros por Unidade</TabsTrigger>
-          <TabsTrigger value="advanced">Configurações Avançadas</TabsTrigger>
+          <TabsTrigger value="units">Configurações por Unidade</TabsTrigger>
+          <TabsTrigger value="advanced">Filtros Avançados</TabsTrigger>
         </TabsList>
 
         <TabsContent value="basic" className="space-y-6">
@@ -140,6 +141,17 @@ export const DREGenerator = ({
                     {selectedTemplateData.description} • {selectedTemplateData.structure.length} itens
                   </p>
                 )}
+              </div>
+
+              {/* Unit Selection */}
+              <div>
+                <Label className="text-base font-medium mb-3 block">Seleção de Unidades</Label>
+                <DREUnitFilter
+                  selectedUnits={state.filters.units}
+                  onUnitsChange={(units) => actions.updateFilters({ units })}
+                  showUnitSpecificTemplates={showUnitSpecificTemplates}
+                  onToggleUnitTemplates={setShowUnitSpecificTemplates}
+                />
               </div>
 
               {/* Date Ranges */}
@@ -213,35 +225,46 @@ export const DREGenerator = ({
         </TabsContent>
 
         <TabsContent value="units" className="space-y-6">
-          <DREUnitFilter
-            selectedUnits={state.filters.units}
-            onUnitsChange={(units) => actions.updateFilters({ units })}
-            showUnitSpecificTemplates={showUnitSpecificTemplates}
-            onToggleUnitTemplates={setShowUnitSpecificTemplates}
-          />
-
-          {state.filters.units.some(id => id !== 'all') && (
-            <DREUnitConfiguration
-              selectedUnits={state.filters.units}
-              unitConfigs={unitConfigs}
-              onConfigChange={(unitId, config) => 
-                setUnitConfigs(prev => ({ ...prev, [unitId]: config }))
-              }
-              onConfigReset={(unitId) => {
-                const { [unitId]: removed, ...rest } = unitConfigs;
-                setUnitConfigs(rest);
-              }}
-              availableTemplates={templates.map(t => ({ id: t.id, name: t.name }))}
-            />
-          )}
+          <Card>
+            <CardHeader>
+              <CardTitle>Configurações Específicas por Unidade</CardTitle>
+              <CardDescription>
+                Configure templates e parâmetros específicos para cada unidade selecionada
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {state.filters.units.some(id => id !== 'all') ? (
+                <DREUnitConfiguration
+                  selectedUnits={state.filters.units}
+                  unitConfigs={unitConfigs}
+                  onConfigChange={(unitId, config) => 
+                    setUnitConfigs(prev => ({ ...prev, [unitId]: config }))
+                  }
+                  onConfigReset={(unitId) => {
+                    const { [unitId]: removed, ...rest } = unitConfigs;
+                    setUnitConfigs(rest);
+                  }}
+                  availableTemplates={templates.map(t => ({ id: t.id, name: t.name }))}
+                />
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <Settings className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                  <p className="text-lg font-medium mb-2">Nenhuma unidade específica selecionada</p>
+                  <p className="text-sm">
+                    Selecione unidades específicas na aba "Configuração Básica" para configurar parâmetros individuais.
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="advanced" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Configurações Avançadas</CardTitle>
+              <CardTitle>Filtros Avançados</CardTitle>
               <CardDescription>
-                Filtros e configurações adicionais para o DRE
+                Configurações adicionais e filtros especializados para o DRE
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
