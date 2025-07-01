@@ -3,9 +3,10 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Brain, TrendingUp, Target, BarChart3, AlertCircle, CheckCircle, RefreshCw, Sparkles } from 'lucide-react';
+import { Brain, TrendingUp, Target, BarChart3, AlertCircle, CheckCircle, RefreshCw, Sparkles, ChevronRight } from 'lucide-react';
 import { UnitPerformanceData } from '@/types/unitPerformance';
 import { AIInsightService } from '@/services/aiInsightService';
+import { UnitInsightDetailModal } from './UnitInsightDetailModal';
 
 interface UnitAIInsightsProps {
   performanceData: UnitPerformanceData[];
@@ -19,11 +20,18 @@ interface AIInsight {
   impact: 'high' | 'medium' | 'low';
   priority: 'urgent' | 'important' | 'monitor';
   metrics?: Array<{ label: string; value: string; trend?: 'up' | 'down' | 'stable' }>;
+  detailedAnalysis?: {
+    recommendations: string[];
+    keyFindings: string[];
+    nextSteps: string[];
+  };
 }
 
 export const UnitAIInsights = ({ performanceData, selectedUnit }: UnitAIInsightsProps) => {
   const [insights, setInsights] = useState<AIInsight[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedInsight, setSelectedInsight] = useState<AIInsight | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (performanceData.length > 0) {
@@ -46,6 +54,11 @@ export const UnitAIInsights = ({ performanceData, selectedUnit }: UnitAIInsights
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleInsightClick = (insight: AIInsight) => {
+    setSelectedInsight(insight);
+    setIsModalOpen(true);
   };
 
   const getImpactColor = (impact: string) => {
@@ -143,79 +156,98 @@ export const UnitAIInsights = ({ performanceData, selectedUnit }: UnitAIInsights
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Brain className="w-5 h-5 text-purple-600" />
-            Insights do Consultor Financeiro AI
-            <Badge variant="secondary" className="ml-2">
-              {selectedUnit === 'all' ? 'Todas as Unidades' : selectedUnit}
-            </Badge>
-          </CardTitle>
-          <Button 
-            onClick={generateInsights} 
-            size="sm"
-            variant="outline"
-            className="gap-2"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Atualizar
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {topInsights.map((insight, index) => (
-            <Card key={index} className="border-l-4 border-l-purple-500">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    {getTypeIcon(insight.type)}
-                    <CardTitle className="text-base">{insight.title}</CardTitle>
+    <>
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Brain className="w-5 h-5 text-purple-600" />
+              Insights do Consultor Financeiro AI
+              <Badge variant="secondary" className="ml-2">
+                {selectedUnit === 'all' ? 'Todas as Unidades' : selectedUnit}
+              </Badge>
+            </CardTitle>
+            <Button 
+              onClick={generateInsights} 
+              size="sm"
+              variant="outline"
+              className="gap-2"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Atualizar
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {topInsights.map((insight, index) => (
+              <Card 
+                key={index} 
+                className="border-l-4 border-l-purple-500 cursor-pointer hover:shadow-md transition-shadow group"
+                onClick={() => handleInsightClick(insight)}
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {getTypeIcon(insight.type)}
+                      <CardTitle className="text-base">{insight.title}</CardTitle>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {getPriorityIcon(insight.priority)}
+                      <Badge className={getImpactColor(insight.impact)} variant="secondary">
+                        {insight.impact === 'high' ? 'Alto Impacto' : 
+                         insight.impact === 'medium' ? 'Médio Impacto' : 'Baixo Impacto'}
+                      </Badge>
+                      <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    {getPriorityIcon(insight.priority)}
-                    <Badge className={getImpactColor(insight.impact)} variant="secondary">
-                      {insight.impact === 'high' ? 'Alto Impacto' : 
-                       insight.impact === 'medium' ? 'Médio Impacto' : 'Baixo Impacto'}
-                    </Badge>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-700 text-sm mb-3">{insight.content}</p>
-                {insight.metrics && (
-                  <div className="grid grid-cols-3 gap-3">
-                    {insight.metrics.map((metric, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-2 bg-gray-50 rounded text-xs">
-                        <span className="font-medium">{metric.label}</span>
-                        <div className="flex items-center gap-1">
-                          <span className="font-bold">{metric.value}</span>
-                          {metric.trend && (
-                            <TrendingUp className={`w-3 h-3 ${
-                              metric.trend === 'up' ? 'text-green-600' : 
-                              metric.trend === 'down' ? 'text-red-600 rotate-180' : 'text-gray-600'
-                            }`} />
-                          )}
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-700 text-sm mb-3">{insight.content}</p>
+                  {insight.metrics && (
+                    <div className="grid grid-cols-3 gap-3">
+                      {insight.metrics.map((metric, idx) => (
+                        <div key={idx} className="flex items-center justify-between p-2 bg-gray-50 rounded text-xs">
+                          <span className="font-medium">{metric.label}</span>
+                          <div className="flex items-center gap-1">
+                            <span className="font-bold">{metric.value}</span>
+                            {metric.trend && (
+                              <TrendingUp className={`w-3 h-3 ${
+                                metric.trend === 'up' ? 'text-green-600' : 
+                                metric.trend === 'down' ? 'text-red-600 rotate-180' : 'text-gray-600'
+                              }`} />
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
+                  )}
+                  <div className="mt-3 pt-3 border-t border-gray-100">
+                    <p className="text-xs text-gray-500 flex items-center gap-1">
+                      <Sparkles className="w-3 h-3" />
+                      Clique para ver análise detalhada
+                    </p>
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-          
-          {insights.length > 3 && (
-            <div className="text-center pt-2">
-              <p className="text-sm text-gray-500">
-                Mostrando {topInsights.length} de {insights.length} insights prioritários
-              </p>
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+                </CardContent>
+              </Card>
+            ))}
+            
+            {insights.length > 3 && (
+              <div className="text-center pt-2">
+                <p className="text-sm text-gray-500">
+                  Mostrando {topInsights.length} de {insights.length} insights prioritários
+                </p>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      <UnitInsightDetailModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        insight={selectedInsight}
+      />
+    </>
   );
 };
