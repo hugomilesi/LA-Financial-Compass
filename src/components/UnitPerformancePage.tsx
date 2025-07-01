@@ -1,10 +1,9 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Building, TrendingUp, Users, DollarSign, Download, RefreshCw, BarChart3, Percent, Brain } from 'lucide-react';
+import { Building, TrendingUp, Users, DollarSign, Download, RefreshCw, BarChart3, Percent } from 'lucide-react';
 import { useUnitPerformance } from '@/hooks/useUnitPerformance';
 import { usePeriod } from '@/contexts/PeriodContext';
 import { useUnit } from '@/contexts/UnitContext';
@@ -12,7 +11,7 @@ import { UnitHighlights } from './unitPerformance/UnitHighlights';
 import { ComparativeCharts } from './unitPerformance/ComparativeCharts';
 import { UnitRankings } from './unitPerformance/UnitRankings';
 import { UnitDetailModal } from './unitPerformance/UnitDetailModal';
-import { AIInsightsModal } from './unitPerformance/AIInsightsModal';
+import { UnitAIInsights } from './unitPerformance/UnitAIInsights';
 
 export const UnitPerformancePage = () => {
   console.log('🎯 [UnitPerformancePage] Component is rendering...');
@@ -39,7 +38,6 @@ export const UnitPerformancePage = () => {
   const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('highlights');
   const [viewMode, setViewMode] = useState<'all' | 'financial' | 'operational' | 'strategic'>('all');
-  const [showAIInsights, setShowAIInsights] = useState(false);
 
   const selectedUnitData = selectedUnitId ? getUnitPerformance(selectedUnitId) : null;
 
@@ -193,14 +191,6 @@ export const UnitPerformancePage = () => {
           </Select>
 
           <Button
-            onClick={() => setShowAIInsights(true)}
-            className="gap-2 bg-purple-600 hover:bg-purple-700"
-          >
-            <Brain className="h-4 w-4" />
-            Insights AI
-          </Button>
-
-          <Button
             onClick={refreshData}
             variant="outline"
             className="gap-2"
@@ -315,19 +305,17 @@ export const UnitPerformancePage = () => {
         </TabsContent>
       </Tabs>
 
+      {/* AI Insights Section */}
+      <UnitAIInsights 
+        performanceData={filteredData}
+        selectedUnit={selectedUnit}
+      />
+
       {/* Unit Detail Modal */}
       <UnitDetailModal
         isOpen={!!selectedUnitId}
         onClose={() => setSelectedUnitId(null)}
         unitData={selectedUnitData}
-      />
-
-      {/* AI Insights Modal */}
-      <AIInsightsModal
-        isOpen={showAIInsights}
-        onClose={() => setShowAIInsights(false)}
-        performanceData={filteredData}
-        selectedUnit={selectedUnit}
       />
     </div>
   );
