@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Download, FileText, TrendingUp, DollarSign, Calendar, Settings, Brain, Wrench } from 'lucide-react';
+import { Download, FileText, TrendingUp, DollarSign, Calendar, Settings, Brain, Wrench, Maximize2 } from 'lucide-react';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { ReportBuilder } from '@/components/reports/ReportBuilder';
@@ -19,11 +19,13 @@ import { useToast } from '@/hooks/use-toast';
 import { DRETemplate, DREConfiguration, DREData, DREAnalysis } from '@/types/dre';
 import { Account } from '@/types/chartOfAccounts';
 import { CostCenterCategory } from '@/types/costCenter';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 export const ReportsDREPage = () => {
   const { toast } = useToast();
   const [selectedPeriod, setSelectedPeriod] = useState('2024');
   const [selectedUnits, setSelectedUnits] = useState<string[]>(['all']);
+  const [isChartFullscreen, setIsChartFullscreen] = useState(false);
   
   // DRE Templates State
   const [dreTemplates, setDreTemplates] = useState<DRETemplate[]>([
@@ -402,6 +404,28 @@ export const ReportsDREPage = () => {
     // Implementation would use email service
   };
 
+  const renderEvolutionChart = (height = "h-[450px]") => (
+    <ChartContainer
+      config={{
+        receita: { label: "Receita", color: "#8884d8" },
+        despesas: { label: "Despesas", color: "#82ca9d" },
+        lucro: { label: "Lucro", color: "#ffc658" }
+      }}
+      className={height}
+    >
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={monthlyData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+          <XAxis dataKey="mes" />
+          <YAxis />
+          <ChartTooltip content={<ChartTooltipContent />} />
+          <Bar dataKey="receita" fill="#8884d8" radius={[2, 2, 0, 0]} />
+          <Bar dataKey="despesas" fill="#82ca9d" radius={[2, 2, 0, 0]} />
+          <Bar dataKey="lucro" fill="#ffc658" radius={[2, 2, 0, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
+    </ChartContainer>
+  );
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
@@ -441,8 +465,8 @@ export const ReportsDREPage = () => {
         </TabsList>
 
         <TabsContent value="dre" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
+          <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
+            <Card className="xl:col-span-2">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <FileText className="w-5 h-5" />
@@ -453,52 +477,55 @@ export const ReportsDREPage = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Item</TableHead>
-                      <TableHead className="text-right">Valor</TableHead>
-                      <TableHead className="text-right">%</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {dreData.map((item, index) => (
-                      <TableRow key={index} className={item.valor < 0 ? 'text-red-600' : item.item.includes('Lucro') ? 'text-green-600 font-semibold' : ''}>
-                        <TableCell className="font-medium">{item.item}</TableCell>
-                        <TableCell className="text-right">{formatCurrency(item.valor)}</TableCell>
-                        <TableCell className="text-right">{item.percentual.toFixed(1)}%</TableCell>
+                <div className="max-h-[450px] overflow-y-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Item</TableHead>
+                        <TableHead className="text-right">Valor</TableHead>
+                        <TableHead className="text-right">%</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {dreData.map((item, index) => (
+                        <TableRow key={index} className={item.valor < 0 ? 'text-red-600' : item.item.includes('Lucro') ? 'text-green-600 font-semibold' : ''}>
+                          <TableCell className="font-medium">{item.item}</TableCell>
+                          <TableCell className="text-right">{formatCurrency(item.valor)}</TableCell>
+                          <TableCell className="text-right">{item.percentual.toFixed(1)}%</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="xl:col-span-3">
               <CardHeader>
-                <CardTitle>Evolução Mensal</CardTitle>
-                <CardDescription>Receitas vs Despesas vs Lucro</CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Evolução Mensal</CardTitle>
+                    <CardDescription>Receitas vs Despesas vs Lucro</CardDescription>
+                  </div>
+                  <Dialog open={isChartFullscreen} onOpenChange={setIsChartFullscreen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <Maximize2 className="w-4 h-4" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-6xl max-h-[90vh]">
+                      <DialogHeader>
+                        <DialogTitle>Evolução Mensal - Visão Completa</DialogTitle>
+                      </DialogHeader>
+                      <div className="mt-4">
+                        {renderEvolutionChart("h-[70vh]")}
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
               </CardHeader>
               <CardContent>
-                <ChartContainer
-                  config={{
-                    receita: { label: "Receita", color: "#8884d8" },
-                    despesas: { label: "Despesas", color: "#82ca9d" },
-                    lucro: { label: "Lucro", color: "#ffc658" }
-                  }}
-                  className="h-[300px]"
-                >
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={monthlyData}>
-                      <XAxis dataKey="mes" />
-                      <YAxis />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                      <Bar dataKey="receita" fill="#8884d8" />
-                      <Bar dataKey="despesas" fill="#82ca9d" />
-                      <Bar dataKey="lucro" fill="#ffc658" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
+                {renderEvolutionChart()}
               </CardContent>
             </Card>
           </div>
