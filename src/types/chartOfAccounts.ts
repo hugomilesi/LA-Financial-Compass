@@ -1,5 +1,5 @@
 
-export type AccountType = 'revenue' | 'expense' | 'asset' | 'liability' | 'equity';
+export type AccountType = 'revenue' | 'expense' | 'liability' | 'equity';
 
 export interface Account {
   id: string;

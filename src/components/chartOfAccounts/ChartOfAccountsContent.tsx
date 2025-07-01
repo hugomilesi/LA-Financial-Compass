@@ -22,7 +22,6 @@ interface ChartOfAccountsContentProps {
 const accountTypes: { type: AccountType; label: string; description: string }[] = [
   { type: 'revenue', label: 'Receitas', description: 'Contas de receita e faturamento' },
   { type: 'expense', label: 'Despesas', description: 'Contas de custos e despesas' },
-  { type: 'asset', label: 'Ativo', description: 'Bens e direitos' },
   { type: 'liability', label: 'Passivo', description: 'Obrigações e dívidas' },
   { type: 'equity', label: 'Patrimônio Líquido', description: 'Capital e reservas' }
 ];

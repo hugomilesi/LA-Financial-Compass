@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -43,7 +42,6 @@ export const AccountForm = ({ account, accounts, onSave, onCancel }: AccountForm
   const accountTypes = [
     { value: 'revenue', label: 'Receita' },
     { value: 'expense', label: 'Despesa' },
-    { value: 'asset', label: 'Ativo' },
     { value: 'liability', label: 'Passivo' },
     { value: 'equity', label: 'Patrimônio Líquido' }
   ];
