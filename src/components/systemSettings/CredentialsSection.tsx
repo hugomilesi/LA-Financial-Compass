@@ -138,7 +138,9 @@ export const CredentialsSection = ({ credentials }: CredentialsSectionProps) => 
                         {getStatusText(credential.status)}
                       </Badge>
                       {isExpiringSoon(credential.expiresAt) && (
-                        <AlertCircle className="h-4 w-4 text-yellow-500" title="Expira em breve" />
+                        <div title="Expira em breve">
+                          <AlertCircle className="h-4 w-4 text-yellow-500" />
+                        </div>
                       )}
                     </div>
                   </TableCell>
