@@ -13,6 +13,8 @@ import { UnitRankings } from './unitPerformance/UnitRankings';
 import { UnitDetailModal } from './unitPerformance/UnitDetailModal';
 
 export const UnitPerformancePage = () => {
+  console.log('🎯 [UnitPerformancePage] Component is rendering...');
+  
   const { 
     performanceData, 
     comparisons, 
@@ -21,6 +23,13 @@ export const UnitPerformancePage = () => {
     getUnitPerformance,
     refreshData 
   } = useUnitPerformance();
+  
+  console.log('📊 [UnitPerformancePage] Hook data:', {
+    performanceDataLength: performanceData?.length || 0,
+    comparisonsLength: comparisons?.length || 0,
+    rankingsLength: rankings?.length || 0,
+    isLoading
+  });
   
   const { getDisplayPeriod } = usePeriod();
   
@@ -31,29 +40,37 @@ export const UnitPerformancePage = () => {
   const selectedUnitData = selectedUnitId ? getUnitPerformance(selectedUnitId) : null;
 
   const handleExportData = () => {
-    const csvContent = [
-      ['Unidade', 'Receita', 'Despesa', 'Lucro', 'Margem %', 'Alunos', 'Ocupação %', 'Ticket Médio', 'Satisfação %'],
-      ...performanceData.map(unit => [
-        unit.unitName,
-        unit.financial.revenue.toLocaleString('pt-BR'),
-        unit.financial.expenses.toLocaleString('pt-BR'),
-        unit.financial.profit.toLocaleString('pt-BR'),
-        unit.financial.profitMargin.toFixed(2),
-        unit.operational.students.toString(),
-        unit.operational.occupancy.toString(),
-        unit.operational.averageTicket.toLocaleString('pt-BR'),
-        unit.strategic.customerSatisfaction.toString()
-      ])
-    ].map(row => row.join(',')).join('\n');
+    console.log('📤 [UnitPerformancePage] Exporting data...');
+    try {
+      const csvContent = [
+        ['Unidade', 'Receita', 'Despesa', 'Lucro', 'Margem %', 'Alunos', 'Ocupação %', 'Ticket Médio', 'Satisfação %'],
+        ...performanceData.map(unit => [
+          unit.unitName,
+          unit.financial.revenue.toLocaleString('pt-BR'),
+          unit.financial.expenses.toLocaleString('pt-BR'),
+          unit.financial.profit.toLocaleString('pt-BR'),
+          unit.financial.profitMargin.toFixed(2),
+          unit.operational.students.toString(),
+          unit.operational.occupancy.toString(),
+          unit.operational.averageTicket.toLocaleString('pt-BR'),
+          unit.strategic.customerSatisfaction.toString()
+        ])
+      ].map(row => row.join(',')).join('\n');
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `desempenho-unidades-${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `desempenho-unidades-${new Date().toISOString().split('T')[0]}.csv`;
+      link.click();
+    } catch (error) {
+      console.error('❌ [UnitPerformancePage] Export error:', error);
+    }
   };
 
+  console.log('🔄 [UnitPerformancePage] Rendering state - isLoading:', isLoading);
+
   if (isLoading) {
+    console.log('⏳ [UnitPerformancePage] Showing loading state');
     return (
       <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
         <div className="flex items-center justify-center h-64">
@@ -66,11 +83,56 @@ export const UnitPerformancePage = () => {
     );
   }
 
-  // Calculate summary metrics
-  const totalRevenue = performanceData.reduce((sum, unit) => sum + unit.financial.revenue, 0);
-  const totalStudents = performanceData.reduce((sum, unit) => sum + unit.operational.students, 0);
-  const averageOccupancy = performanceData.reduce((sum, unit) => sum + unit.operational.occupancy, 0) / performanceData.length;
-  const averageSatisfaction = performanceData.reduce((sum, unit) => sum + unit.strategic.customerSatisfaction, 0) / performanceData.length;
+  console.log('📈 [UnitPerformancePage] Calculating summary metrics...');
+
+  // Calculate summary metrics with error handling
+  const totalRevenue = performanceData?.reduce((sum, unit) => {
+    const revenue = unit?.financial?.revenue || 0;
+    return sum + revenue;
+  }, 0) || 0;
+  
+  const totalStudents = performanceData?.reduce((sum, unit) => {
+    const students = unit?.operational?.students || 0;
+    return sum + students;
+  }, 0) || 0;
+  
+  const averageOccupancy = performanceData?.length > 0 
+    ? (performanceData.reduce((sum, unit) => sum + (unit?.operational?.occupancy || 0), 0) / performanceData.length)
+    : 0;
+    
+  const averageSatisfaction = performanceData?.length > 0
+    ? (performanceData.reduce((sum, unit) => sum + (unit?.strategic?.customerSatisfaction || 0), 0) / performanceData.length)
+    : 0;
+
+  console.log('💰 [UnitPerformancePage] Summary metrics:', {
+    totalRevenue,
+    totalStudents,
+    averageOccupancy,
+    averageSatisfaction,
+    unitsCount: performanceData?.length || 0
+  });
+
+  // Error fallback
+  if (!performanceData || performanceData.length === 0) {
+    console.log('⚠️ [UnitPerformancePage] No performance data available');
+    return (
+      <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <BarChart3 className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+            <h2 className="text-xl font-semibold text-gray-700 mb-2">Nenhum dado disponível</h2>
+            <p className="text-gray-600 mb-4">Não foi possível carregar os dados de desempenho das unidades.</p>
+            <Button onClick={refreshData} className="gap-2">
+              <RefreshCw className="h-4 w-4" />
+              Tentar Novamente
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  console.log('✅ [UnitPerformancePage] Rendering main content with', performanceData.length, 'units');
 
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">

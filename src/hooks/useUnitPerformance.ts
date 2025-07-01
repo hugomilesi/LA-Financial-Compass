@@ -1,78 +1,118 @@
-
 import { useState, useEffect } from 'react';
 import { UnitPerformanceData, UnitAlert, UnitComparison, UnitRanking } from '@/types/unitPerformance';
 import { getDataByUnit, getHistoricalDataByUnit } from '@/utils/unitData';
 import { UNITS } from '@/contexts/UnitContext';
 
 export const useUnitPerformance = () => {
+  console.log('🔍 [useUnitPerformance] Hook initialized');
+  
   const [performanceData, setPerformanceData] = useState<UnitPerformanceData[]>([]);
   const [comparisons, setComparisons] = useState<UnitComparison[]>([]);
   const [rankings, setRankings] = useState<UnitRanking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    console.log('🚀 [useUnitPerformance] useEffect triggered, calling generatePerformanceData');
     generatePerformanceData();
   }, []);
 
-  const generatePerformanceData = () => {
+  const generatePerformanceData = async () => {
     console.log('🔍 [useUnitPerformance] Generating performance data...');
+    setIsLoading(true);
+    setError(null);
     
-    const data: UnitPerformanceData[] = UNITS.filter(unit => unit.id !== 'all').map(unit => {
-      const unitData = getDataByUnit(unit.id);
-      const historicalData = getHistoricalDataByUnit(unit.id);
+    try {
+      // Verify UNITS data
+      console.log('📋 [useUnitPerformance] Available UNITS:', UNITS);
       
-      // Calculate financial metrics
-      const profit = unitData.receita - unitData.despesa;
-      const profitMargin = (profit / unitData.receita) * 100;
-      const costPerStudent = unitData.despesa / unitData.alunos;
-      const revenueGrowth = calculateGrowth(historicalData.map(h => h.receita));
+      const availableUnits = UNITS.filter(unit => unit.id !== 'all');
+      console.log('🏢 [useUnitPerformance] Filtered units:', availableUnits);
       
-      // Generate strategic metrics
-      const strategic = generateStrategicMetrics(unit.id);
-      
-      // Generate alerts
-      const alerts = generateUnitAlerts(unit.id, unitData, profitMargin);
-      
-      return {
-        unitId: unit.id,
-        unitName: unit.displayName,
-        financial: {
-          revenue: unitData.receita,
-          expenses: unitData.despesa,
-          profit,
-          profitMargin,
-          costPerStudent,
-          revenueGrowth
-        },
-        operational: {
-          students: unitData.alunos,
-          enrollments: unitData.matriculas,
-          capacity: unitData.capacidade,
-          occupancy: unitData.ocupacao,
-          averageTicket: unitData.ticketMedio,
-          studentRetention: generateRetentionRate(unit.id)
-        },
-        strategic,
-        trends: {
-          revenueHistory: historicalData.map(h => ({ month: h.month, value: h.receita })),
-          studentsHistory: generateStudentHistory(unit.id),
-          profitHistory: historicalData.map(h => ({ month: h.month, value: h.receita - h.despesa }))
-        },
-        alerts
-      };
-    });
+      if (availableUnits.length === 0) {
+        throw new Error('No units available for performance analysis');
+      }
 
-    setPerformanceData(data);
-    generateComparisons(data);
-    generateRankings(data);
-    setIsLoading(false);
+      const data: UnitPerformanceData[] = availableUnits.map(unit => {
+        console.log(`🔍 [useUnitPerformance] Processing unit: ${unit.id} - ${unit.displayName}`);
+        
+        try {
+          const unitData = getDataByUnit(unit.id);
+          console.log(`📊 [useUnitPerformance] Unit data for ${unit.id}:`, unitData);
+          
+          const historicalData = getHistoricalDataByUnit(unit.id);
+          console.log(`📈 [useUnitPerformance] Historical data for ${unit.id}:`, historicalData);
+          
+          // Calculate financial metrics
+          const profit = unitData.receita - unitData.despesa;
+          const profitMargin = unitData.receita > 0 ? (profit / unitData.receita) * 100 : 0;
+          const costPerStudent = unitData.alunos > 0 ? unitData.despesa / unitData.alunos : 0;
+          const revenueGrowth = calculateGrowth(historicalData.map(h => h.receita));
+          
+          // Generate strategic metrics
+          const strategic = generateStrategicMetrics(unit.id);
+          
+          // Generate alerts
+          const alerts = generateUnitAlerts(unit.id, unitData, profitMargin);
+          
+          const unitPerformance: UnitPerformanceData = {
+            unitId: unit.id,
+            unitName: unit.displayName,
+            financial: {
+              revenue: unitData.receita,
+              expenses: unitData.despesa,
+              profit,
+              profitMargin,
+              costPerStudent,
+              revenueGrowth
+            },
+            operational: {
+              students: unitData.alunos,
+              enrollments: unitData.matriculas,
+              capacity: unitData.capacidade,
+              occupancy: unitData.ocupacao,
+              averageTicket: unitData.ticketMedio,
+              studentRetention: generateRetentionRate(unit.id)
+            },
+            strategic,
+            trends: {
+              revenueHistory: historicalData.map(h => ({ month: h.month, value: h.receita })),
+              studentsHistory: generateStudentHistory(unit.id),
+              profitHistory: historicalData.map(h => ({ month: h.month, value: h.receita - h.despesa }))
+            },
+            alerts
+          };
+          
+          console.log(`✅ [useUnitPerformance] Completed processing unit ${unit.id}`);
+          return unitPerformance;
+          
+        } catch (unitError) {
+          console.error(`❌ [useUnitPerformance] Error processing unit ${unit.id}:`, unitError);
+          throw unitError;
+        }
+      });
+
+      console.log('📊 [useUnitPerformance] Generated performance data:', data);
+      setPerformanceData(data);
+      
+      generateComparisons(data);
+      generateRankings(data);
+      
+      console.log('✅ [useUnitPerformance] Performance data generation completed successfully');
+      
+    } catch (error) {
+      console.error('❌ [useUnitPerformance] Error generating performance data:', error);
+      setError(error instanceof Error ? error.message : 'Unknown error occurred');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const calculateGrowth = (values: number[]): number => {
     if (values.length < 2) return 0;
     const firstValue = values[0];
     const lastValue = values[values.length - 1];
-    return ((lastValue - firstValue) / firstValue) * 100;
+    return firstValue > 0 ? ((lastValue - firstValue) / firstValue) * 100 : 0;
   };
 
   const generateStrategicMetrics = (unitId: string) => {
@@ -160,6 +200,8 @@ export const useUnitPerformance = () => {
   };
 
   const generateComparisons = (data: UnitPerformanceData[]) => {
+    console.log('📊 [useUnitPerformance] Generating comparisons...');
+    
     const metrics = [
       { key: 'revenue', label: 'Receita', category: 'financial' as const, getValue: (d: UnitPerformanceData) => d.financial.revenue },
       { key: 'profitMargin', label: 'Margem de Lucro', category: 'financial' as const, getValue: (d: UnitPerformanceData) => d.financial.profitMargin },
@@ -193,6 +235,8 @@ export const useUnitPerformance = () => {
   };
 
   const generateRankings = (data: UnitPerformanceData[]) => {
+    console.log('🏆 [useUnitPerformance] Generating rankings...');
+    
     const rankings: UnitRanking[] = data.map(unit => {
       const financialScore = calculateScore([
         unit.financial.profitMargin,
@@ -251,11 +295,20 @@ export const useUnitPerformance = () => {
     return comparisons.filter(comp => comp.category === category);
   };
 
+  console.log('🔄 [useUnitPerformance] Hook returning data:', {
+    performanceDataLength: performanceData.length,
+    comparisonsLength: comparisons.length,
+    rankingsLength: rankings.length,
+    isLoading,
+    error
+  });
+
   return {
     performanceData,
     comparisons,
     rankings,
     isLoading,
+    error,
     getUnitPerformance,
     getUnitComparisons,
     refreshData: generatePerformanceData
