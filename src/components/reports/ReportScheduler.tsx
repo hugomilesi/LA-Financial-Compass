@@ -45,15 +45,25 @@ export const ReportScheduler = ({
 }: ReportSchedulerProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState<ScheduledReport | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    reportId: string;
+    frequency: 'daily' | 'weekly' | 'monthly' | 'quarterly';
+    dayOfWeek: number;
+    dayOfMonth: number;
+    time: string;
+    recipients: string[];
+    format: 'pdf' | 'excel' | 'csv';
+    isActive: boolean;
+  }>({
     name: '',
     reportId: '',
-    frequency: 'monthly' as const,
+    frequency: 'monthly',
     dayOfWeek: 1,
     dayOfMonth: 1,
     time: '09:00',
     recipients: [''],
-    format: 'pdf' as const,
+    format: 'pdf',
     isActive: true
   });
 
@@ -210,7 +220,7 @@ export const ReportScheduler = ({
                     <Label htmlFor="frequency">Frequência</Label>
                     <Select
                       value={formData.frequency}
-                      onValueChange={(value: any) => setFormData(prev => ({ ...prev, frequency: value }))}
+                      onValueChange={(value: 'daily' | 'weekly' | 'monthly' | 'quarterly') => setFormData(prev => ({ ...prev, frequency: value }))}
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -274,7 +284,7 @@ export const ReportScheduler = ({
                   <Label htmlFor="format">Formato</Label>
                   <Select
                     value={formData.format}
-                    onValueChange={(value: any) => setFormData(prev => ({ ...prev, format: value }))}
+                    onValueChange={(value: 'pdf' | 'excel' | 'csv') => setFormData(prev => ({ ...prev, format: value }))}
                   >
                     <SelectTrigger>
                       <SelectValue />
