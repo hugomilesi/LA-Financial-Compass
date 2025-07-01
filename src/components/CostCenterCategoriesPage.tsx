@@ -2,7 +2,8 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, Filter, Download, BarChart3 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Plus, Filter, Download, BarChart3, Bell, Target } from 'lucide-react';
 import { useCostCenterCategories } from '@/hooks/useCostCenterCategories';
 import { useUnit } from '@/contexts/UnitContext';
 import { usePeriod } from '@/contexts/PeriodContext';
@@ -12,10 +13,23 @@ import { CostCenterFilters } from './costCenter/CostCenterFilters';
 import { CostCenterCategoryModal } from './costCenter/CostCenterCategoryModal';
 import { CostCenterDetailsModal } from './costCenter/CostCenterDetailsModal';
 import { CostCenterChartModal } from './costCenter/CostCenterChartModal';
+import { CostCenterAlerts } from './costCenter/CostCenterAlerts';
+import { CostCenterStrategicIndicators } from './costCenter/CostCenterStrategicIndicators';
 import { CostCenterCategory } from '@/types/costCenter';
 
 export const CostCenterCategoriesPage = () => {
-  const { categories, addCategory, updateCategory, deleteCategory, getCategoryMetrics, getCategoriesByUnit } = useCostCenterCategories();
+  const { 
+    categories, 
+    alerts,
+    addCategory, 
+    updateCategory, 
+    deleteCategory, 
+    getCategoryMetrics, 
+    getCategoriesByUnit,
+    markAlertAsRead,
+    dismissAlert,
+    refreshAlerts
+  } = useCostCenterCategories();
   const { selectedUnit, getUnitDisplayName } = useUnit();
   const { getDisplayPeriod } = usePeriod();
 
@@ -26,6 +40,7 @@ export const CostCenterCategoriesPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<'name' | 'amount' | 'percentage'>('amount');
   const [filterActive, setFilterActive] = useState<boolean | null>(null);
+  const [activeTab, setActiveTab] = useState('categories');
 
   const displayCategories = getCategoriesByUnit(selectedUnit);
   const metrics = getCategoryMetrics();
@@ -126,40 +141,74 @@ export const CostCenterCategoriesPage = () => {
       {/* Metrics */}
       <CostCenterMetrics metrics={metrics} />
 
-      {/* Filters */}
-      <CostCenterFilters
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        sortBy={sortBy}
-        onSortChange={setSortBy}
-        filterActive={filterActive}
-        onFilterActiveChange={setFilterActive}
-      />
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="categories">Categorias</TabsTrigger>
+          <TabsTrigger value="alerts" className="flex items-center gap-2">
+            <Bell className="h-4 w-4" />
+            Alertas
+            {alerts.filter(a => !a.isRead).length > 0 && (
+              <span className="bg-red-500 text-white text-xs rounded-full px-2 py-0.5">
+                {alerts.filter(a => !a.isRead).length}
+              </span>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="indicators" className="flex items-center gap-2">
+            <Target className="h-4 w-4" />
+            Indicadores
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Categories Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredCategories.map((category) => (
-          <CostCenterCategoryCard
-            key={category.id}
-            category={category}
-            onEdit={(category) => setEditingCategory(category)}
-            onDelete={handleDeleteCategory}
-            onViewDetails={(category) => setSelectedCategory(category)}
+        <TabsContent value="categories" className="space-y-6">
+          {/* Filters */}
+          <CostCenterFilters
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+            filterActive={filterActive}
+            onFilterActiveChange={setFilterActive}
           />
-        ))}
-      </div>
 
-      {filteredCategories.length === 0 && (
-        <Card>
-          <CardContent className="text-center py-12">
-            <div className="text-gray-500">
-              <Filter className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p className="text-lg font-medium mb-2">Nenhuma categoria encontrada</p>
-              <p>Tente ajustar os filtros ou criar uma nova categoria.</p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+          {/* Categories Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredCategories.map((category) => (
+              <CostCenterCategoryCard
+                key={category.id}
+                category={category}
+                onEdit={(category) => setEditingCategory(category)}
+                onDelete={handleDeleteCategory}
+                onViewDetails={(category) => setSelectedCategory(category)}
+              />
+            ))}
+          </div>
+
+          {filteredCategories.length === 0 && (
+            <Card>
+              <CardContent className="text-center py-12">
+                <div className="text-gray-500">
+                  <Filter className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p className="text-lg font-medium mb-2">Nenhuma categoria encontrada</p>
+                  <p>Tente ajustar os filtros ou criar uma nova categoria.</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="alerts">
+          <CostCenterAlerts
+            alerts={alerts}
+            onMarkAsRead={markAlertAsRead}
+            onDismiss={dismissAlert}
+          />
+        </TabsContent>
+
+        <TabsContent value="indicators">
+          <CostCenterStrategicIndicators categories={displayCategories} />
+        </TabsContent>
+      </Tabs>
 
       {/* Modals */}
       <CostCenterCategoryModal

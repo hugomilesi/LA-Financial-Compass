@@ -1,105 +1,14 @@
 
 import { useState, useEffect } from 'react';
 import { CostCenterCategory, CostCenterMetrics } from '@/types/costCenter';
-import { UNIT_COST_CENTER_DATA, UNIT_DATA } from '@/utils/unitData';
+import { DEFAULT_COST_CENTER_CATEGORIES, CostCenterAlert, generateSmartAlerts } from '@/utils/costCenterData';
 
 const STORAGE_KEY = 'la-music-cost-center-categories';
-
-const defaultCategories: CostCenterCategory[] = [
-  {
-    id: 'cc-pessoal',
-    name: 'Pessoal',
-    description: 'Salários, encargos sociais e benefícios dos colaboradores',
-    color: '#EF4444',
-    icon: 'Users',
-    isActive: true,
-    totalAmount: 165519,
-    percentage: 58.1,
-    unitBreakdown: [
-      { unitId: 'campo-grande', unitName: 'Campo Grande', amount: 68451, percentage: 60.1 },
-      { unitId: 'recreio', unitName: 'Recreio', amount: 58100, percentage: 57.2 },
-      { unitId: 'barra', unitName: 'Barra', amount: 38968, percentage: 55.8 }
-    ],
-    accounts: ['exp-4.1.1.1', 'exp-4.2.1.1'],
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: 'cc-aluguel',
-    name: 'Aluguel e Ocupação',
-    description: 'Aluguel, condomínio e taxas relacionadas ao espaço físico',
-    color: '#F59E0B',
-    icon: 'Building',
-    isActive: true,
-    totalAmount: 52405,
-    percentage: 18.4,
-    unitBreakdown: [
-      { unitId: 'campo-grande', unitName: 'Campo Grande', amount: 19938, percentage: 17.5 },
-      { unitId: 'recreio', unitName: 'Recreio', amount: 19401, percentage: 19.1 },
-      { unitId: 'barra', unitName: 'Barra', amount: 13066, percentage: 18.7 }
-    ],
-    accounts: ['exp-4.1.2.1.1', 'exp-4.1.2.1.2', 'exp-4.1.2.2.1', 'exp-4.1.2.2.2', 'exp-4.1.2.3.1', 'exp-4.1.2.3.2'],
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: 'cc-marketing',
-    name: 'Marketing e Comunicação',
-    description: 'Publicidade, material gráfico e eventos promocionais',
-    color: '#10B981',
-    icon: 'Megaphone',
-    isActive: true,
-    totalAmount: 38217,
-    percentage: 13.4,
-    unitBreakdown: [
-      { unitId: 'campo-grande', unitName: 'Campo Grande', amount: 14583, percentage: 12.8 },
-      { unitId: 'recreio', unitName: 'Recreio', amount: 13712, percentage: 13.5 },
-      { unitId: 'barra', unitName: 'Barra', amount: 9922, percentage: 14.2 }
-    ],
-    accounts: ['exp-4.2.2.1', 'exp-4.2.2.2', 'exp-4.2.2.3'],
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: 'cc-operacional',
-    name: 'Despesas Operacionais',
-    description: 'Utilities, material de ensino e despesas gerais',
-    color: '#3B82F6',
-    icon: 'Settings',
-    isActive: true,
-    totalAmount: 23893,
-    percentage: 8.4,
-    unitBreakdown: [
-      { unitId: 'campo-grande', unitName: 'Campo Grande', amount: 9001, percentage: 7.9 },
-      { unitId: 'recreio', unitName: 'Recreio', amount: 8532, percentage: 8.4 },
-      { unitId: 'barra', unitName: 'Barra', amount: 6360, percentage: 9.1 }
-    ],
-    accounts: ['exp-4.1.2.1.3', 'exp-4.1.2.2.3', 'exp-4.1.2.3.3', 'exp-4.1.1.2', 'exp-4.2.4'],
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: 'cc-outros',
-    name: 'Outros',
-    description: 'Despesas diversas e não categorizadas',
-    color: '#6B7280',
-    icon: 'MoreHorizontal',
-    isActive: true,
-    totalAmount: 5341,
-    percentage: 1.9,
-    unitBreakdown: [
-      { unitId: 'campo-grande', unitName: 'Campo Grande', amount: 1957, percentage: 1.7 },
-      { unitId: 'recreio', unitName: 'Recreio', amount: 1829, percentage: 1.8 },
-      { unitId: 'barra', unitName: 'Barra', amount: 1555, percentage: 2.2 }
-    ],
-    accounts: ['exp-4.3'],
-    createdAt: new Date(),
-    updatedAt: new Date()
-  }
-];
+const ALERTS_STORAGE_KEY = 'la-music-cost-center-alerts';
 
 export const useCostCenterCategories = () => {
   const [categories, setCategories] = useState<CostCenterCategory[]>([]);
+  const [alerts, setAlerts] = useState<CostCenterAlert[]>([]);
 
   useEffect(() => {
     const storedCategories = localStorage.getItem(STORAGE_KEY);
@@ -113,16 +22,48 @@ export const useCostCenterCategories = () => {
         })));
       } catch (error) {
         console.error('Error parsing stored categories:', error);
-        setCategories(defaultCategories);
+        setCategories(DEFAULT_COST_CENTER_CATEGORIES);
       }
     } else {
-      setCategories(defaultCategories);
+      setCategories(DEFAULT_COST_CENTER_CATEGORIES);
+    }
+
+    // Load alerts
+    const storedAlerts = localStorage.getItem(ALERTS_STORAGE_KEY);
+    if (storedAlerts) {
+      try {
+        const parsed = JSON.parse(storedAlerts);
+        setAlerts(parsed.map((alert: any) => ({
+          ...alert,
+          createdAt: new Date(alert.createdAt)
+        })));
+      } catch (error) {
+        console.error('Error parsing stored alerts:', error);
+      }
     }
   }, []);
+
+  // Generate alerts when categories change
+  useEffect(() => {
+    if (categories.length > 0) {
+      const newAlerts = generateSmartAlerts(categories);
+      setAlerts(prev => {
+        // Merge with existing alerts, avoiding duplicates
+        const existingIds = prev.map(alert => alert.id);
+        const filteredNewAlerts = newAlerts.filter(alert => !existingIds.includes(alert.id));
+        return [...prev, ...filteredNewAlerts];
+      });
+    }
+  }, [categories]);
 
   const saveToStorage = (updatedCategories: CostCenterCategory[]) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedCategories));
     setCategories(updatedCategories);
+  };
+
+  const saveAlertsToStorage = (updatedAlerts: CostCenterAlert[]) => {
+    localStorage.setItem(ALERTS_STORAGE_KEY, JSON.stringify(updatedAlerts));
+    setAlerts(updatedAlerts);
   };
 
   const generateId = () => {
@@ -191,12 +132,34 @@ export const useCostCenterCategories = () => {
     }));
   };
 
+  const markAlertAsRead = (alertId: string) => {
+    const updatedAlerts = alerts.map(alert =>
+      alert.id === alertId ? { ...alert, isRead: true } : alert
+    );
+    saveAlertsToStorage(updatedAlerts);
+  };
+
+  const dismissAlert = (alertId: string) => {
+    const updatedAlerts = alerts.filter(alert => alert.id !== alertId);
+    saveAlertsToStorage(updatedAlerts);
+  };
+
+  const refreshAlerts = () => {
+    const newAlerts = generateSmartAlerts(categories);
+    setAlerts(newAlerts);
+    saveAlertsToStorage(newAlerts);
+  };
+
   return {
     categories,
+    alerts,
     addCategory,
     updateCategory,
     deleteCategory,
     getCategoryMetrics,
-    getCategoriesByUnit
+    getCategoriesByUnit,
+    markAlertAsRead,
+    dismissAlert,
+    refreshAlerts
   };
 };
