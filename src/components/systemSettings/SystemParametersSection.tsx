@@ -5,10 +5,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
+import { useSystemSettings } from '@/hooks/useSystemSettings';
 import { SystemParameter } from '@/types/systemSettings';
-import { Edit, Save, X, Eye, EyeOff, Settings } from 'lucide-react';
+import { SystemParameterModal } from './SystemParameterModal';
+import { Search, Filter, Plus, Edit, Trash2, Lock, Eye, EyeOff, Save, X } from 'lucide-react';
 
 interface SystemParametersSectionProps {
   parameters: SystemParameter[];
@@ -16,69 +19,119 @@ interface SystemParametersSectionProps {
 
 export const SystemParametersSection = ({ parameters }: SystemParametersSectionProps) => {
   const { toast } = useToast();
+  const { updateSystemParameter } = useSystemSettings();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [selectedParameter, setSelectedParameter] = useState<SystemParameter | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingParameter, setEditingParameter] = useState<string | null>(null);
-  const [editValue, setEditValue] = useState<string>('');
+  const [editValue, setEditValue] = useState('');
   const [visibleSensitive, setVisibleSensitive] = useState<Set<string>>(new Set());
 
-  const getCategoryColor = (category: string) => {
-    switch (category.toLowerCase()) {
-      case 'integration':
-        return 'bg-blue-100 text-blue-800';
-      case 'security':
-        return 'bg-red-100 text-red-800';
-      case 'sync':
-        return 'bg-green-100 text-green-800';
-      case 'performance':
-        return 'bg-purple-100 text-purple-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
+  const filteredParameters = parameters.filter(param => {
+    const matchesSearch = param.key.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         param.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         param.category.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesCategory = categoryFilter === 'all' || param.category === categoryFilter;
+    
+    return matchesSearch && matchesCategory;
+  });
+
+  const uniqueCategories = Array.from(new Set(parameters.map(param => param.category)));
 
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'string':
-        return 'bg-gray-100 text-gray-800';
-      case 'number':
         return 'bg-blue-100 text-blue-800';
-      case 'boolean':
+      case 'number':
         return 'bg-green-100 text-green-800';
-      case 'json':
+      case 'boolean':
         return 'bg-purple-100 text-purple-800';
+      case 'json':
+        return 'bg-orange-100 text-orange-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
   };
 
+  const getTypeText = (type: string) => {
+    switch (type) {
+      case 'string':
+        return 'Texto';
+      case 'number':
+        return 'Número';
+      case 'boolean':
+        return 'Booleano';
+      case 'json':
+        return 'JSON';
+      default:
+        return type;
+    }
+  };
+
+  const formatValue = (value: string, type: string, sensitive: boolean, parameterId: string) => {
+    if (sensitive && !visibleSensitive.has(parameterId)) {
+      return '••••••••';
+    }
+
+    switch (type) {
+      case 'boolean':
+        return value === 'true' ? 'Verdadeiro' : 'Falso';
+      case 'json':
+        try {
+          return JSON.stringify(JSON.parse(value), null, 2);
+        } catch {
+          return value;
+        }
+      default:
+        return value;
+    }
+  };
+
+  const handleNewParameter = () => {
+    setSelectedParameter(null);
+    setIsModalOpen(true);
+  };
+
   const handleEditParameter = (parameter: SystemParameter) => {
+    setSelectedParameter(parameter);
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteParameter = async (parameter: SystemParameter) => {
+    // In a real implementation, this would call a delete API
+    toast({
+      title: "Parâmetro Removido",
+      description: `${parameter.key} foi removido com sucesso`,
+    });
+  };
+
+  const handleSaveParameter = async (parameter: SystemParameter) => {
+    await updateSystemParameter(parameter);
+    setIsModalOpen(false);
+  };
+
+  const startInlineEdit = (parameter: SystemParameter) => {
     setEditingParameter(parameter.id);
     setEditValue(parameter.value);
   };
 
-  const handleSaveParameter = async (parameter: SystemParameter) => {
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      toast({
-        title: "Parâmetro Atualizado",
-        description: `${parameter.key} foi atualizado com sucesso`,
-      });
-      
-      setEditingParameter(null);
-      setEditValue('');
-    } catch (error) {
-      toast({
-        title: "Erro ao Atualizar",
-        description: `Falha ao atualizar parâmetro ${parameter.key}`,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleCancelEdit = () => {
+  const cancelInlineEdit = () => {
     setEditingParameter(null);
     setEditValue('');
+  };
+
+  const saveInlineEdit = async (parameter: SystemParameter) => {
+    const updatedParameter = { ...parameter, value: editValue, lastModified: new Date().toISOString() };
+    await updateSystemParameter(updatedParameter);
+    setEditingParameter(null);
+    setEditValue('');
+    
+    toast({
+      title: "Parâmetro Atualizado",
+      description: `${parameter.key} foi atualizado com sucesso`,
+    });
   };
 
   const toggleSensitiveVisibility = (parameterId: string) => {
@@ -96,115 +149,145 @@ export const SystemParametersSection = ({ parameters }: SystemParametersSectionP
     return date.toLocaleString('pt-BR');
   };
 
-  const renderParameterValue = (parameter: SystemParameter) => {
-    if (parameter.sensitive && !visibleSensitive.has(parameter.id)) {
-      return '***OCULTO***';
-    }
-
-    if (editingParameter === parameter.id) {
-      if (parameter.type === 'boolean') {
-        return (
-          <Switch
-            checked={editValue === 'true'}
-            onCheckedChange={(checked) => setEditValue(checked ? 'true' : 'false')}
-          />
-        );
-      }
-      return (
-        <Input
-          value={editValue}
-          onChange={(e) => setEditValue(e.target.value)}
-          className="w-full"
-          type={parameter.type === 'number' ? 'number' : 'text'}
-        />
-      );
-    }
-
-    if (parameter.type === 'boolean') {
-      return (
-        <Badge className={parameter.value === 'true' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
-          {parameter.value === 'true' ? 'Ativo' : 'Inativo'}
-        </Badge>
-      );
-    }
-
-    return parameter.value;
-  };
-
-  const groupedParameters = parameters.reduce((groups, parameter) => {
-    const category = parameter.category;
-    if (!groups[category]) {
-      groups[category] = [];
-    }
-    groups[category].push(parameter);
-    return groups;
-  }, {} as Record<string, SystemParameter[]>);
-
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Parâmetros do Sistema</h2>
-        <p className="text-gray-600">
-          Configure parâmetros globais que controlam o comportamento do sistema.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Parâmetros do Sistema</h2>
+          <p className="text-gray-600">
+            Configure parâmetros globais que controlam o comportamento do sistema.
+          </p>
+        </div>
+        <Button onClick={handleNewParameter}>
+          <Plus className="h-4 w-4" />
+          Novo Parâmetro
+        </Button>
       </div>
 
-      {Object.entries(groupedParameters).map(([category, categoryParameters]) => (
-        <Card key={category}>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Settings className="h-5 w-5" />
-              {category}
-            </CardTitle>
-            <CardDescription>
-              Parâmetros da categoria {category.toLowerCase()}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Chave</TableHead>
-                  <TableHead>Valor</TableHead>
-                  <TableHead>Tipo</TableHead>
-                  <TableHead>Descrição</TableHead>
-                  <TableHead>Modificado por</TableHead>
-                  <TableHead>Última Modificação</TableHead>
-                  <TableHead>Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {categoryParameters.map((parameter) => (
-                  <TableRow key={parameter.id}>
-                    <TableCell className="font-mono text-sm">{parameter.key}</TableCell>
-                    <TableCell className="min-w-32">
-                      {renderParameterValue(parameter)}
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={`text-xs ${getTypeColor(parameter.type)}`}>
-                        {parameter.type}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="max-w-md">
+      {/* Filters */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Filter className="h-5 w-5" />
+            Filtros
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
+                Buscar
+              </label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  id="search"
+                  placeholder="Buscar parâmetros..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+            
+            <div>
+              <label htmlFor="category-filter" className="block text-sm font-medium text-gray-700 mb-1">
+                Categoria
+              </label>
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecionar categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas as categorias</SelectItem>
+                  {uniqueCategories.map(category => (
+                    <SelectItem key={category} value={category}>{category}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Parameters Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Parâmetros Configurados</CardTitle>
+          <CardDescription>
+            Mostrando {filteredParameters.length} de {parameters.length} parâmetros
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Categoria</TableHead>
+                <TableHead>Chave</TableHead>
+                <TableHead>Tipo</TableHead>
+                <TableHead>Valor</TableHead>
+                <TableHead>Descrição</TableHead>
+                <TableHead>Modificado</TableHead>
+                <TableHead>Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredParameters.map((parameter) => (
+                <TableRow key={parameter.id}>
+                  <TableCell>
+                    <Badge variant="outline" className="text-xs">
+                      {parameter.category}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <code className="text-sm bg-gray-100 px-2 py-1 rounded">
+                        {parameter.key}
+                      </code>
+                      {parameter.sensitive && (
+                        <Lock className="h-4 w-4 text-amber-500" title="Parâmetro sensível" />
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={`text-xs ${getTypeColor(parameter.type)}`}>
+                      {getTypeText(parameter.type)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="max-w-xs">
+                    {editingParameter === parameter.id ? (
                       <div className="flex items-center gap-2">
-                        <span className="text-sm">{parameter.description}</span>
-                        {parameter.sensitive && (
-                          <Badge variant="outline" className="text-xs">
-                            Sensível
-                          </Badge>
-                        )}
+                        <Input
+                          value={editValue}
+                          onChange={(e) => setEditValue(e.target.value)}
+                          className="h-8 text-sm"
+                        />
+                        <Button
+                          size="sm"
+                          onClick={() => saveInlineEdit(parameter)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Save className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={cancelInlineEdit}
+                          className="h-8 w-8 p-0"
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
                       </div>
-                    </TableCell>
-                    <TableCell className="text-sm">{parameter.modifiedBy}</TableCell>
-                    <TableCell className="text-sm">
-                      {formatDate(parameter.lastModified)}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-1">
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <code className="text-sm bg-gray-50 px-2 py-1 rounded truncate">
+                          {formatValue(parameter.value, parameter.type, parameter.sensitive, parameter.id)}
+                        </code>
                         {parameter.sensitive && (
                           <Button
                             size="sm"
-                            variant="outline"
+                            variant="ghost"
+                            className="h-6 w-6 p-0"
                             onClick={() => toggleSensitiveVisibility(parameter.id)}
                           >
                             {visibleSensitive.has(parameter.id) ? (
@@ -214,45 +297,79 @@ export const SystemParametersSection = ({ parameters }: SystemParametersSectionP
                             )}
                           </Button>
                         )}
-                        {parameter.editable && (
-                          <>
-                            {editingParameter === parameter.id ? (
-                              <>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => handleSaveParameter(parameter)}
-                                >
-                                  <Save className="h-3 w-3" />
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={handleCancelEdit}
-                                >
-                                  <X className="h-3 w-3" />
-                                </Button>
-                              </>
-                            ) : (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleEditParameter(parameter)}
-                              >
-                                <Edit className="h-3 w-3" />
-                              </Button>
-                            )}
-                          </>
-                        )}
                       </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      ))}
+                    )}
+                  </TableCell>
+                  <TableCell className="max-w-xs truncate" title={parameter.description}>
+                    {parameter.description}
+                  </TableCell>
+                  <TableCell className="text-xs text-gray-500">
+                    <div>
+                      {formatDate(parameter.lastModified)}
+                    </div>
+                    <div className="text-gray-400">
+                      por {parameter.modifiedBy}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-1">
+                      {parameter.editable && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => startInlineEdit(parameter)}
+                          disabled={editingParameter === parameter.id}
+                        >
+                          <Edit className="h-3 w-3" />
+                        </Button>
+                      )}
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => handleEditParameter(parameter)}
+                      >
+                        <Edit className="h-3 w-3" />
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button size="sm" variant="outline">
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Tem certeza que deseja remover o parâmetro "{parameter.key}"? 
+                              Esta ação pode afetar o funcionamento do sistema.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogAction 
+                              onClick={() => handleDeleteParameter(parameter)}
+                              className="bg-red-600 hover:bg-red-700"
+                            >
+                              Remover
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <SystemParameterModal
+        parameter={selectedParameter}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveParameter}
+      />
     </div>
   );
 };

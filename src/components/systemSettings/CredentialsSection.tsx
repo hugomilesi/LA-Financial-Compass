@@ -4,8 +4,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
+import { useSystemSettings } from '@/hooks/useSystemSettings';
 import { Credential } from '@/types/systemSettings';
+import { CredentialConfigModal } from './CredentialConfigModal';
 import { Eye, EyeOff, Edit, Trash2, Plus, Key, Shield, AlertCircle } from 'lucide-react';
 
 interface CredentialsSectionProps {
@@ -14,7 +17,10 @@ interface CredentialsSectionProps {
 
 export const CredentialsSection = ({ credentials }: CredentialsSectionProps) => {
   const { toast } = useToast();
+  const { updateCredential } = useSystemSettings();
   const [visibleCredentials, setVisibleCredentials] = useState<Set<string>>(new Set());
+  const [selectedCredential, setSelectedCredential] = useState<Credential | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -69,6 +75,29 @@ export const CredentialsSection = ({ credentials }: CredentialsSectionProps) => 
     setVisibleCredentials(newVisible);
   };
 
+  const handleNewCredential = () => {
+    setSelectedCredential(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEditCredential = (credential: Credential) => {
+    setSelectedCredential(credential);
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteCredential = async (credential: Credential) => {
+    // In a real implementation, this would call a delete API
+    toast({
+      title: "Credencial Removida",
+      description: `${credential.name} foi removido com sucesso`,
+    });
+  };
+
+  const handleSaveCredential = async (credential: Credential) => {
+    await updateCredential(credential);
+    setIsModalOpen(false);
+  };
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('pt-BR');
@@ -82,6 +111,11 @@ export const CredentialsSection = ({ credentials }: CredentialsSectionProps) => 
     return daysUntilExpiry <= 30 && daysUntilExpiry > 0;
   };
 
+  const maskValue = (value: string) => {
+    if (value.length <= 8) return '*'.repeat(value.length);
+    return value.substring(0, 4) + '*'.repeat(value.length - 8) + value.substring(value.length - 4);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -91,7 +125,7 @@ export const CredentialsSection = ({ credentials }: CredentialsSectionProps) => 
             Gerencie chaves de API, tokens de acesso e outras credenciais de segurança.
           </p>
         </div>
-        <Button>
+        <Button onClick={handleNewCredential}>
           <Plus className="h-4 w-4" />
           Adicionar Credencial
         </Button>
@@ -156,6 +190,7 @@ export const CredentialsSection = ({ credentials }: CredentialsSectionProps) => 
                         size="sm"
                         variant="outline"
                         onClick={() => toggleCredentialVisibility(credential.id)}
+                        title={visibleCredentials.has(credential.id) ? 'Ocultar' : 'Mostrar'}
                       >
                         {visibleCredentials.has(credential.id) ? (
                           <EyeOff className="h-3 w-3" />
@@ -163,20 +198,78 @@ export const CredentialsSection = ({ credentials }: CredentialsSectionProps) => 
                           <Eye className="h-3 w-3" />
                         )}
                       </Button>
-                      <Button size="sm" variant="outline">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => handleEditCredential(credential)}
+                      >
                         <Edit className="h-3 w-3" />
                       </Button>
-                      <Button size="sm" variant="outline">
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button size="sm" variant="outline">
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Tem certeza que deseja remover a credencial "{credential.name}"? 
+                              Esta ação não pode ser desfeita e pode afetar integrações que dependem desta credencial.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogAction 
+                              onClick={() => handleDeleteCredential(credential)}
+                              className="bg-red-600 hover:bg-red-700"
+                            >
+                              Remover
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
+
+          {/* Show credential values when toggled */}
+          {Array.from(visibleCredentials).map((credentialId) => {
+            const credential = credentials.find(c => c.id === credentialId);
+            if (!credential) return null;
+
+            return (
+              <Card key={`${credentialId}-details`} className="mt-4 bg-gray-50">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <Shield className="h-4 w-4" />
+                    Valor da Credencial: {credential.name}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="font-mono text-sm bg-white p-3 rounded border">
+                    {credential.masked ? maskValue('sk_test_1234567890abcdef') : 'sk_test_1234567890abcdef'}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">
+                    ⚠️ Mantenha esta informação segura e não compartilhe com terceiros não autorizados.
+                  </p>
+                </CardContent>
+              </Card>
+            );
+          })}
         </CardContent>
       </Card>
+
+      <CredentialConfigModal
+        credential={selectedCredential}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveCredential}
+      />
     </div>
   );
 };

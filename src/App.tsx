@@ -9,6 +9,7 @@ import { PeriodProvider } from "@/contexts/PeriodContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { CostCenterCategoriesPage } from "./components/CostCenterCategoriesPage";
+import { SystemSettingsPage } from "./components/SystemSettingsPage";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/cost-center-categories" element={<CostCenterCategoriesPage />} />
+              <Route path="/system-settings" element={<SystemSettingsPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

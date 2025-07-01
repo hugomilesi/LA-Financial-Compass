@@ -4,9 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
+import { useSystemSettings } from '@/hooks/useSystemSettings';
 import { ExternalIntegration } from '@/types/systemSettings';
-import { Building2, Users, CreditCard, BarChart3, Settings, Play, Pause, AlertCircle } from 'lucide-react';
+import { IntegrationConfigModal } from './IntegrationConfigModal';
+import { Building2, Users, CreditCard, BarChart3, Settings, Play, Pause, AlertCircle, Plus, Edit, Trash2 } from 'lucide-react';
 
 interface ExternalIntegrationsSectionProps {
   integrations: ExternalIntegration[];
@@ -14,7 +17,10 @@ interface ExternalIntegrationsSectionProps {
 
 export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegrationsSectionProps) => {
   const { toast } = useToast();
+  const { updateIntegration, testConnection } = useSystemSettings();
   const [loadingIntegration, setLoadingIntegration] = useState<string | null>(null);
+  const [selectedIntegration, setSelectedIntegration] = useState<ExternalIntegration | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const getIntegrationIcon = (icon: string) => {
     const icons = {
@@ -56,12 +62,12 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
     setLoadingIntegration(integration.id);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const result = await testConnection(integration.id);
       
       toast({
         title: "Teste de Conexão",
-        description: `Conexão com ${integration.name} testada com sucesso`,
+        description: result.message,
+        variant: result.success ? "default" : "destructive",
       });
     } catch (error) {
       toast({
@@ -75,10 +81,38 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
   };
 
   const handleToggleIntegration = async (integration: ExternalIntegration) => {
+    const newStatus = integration.status === 'connected' ? 'disconnected' : 'connected';
+    const updatedIntegration = { ...integration, status: newStatus };
+    
+    await updateIntegration(updatedIntegration);
+    
     toast({
       title: "Integração Atualizada",
-      description: `${integration.name} foi ${integration.status === 'connected' ? 'desconectado' : 'conectado'}`,
+      description: `${integration.name} foi ${newStatus === 'connected' ? 'conectado' : 'desconectado'}`,
     });
+  };
+
+  const handleEditIntegration = (integration: ExternalIntegration) => {
+    setSelectedIntegration(integration);
+    setIsModalOpen(true);
+  };
+
+  const handleNewIntegration = () => {
+    setSelectedIntegration(null);
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteIntegration = async (integration: ExternalIntegration) => {
+    // In a real implementation, this would call a delete API
+    toast({
+      title: "Integração Removida",
+      description: `${integration.name} foi removido com sucesso`,
+    });
+  };
+
+  const handleSaveIntegration = async (integration: ExternalIntegration) => {
+    await updateIntegration(integration);
+    setIsModalOpen(false);
   };
 
   const formatLastSync = (lastSync: string) => {
@@ -88,11 +122,17 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Integrações Externas</h2>
-        <p className="text-gray-600">
-          Configure e gerencie suas integrações com sistemas externos como ERP, CRM, e outras plataformas.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Integrações Externas</h2>
+          <p className="text-gray-600">
+            Configure e gerencie suas integrações com sistemas externos como ERP, CRM, e outras plataformas.
+          </p>
+        </div>
+        <Button onClick={handleNewIntegration}>
+          <Plus className="h-4 w-4" />
+          Nova Integração
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -159,12 +199,40 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
                     Testar
                   </Button>
                   
-                  {integration.configurable && (
-                    <Button size="sm" variant="outline">
-                      <Settings className="h-4 w-4" />
-                      Configurar
-                    </Button>
-                  )}
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    onClick={() => handleEditIntegration(integration)}
+                  >
+                    <Edit className="h-4 w-4" />
+                    Editar
+                  </Button>
+
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button size="sm" variant="outline">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Tem certeza que deseja remover a integração "{integration.name}"? 
+                          Esta ação não pode ser desfeita.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={() => handleDeleteIntegration(integration)}
+                          className="bg-red-600 hover:bg-red-700"
+                        >
+                          Remover
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
 
                 {integration.status === 'error' && (
@@ -180,6 +248,14 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
           );
         })}
       </div>
+
+      <IntegrationConfigModal
+        integration={selectedIntegration}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveIntegration}
+        onTest={testConnection}
+      />
     </div>
   );
 };
