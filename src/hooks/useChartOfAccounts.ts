@@ -2241,10 +2241,511 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
 
-  // 7.1 - DESPESAS OPERACIONAIS (RENUMBERED FROM 6.1)
+  // 7. NÃO OPERACIONAIS — Saídas
+  {
+    id: 'exp-7',
+    code: '7',
+    name: 'NÃO OPERACIONAIS — Saídas',
+    type: 'expense',
+    isActive: true,
+    level: 0,
+    hasChildren: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+
+  // 7.1 - DEPRECIAÇÃO E AMORTIZAÇÃO
   {
     id: 'exp-7.1',
     code: '7.1',
+    name: 'Depreciação e Amortização',
+    type: 'expense',
+    parentId: 'exp-7',
+    isActive: true,
+    level: 1,
+    hasChildren: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.1.1',
+    code: '7.1.1',
+    name: 'Depreciação de Instrumentos Musicais',
+    type: 'expense',
+    parentId: 'exp-7.1',
+    isActive: true,
+    level: 2,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.1.2',
+    code: '7.1.2',
+    name: 'Depreciação de Equipamentos de Som',
+    type: 'expense',
+    parentId: 'exp-7.1',
+    isActive: true,
+    level: 2,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.1.3',
+    code: '7.1.3',
+    name: 'Depreciação de Móveis e Utensílios',
+    type: 'expense',
+    parentId: 'exp-7.1',
+    isActive: true,
+    level: 2,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.1.4',
+    code: '7.1.4',
+    name: 'Depreciação de Equipamentos de TI',
+    type: 'expense',
+    parentId: 'exp-7.1',
+    isActive: true,
+    level: 2,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.1.5',
+    code: '7.1.5',
+    name: 'Amortização de Reformas e Melhorias',
+    type: 'expense',
+    parentId: 'exp-7.1',
+    isActive: true,
+    level: 2,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.1.6',
+    code: '7.1.6',
+    name: 'Amortização de Software',
+    type: 'expense',
+    parentId: 'exp-7.1',
+    isActive: true,
+    level: 2,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+
+  // 7.2 - PERDAS E BAIXAS
+  {
+    id: 'exp-7.2',
+    code: '7.2',
+    name: 'Perdas e Baixas',
+    type: 'expense',
+    parentId: 'exp-7',
+    isActive: true,
+    level: 1,
+    hasChildren: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.2.1',
+    code: '7.2.1',
+    name: 'Perda por Furto ou Roubo',
+    type: 'expense',
+    parentId: 'exp-7.2',
+    isActive: true,
+    level: 2,
+    hasChildren: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.2.1.1',
+    code: '7.2.1.1',
+    name: 'Perda de Instrumentos Musicais',
+    type: 'expense',
+    parentId: 'exp-7.2.1',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.2.1.2',
+    code: '7.2.1.2',
+    name: 'Perda de Equipamentos',
+    type: 'expense',
+    parentId: 'exp-7.2.1',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.2.2',
+    code: '7.2.2',
+    name: 'Baixa por Obsolescência',
+    type: 'expense',
+    parentId: 'exp-7.2',
+    isActive: true,
+    level: 2,
+    hasChildren: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.2.2.1',
+    code: '7.2.2.1',
+    name: 'Baixa de Equipamentos Obsoletos',
+    type: 'expense',
+    parentId: 'exp-7.2.2',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.2.2.2',
+    code: '7.2.2.2',
+    name: 'Baixa de Software Descontinuado',
+    type: 'expense',
+    parentId: 'exp-7.2.2',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.2.3',
+    code: '7.2.3',
+    name: 'Perda por Inadimplência',
+    type: 'expense',
+    parentId: 'exp-7.2',
+    isActive: true,
+    level: 2,
+    hasChildren: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.2.3.1',
+    code: '7.2.3.1',
+    name: 'Inadimplência - Mensalidades',
+    type: 'expense',
+    parentId: 'exp-7.2.3',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.2.3.2',
+    code: '7.2.3.2',
+    name: 'Inadimplência - Outras Vendas',
+    type: 'expense',
+    parentId: 'exp-7.2.3',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+
+  // 7.3 - MULTAS E PENALIDADES
+  {
+    id: 'exp-7.3',
+    code: '7.3',
+    name: 'Multas e Penalidades',
+    type: 'expense',
+    parentId: 'exp-7',
+    isActive: true,
+    level: 1,
+    hasChildren: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.3.1',
+    code: '7.3.1',
+    name: 'Multas Fiscais',
+    type: 'expense',
+    parentId: 'exp-7.3',
+    isActive: true,
+    level: 2,
+    hasChildren: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.3.1.1',
+    code: '7.3.1.1',
+    name: 'Multa - FGTS',
+    type: 'expense',
+    parentId: 'exp-7.3.1',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.3.1.2',
+    code: '7.3.1.2',
+    name: 'Multa - INSS',
+    type: 'expense',
+    parentId: 'exp-7.3.1',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.3.1.3',
+    code: '7.3.1.3',
+    name: 'Multa - ISS',
+    type: 'expense',
+    parentId: 'exp-7.3.1',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.3.1.4',
+    code: '7.3.1.4',
+    name: 'Multa - Simples Nacional',
+    type: 'expense',
+    parentId: 'exp-7.3.1',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.3.2',
+    code: '7.3.2',
+    name: 'Multas Trabalhistas',
+    type: 'expense',
+    parentId: 'exp-7.3',
+    isActive: true,
+    level: 2,
+    hasChildren: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.3.2.1',
+    code: '7.3.2.1',
+    name: 'Multa - Rescisão Contratual',
+    type: 'expense',
+    parentId: 'exp-7.3.2',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.3.2.2',
+    code: '7.3.2.2',
+    name: 'Multa - Ministério do Trabalho',
+    type: 'expense',
+    parentId: 'exp-7.3.2',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.3.3',
+    code: '7.3.3',
+    name: 'Outras Multas',
+    type: 'expense',
+    parentId: 'exp-7.3',
+    isActive: true,
+    level: 2,
+    hasChildren: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.3.3.1',
+    code: '7.3.3.1',
+    name: 'Multa de Trânsito',
+    type: 'expense',
+    parentId: 'exp-7.3.3',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.3.3.2',
+    code: '7.3.3.2',
+    name: 'Multa - Corpo de Bombeiros',
+    type: 'expense',
+    parentId: 'exp-7.3.3',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.3.3.3',
+    code: '7.3.3.3',
+    name: 'Multa - Vigilância Sanitária',
+    type: 'expense',
+    parentId: 'exp-7.3.3',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+
+  // 7.4 - DOAÇÕES E CONTRIBUIÇÕES
+  {
+    id: 'exp-7.4',
+    code: '7.4',
+    name: 'Doações e Contribuições',
+    type: 'expense',
+    parentId: 'exp-7',
+    isActive: true,
+    level: 1,
+    hasChildren: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.4.1',
+    code: '7.4.1',
+    name: 'Doações para Instituições',
+    type: 'expense',
+    parentId: 'exp-7.4',
+    isActive: true,
+    level: 2,
+    hasChildren: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.4.1.1',
+    code: '7.4.1.1',
+    name: 'Doação - Instituições de Caridade',
+    type: 'expense',
+    parentId: 'exp-7.4.1',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.4.1.2',
+    code: '7.4.1.2',
+    name: 'Doação - Projetos Sociais',
+    type: 'expense',
+    parentId: 'exp-7.4.1',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.4.2',
+    code: '7.4.2',
+    name: 'Contribuições Associativas',
+    type: 'expense',
+    parentId: 'exp-7.4',
+    isActive: true,
+    level: 2,
+    hasChildren: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.4.2.1',
+    code: '7.4.2.1',
+    name: 'Contribuição - Sindicatos',
+    type: 'expense',
+    parentId: 'exp-7.4.2',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.4.2.2',
+    code: '7.4.2.2',
+    name: 'Contribuição - Associações de Classe',
+    type: 'expense',
+    parentId: 'exp-7.4.2',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.4.3',
+    code: '7.4.3',
+    name: 'Patrocínios e Apoios',
+    type: 'expense',
+    parentId: 'exp-7.4',
+    isActive: true,
+    level: 2,
+    hasChildren: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.4.3.1',
+    code: '7.4.3.1',
+    name: 'Patrocínio - Eventos Culturais',
+    type: 'expense',
+    parentId: 'exp-7.4.3',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'exp-7.4.3.2',
+    code: '7.4.3.2',
+    name: 'Apoio - Projetos Educacionais',
+    type: 'expense',
+    parentId: 'exp-7.4.3',
+    isActive: true,
+    level: 3,
+    hasChildren: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+
+  // 8.1 - DESPESAS OPERACIONAIS (RENUMBERED FROM 7.1)
+  {
+    id: 'exp-8.1',
+    code: '8.1',
     name: 'Despesas Operacionais',
     type: 'expense',
     isActive: true,
@@ -2254,13 +2755,13 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
 
-  // 7.1.1 - Custos Diretos de Ensino (formerly 6.1.1)
+  // 8.1.1 - Custos Diretos de Ensino (formerly 7.1.1)
   {
-    id: 'exp-7.1.1',
-    code: '7.1.1',
+    id: 'exp-8.1.1',
+    code: '8.1.1',
     name: 'Custos Diretos de Ensino',
     type: 'expense',
-    parentId: 'exp-7.1',
+    parentId: 'exp-8.1',
     isActive: true,
     level: 1,
     hasChildren: true,
@@ -2268,11 +2769,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.1.1',
-    code: '7.1.1.1',
+    id: 'exp-8.1.1.1',
+    code: '8.1.1.1',
     name: 'Folha de Pagamento - Professores',
     type: 'expense',
-    parentId: 'exp-7.1.1',
+    parentId: 'exp-8.1.1',
     isActive: true,
     level: 2,
     hasChildren: true,
@@ -2280,11 +2781,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.1.1.1',
-    code: '7.1.1.1.1',
+    id: 'exp-8.1.1.1.1',
+    code: '8.1.1.1.1',
     name: 'Salários - Professores',
     type: 'expense',
-    parentId: 'exp-7.1.1.1',
+    parentId: 'exp-8.1.1.1',
     isActive: true,
     level: 3,
     hasChildren: false,
@@ -2292,11 +2793,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.1.1.2',
-    code: '7.1.1.1.2',
+    id: 'exp-8.1.1.1.2',
+    code: '8.1.1.1.2',
     name: 'Encargos Sociais - Professores',
     type: 'expense',
-    parentId: 'exp-7.1.1.1',
+    parentId: 'exp-8.1.1.1',
     isActive: true,
     level: 3,
     hasChildren: false,
@@ -2304,11 +2805,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.1.1.3',
-    code: '7.1.1.1.3',
+    id: 'exp-8.1.1.1.3',
+    code: '8.1.1.1.3',
     name: 'FGTS - Professores',
     type: 'expense',
-    parentId: 'exp-7.1.1.1',
+    parentId: 'exp-8.1.1.1',
     isActive: true,
     level: 3,
     hasChildren: false,
@@ -2316,11 +2817,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.1.2',
-    code: '7.1.1.2',
+    id: 'exp-8.1.1.2',
+    code: '8.1.1.2',
     name: 'Material de Ensino',
     type: 'expense',
-    parentId: 'exp-7.1.1',
+    parentId: 'exp-8.1.1',
     isActive: true,
     level: 2,
     hasChildren: true,
@@ -2328,11 +2829,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.1.2.1',
-    code: '7.1.1.2.1',
+    id: 'exp-8.1.1.2.1',
+    code: '8.1.1.2.1',
     name: 'Instrumentos Musicais',
     type: 'expense',
-    parentId: 'exp-7.1.1.2',
+    parentId: 'exp-8.1.1.2',
     isActive: true,
     level: 3,
     hasChildren: false,
@@ -2340,11 +2841,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.1.2.2',
-    code: '7.1.1.2.2',
+    id: 'exp-8.1.1.2.2',
+    code: '8.1.1.2.2',
     name: 'Partituras e Métodos',
     type: 'expense',
-    parentId: 'exp-7.1.1.2',
+    parentId: 'exp-8.1.1.2',
     isActive: true,
     level: 3,
     hasChildren: false,
@@ -2352,11 +2853,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.1.3',
-    code: '7.1.1.3',
+    id: 'exp-8.1.1.3',
+    code: '8.1.1.3',
     name: 'Aulas Terceirizadas',
     type: 'expense',
-    parentId: 'exp-7.1.1',
+    parentId: 'exp-8.1.1',
     isActive: true,
     level: 2,
     hasChildren: true,
@@ -2364,11 +2865,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.1.3.1',
-    code: '7.1.1.3.1',
+    id: 'exp-8.1.1.3.1',
+    code: '8.1.1.3.1',
     name: 'Professores Freelance',
     type: 'expense',
-    parentId: 'exp-7.1.1.3',
+    parentId: 'exp-8.1.1.3',
     isActive: true,
     level: 3,
     hasChildren: false,
@@ -2376,13 +2877,13 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
 
-  // 7.1.2 - Custos de Unidades (formerly 6.1.2)
+  // 8.1.2 - Custos de Unidades (formerly 7.1.2)
   {
-    id: 'exp-7.1.2',
-    code: '7.1.2',
+    id: 'exp-8.1.2',
+    code: '8.1.2',
     name: 'Custos de Unidades',
     type: 'expense',
-    parentId: 'exp-7.1',
+    parentId: 'exp-8.1',
     isActive: true,
     level: 1,
     hasChildren: true,
@@ -2390,11 +2891,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.2.1',
-    code: '7.1.2.1',
+    id: 'exp-8.1.2.1',
+    code: '8.1.2.1',
     name: 'Campo Grande',
     type: 'expense',
-    parentId: 'exp-7.1.2',
+    parentId: 'exp-8.1.2',
     isActive: true,
     level: 2,
     hasChildren: true,
@@ -2402,11 +2903,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.2.1.1',
-    code: '7.1.2.1.1',
+    id: 'exp-8.1.2.1.1',
+    code: '8.1.2.1.1',
     name: 'Aluguel - Campo Grande',
     type: 'expense',
-    parentId: 'exp-7.1.2.1',
+    parentId: 'exp-8.1.2.1',
     isActive: true,
     level: 3,
     hasChildren: false,
@@ -2414,11 +2915,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.2.1.2',
-    code: '7.1.2.1.2',
+    id: 'exp-8.1.2.1.2',
+    code: '8.1.2.1.2',
     name: 'Condomínio - Campo Grande',
     type: 'expense',
-    parentId: 'exp-7.1.2.1',
+    parentId: 'exp-8.1.2.1',
     isActive: true,
     level: 3,
     hasChildren: false,
@@ -2426,11 +2927,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.2.1.3',
-    code: '7.1.2.1.3',
+    id: 'exp-8.1.2.1.3',
+    code: '8.1.2.1.3',
     name: 'Utilities - Campo Grande',
     type: 'expense',
-    parentId: 'exp-7.1.2.1',
+    parentId: 'exp-8.1.2.1',
     isActive: true,
     level: 3,
     hasChildren: true,
@@ -2438,11 +2939,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.2.1.3.1',
-    code: '7.1.2.1.3.1',
+    id: 'exp-8.1.2.1.3.1',
+    code: '8.1.2.1.3.1',
     name: 'Energia Elétrica - Campo Grande',
     type: 'expense',
-    parentId: 'exp-7.1.2.1.3',
+    parentId: 'exp-8.1.2.1.3',
     isActive: true,
     level: 4,
     hasChildren: false,
@@ -2450,11 +2951,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.2.1.3.2',
-    code: '7.1.2.1.3.2',
+    id: 'exp-8.1.2.1.3.2',
+    code: '8.1.2.1.3.2',
     name: 'Água - Campo Grande',
     type: 'expense',
-    parentId: 'exp-7.1.2.1.3',
+    parentId: 'exp-8.1.2.1.3',
     isActive: true,
     level: 4,
     hasChildren: false,
@@ -2462,11 +2963,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.2.1.3.3',
-    code: '7.1.2.1.3.3',
+    id: 'exp-8.1.2.1.3.3',
+    code: '8.1.2.1.3.3',
     name: 'Internet - Campo Grande',
     type: 'expense',
-    parentId: 'exp-7.1.2.1.3',
+    parentId: 'exp-8.1.2.1.3',
     isActive: true,
     level: 4,
     hasChildren: false,
@@ -2474,11 +2975,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.2.2',
-    code: '7.1.2.2',
+    id: 'exp-8.1.2.2',
+    code: '8.1.2.2',
     name: 'Recreio',
     type: 'expense',
-    parentId: 'exp-7.1.2',
+    parentId: 'exp-8.1.2',
     isActive: true,
     level: 2,
     hasChildren: true,
@@ -2486,11 +2987,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.2.2.1',
-    code: '7.1.2.2.1',
+    id: 'exp-8.1.2.2.1',
+    code: '8.1.2.2.1',
     name: 'Aluguel - Recreio',
     type: 'expense',
-    parentId: 'exp-7.1.2.2',
+    parentId: 'exp-8.1.2.2',
     isActive: true,
     level: 3,
     hasChildren: false,
@@ -2498,11 +2999,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.2.2.2',
-    code: '7.1.2.2.2',
+    id: 'exp-8.1.2.2.2',
+    code: '8.1.2.2.2',
     name: 'Condomínio - Recreio',
     type: 'expense',
-    parentId: 'exp-7.1.2.2',
+    parentId: 'exp-8.1.2.2',
     isActive: true,
     level: 3,
     hasChildren: false,
@@ -2510,11 +3011,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.2.2.3',
-    code: '7.1.2.2.3',
+    id: 'exp-8.1.2.2.3',
+    code: '8.1.2.2.3',
     name: 'Utilities - Recreio',
     type: 'expense',
-    parentId: 'exp-7.1.2.2',
+    parentId: 'exp-8.1.2.2',
     isActive: true,
     level: 3,
     hasChildren: true,
@@ -2522,11 +3023,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.2.2.3.1',
-    code: '7.1.2.2.3.1',
+    id: 'exp-8.1.2.2.3.1',
+    code: '8.1.2.2.3.1',
     name: 'Energia Elétrica - Recreio',
     type: 'expense',
-    parentId: 'exp-7.1.2.2.3',
+    parentId: 'exp-8.1.2.2.3',
     isActive: true,
     level: 4,
     hasChildren: false,
@@ -2534,11 +3035,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.2.2.3.2',
-    code: '7.1.2.2.3.2',
+    id: 'exp-8.1.2.2.3.2',
+    code: '8.1.2.2.3.2',
     name: 'Água - Recreio',
     type: 'expense',
-    parentId: 'exp-7.1.2.2.3',
+    parentId: 'exp-8.1.2.2.3',
     isActive: true,
     level: 4,
     hasChildren: false,
@@ -2546,11 +3047,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.2.2.3.3',
-    code: '7.1.2.2.3.3',
+    id: 'exp-8.1.2.2.3.3',
+    code: '8.1.2.2.3.3',
     name: 'Internet - Recreio',
     type: 'expense',
-    parentId: 'exp-7.1.2.2.3',
+    parentId: 'exp-8.1.2.2.3',
     isActive: true,
     level: 4,
     hasChildren: false,
@@ -2558,11 +3059,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.2.3',
-    code: '7.1.2.3',
+    id: 'exp-8.1.2.3',
+    code: '8.1.2.3',
     name: 'Barra',
     type: 'expense',
-    parentId: 'exp-7.1.2',
+    parentId: 'exp-8.1.2',
     isActive: true,
     level: 2,
     hasChildren: true,
@@ -2570,11 +3071,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.2.3.1',
-    code: '7.1.2.3.1',
+    id: 'exp-8.1.2.3.1',
+    code: '8.1.2.3.1',
     name: 'Aluguel - Barra',
     type: 'expense',
-    parentId: 'exp-7.1.2.3',
+    parentId: 'exp-8.1.2.3',
     isActive: true,
     level: 3,
     hasChildren: false,
@@ -2582,11 +3083,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.2.3.2',
-    code: '7.1.2.3.2',
+    id: 'exp-8.1.2.3.2',
+    code: '8.1.2.3.2',
     name: 'Condomínio - Barra',
     type: 'expense',
-    parentId: 'exp-7.1.2.3',
+    parentId: 'exp-8.1.2.3',
     isActive: true,
     level: 3,
     hasChildren: false,
@@ -2594,11 +3095,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.2.3.3',
-    code: '7.1.2.3.3',
+    id: 'exp-8.1.2.3.3',
+    code: '8.1.2.3.3',
     name: 'Utilities - Barra',
     type: 'expense',
-    parentId: 'exp-7.1.2.3',
+    parentId: 'exp-8.1.2.3',
     isActive: true,
     level: 3,
     hasChildren: true,
@@ -2606,11 +3107,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.2.3.3.1',
-    code: '7.1.2.3.3.1',
+    id: 'exp-8.1.2.3.3.1',
+    code: '8.1.2.3.3.1',
     name: 'Energia Elétrica - Barra',
     type: 'expense',
-    parentId: 'exp-7.1.2.3.3',
+    parentId: 'exp-8.1.2.3.3',
     isActive: true,
     level: 4,
     hasChildren: false,
@@ -2618,11 +3119,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.2.3.3.2',
-    code: '7.1.2.3.3.2',
+    id: 'exp-8.1.2.3.3.2',
+    code: '8.1.2.3.3.2',
     name: 'Água - Barra',
     type: 'expense',
-    parentId: 'exp-7.1.2.3.3',
+    parentId: 'exp-8.1.2.3.3',
     isActive: true,
     level: 4,
     hasChildren: false,
@@ -2630,11 +3131,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.1.2.3.3.3',
-    code: '7.1.2.3.3.3',
+    id: 'exp-8.1.2.3.3.3',
+    code: '8.1.2.3.3.3',
     name: 'Internet - Barra',
     type: 'expense',
-    parentId: 'exp-7.1.2.3.3',
+    parentId: 'exp-8.1.2.3.3',
     isActive: true,
     level: 4,
     hasChildren: false,
@@ -2642,10 +3143,10 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
 
-  // 7.2 - DESPESAS ADMINISTRATIVAS (RENUMBERED FROM 6.2)
+  // 8.2 - DESPESAS ADMINISTRATIVAS (RENUMBERED FROM 7.2)
   {
-    id: 'exp-7.2',
-    code: '7.2',
+    id: 'exp-8.2',
+    code: '8.2',
     name: 'Despesas Administrativas',
     type: 'expense',
     isActive: true,
@@ -2655,13 +3156,13 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
 
-  // 7.2.1 - Pessoal Administrativo (formerly 6.2.1)
+  // 8.2.1 - Pessoal Administrativo (formerly 7.2.1)
   {
-    id: 'exp-7.2.1',
-    code: '7.2.1',
+    id: 'exp-8.2.1',
+    code: '8.2.1',
     name: 'Pessoal Administrativo',
     type: 'expense',
-    parentId: 'exp-7.2',
+    parentId: 'exp-8.2',
     isActive: true,
     level: 1,
     hasChildren: true,
@@ -2669,11 +3170,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.2.1.1',
-    code: '7.2.1.1',
+    id: 'exp-8.2.1.1',
+    code: '8.2.1.1',
     name: 'Folha Administrativa',
     type: 'expense',
-    parentId: 'exp-7.2.1',
+    parentId: 'exp-8.2.1',
     isActive: true,
     level: 2,
     hasChildren: true,
@@ -2681,11 +3182,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.2.1.1.1',
-    code: '7.2.1.1.1',
+    id: 'exp-8.2.1.1.1',
+    code: '8.2.1.1.1',
     name: 'Salário - Coordenação',
     type: 'expense',
-    parentId: 'exp-7.2.1.1',
+    parentId: 'exp-8.2.1.1',
     isActive: true,
     level: 3,
     hasChildren: false,
@@ -2693,11 +3194,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.2.1.1.2',
-    code: '7.2.1.1.2',
+    id: 'exp-8.2.1.1.2',
+    code: '8.2.1.1.2',
     name: 'Salário - Secretaria',
     type: 'expense',
-    parentId: 'exp-7.2.1.1',
+    parentId: 'exp-8.2.1.1',
     isActive: true,
     level: 3,
     hasChildren: false,
@@ -2705,11 +3206,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.2.1.1.3',
-    code: '7.2.1.1.3',
+    id: 'exp-8.2.1.1.3',
+    code: '8.2.1.1.3',
     name: 'Encargos Sociais - Administrativo',
     type: 'expense',
-    parentId: 'exp-7.2.1.1',
+    parentId: 'exp-8.2.1.1',
     isActive: true,
     level: 3,
     hasChildren: false,
@@ -2717,13 +3218,13 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
 
-  // 7.2.2 - Marketing e Comunicação (formerly 6.2.2)
+  // 8.2.2 - Marketing e Comunicação (formerly 7.2.2)
   {
-    id: 'exp-7.2.2',
-    code: '7.2.2',
+    id: 'exp-8.2.2',
+    code: '8.2.2',
     name: 'Marketing e Comunicação',
     type: 'expense',
-    parentId: 'exp-7.2',
+    parentId: 'exp-8.2',
     isActive: true,
     level: 1,
     hasChildren: true,
@@ -2731,11 +3232,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.2.2.1',
-    code: '7.2.2.1',
+    id: 'exp-8.2.2.1',
+    code: '8.2.2.1',
     name: 'Publicidade Online',
     type: 'expense',
-    parentId: 'exp-7.2.2',
+    parentId: 'exp-8.2.2',
     isActive: true,
     level: 2,
     hasChildren: false,
@@ -2743,11 +3244,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.2.2.2',
-    code: '7.2.2.2',
+    id: 'exp-8.2.2.2',
+    code: '8.2.2.2',
     name: 'Material Gráfico',
     type: 'expense',
-    parentId: 'exp-7.2.2',
+    parentId: 'exp-8.2.2',
     isActive: true,
     level: 2,
     hasChildren: false,
@@ -2755,11 +3256,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.2.2.3',
-    code: '7.2.2.3',
+    id: 'exp-8.2.2.3',
+    code: '8.2.2.3',
     name: 'Eventos e Apresentações',
     type: 'expense',
-    parentId: 'exp-7.2.2',
+    parentId: 'exp-8.2.2',
     isActive: true,
     level: 2,
     hasChildren: false,
@@ -2767,13 +3268,13 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
 
-  // 7.2.3 - Serviços Administrativos (formerly 6.2.3)
+  // 8.2.3 - Serviços Administrativos (formerly 7.2.3)
   {
-    id: 'exp-7.2.3',
-    code: '7.2.3',
+    id: 'exp-8.2.3',
+    code: '8.2.3',
     name: 'Serviços Administrativos',
     type: 'expense',
-    parentId: 'exp-7.2',
+    parentId: 'exp-8.2',
     isActive: true,
     level: 1,
     hasChildren: true,
@@ -2781,11 +3282,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.2.3.1',
-    code: '7.2.3.1',
+    id: 'exp-8.2.3.1',
+    code: '8.2.3.1',
     name: 'Contabilidade',
     type: 'expense',
-    parentId: 'exp-7.2.3',
+    parentId: 'exp-8.2.3',
     isActive: true,
     level: 2,
     hasChildren: false,
@@ -2793,11 +3294,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.2.3.2',
-    code: '7.2.3.2',
+    id: 'exp-8.2.3.2',
+    code: '8.2.3.2',
     name: 'Consultoria Jurídica',
     type: 'expense',
-    parentId: 'exp-7.2.3',
+    parentId: 'exp-8.2.3',
     isActive: true,
     level: 2,
     hasChildren: false,
@@ -2805,11 +3306,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.2.3.3',
-    code: '7.2.3.3',
+    id: 'exp-8.2.3.3',
+    code: '8.2.3.3',
     name: 'Seguros',
     type: 'expense',
-    parentId: 'exp-7.2.3',
+    parentId: 'exp-8.2.3',
     isActive: true,
     level: 2,
     hasChildren: false,
@@ -2817,13 +3318,13 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
 
-  // 7.2.4 - Despesas Gerais (formerly 6.2.4)
+  // 8.2.4 - Despesas Gerais (formerly 7.2.4)
   {
-    id: 'exp-7.2.4',
-    code: '7.2.4',
+    id: 'exp-8.2.4',
+    code: '8.2.4',
     name: 'Despesas Gerais',
     type: 'expense',
-    parentId: 'exp-7.2',
+    parentId: 'exp-8.2',
     isActive: true,
     level: 1,
     hasChildren: true,
@@ -2831,11 +3332,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.2.4.1',
-    code: '7.2.4.1',
+    id: 'exp-8.2.4.1',
+    code: '8.2.4.1',
     name: 'Material de Escritório',
     type: 'expense',
-    parentId: 'exp-7.2.4',
+    parentId: 'exp-8.2.4',
     isActive: true,
     level: 2,
     hasChildren: false,
@@ -2843,11 +3344,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.2.4.2',
-    code: '7.2.4.2',
+    id: 'exp-8.2.4.2',
+    code: '8.2.4.2',
     name: 'Limpeza e Conservação',
     type: 'expense',
-    parentId: 'exp-7.2.4',
+    parentId: 'exp-8.2.4',
     isActive: true,
     level: 2,
     hasChildren: false,
@@ -2855,11 +3356,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.2.4.3',
-    code: '7.2.4.3',
+    id: 'exp-8.2.4.3',
+    code: '8.2.4.3',
     name: 'Tecnologia',
     type: 'expense',
-    parentId: 'exp-7.2.4',
+    parentId: 'exp-8.2.4',
     isActive: true,
     level: 2,
     hasChildren: true,
@@ -2867,11 +3368,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.2.4.3.1',
-    code: '7.2.4.3.1',
+    id: 'exp-8.2.4.3.1',
+    code: '8.2.4.3.1',
     name: 'Software e Licenças',
     type: 'expense',
-    parentId: 'exp-7.2.4.3',
+    parentId: 'exp-8.2.4.3',
     isActive: true,
     level: 3,
     hasChildren: false,
@@ -2879,11 +3380,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.2.4.3.2',
-    code: '7.2.4.3.2',
+    id: 'exp-8.2.4.3.2',
+    code: '8.2.4.3.2',
     name: 'Manutenção de Equipamentos',
     type: 'expense',
-    parentId: 'exp-7.2.4.3',
+    parentId: 'exp-8.2.4.3',
     isActive: true,
     level: 3,
     hasChildren: false,
@@ -2891,10 +3392,10 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
 
-  // 7.3 - DESPESAS FINANCEIRAS (RENUMBERED FROM 6.3)
+  // 8.3 - DESPESAS FINANCEIRAS (RENUMBERED FROM 7.3)
   {
-    id: 'exp-7.3',
-    code: '7.3',
+    id: 'exp-8.3',
+    code: '8.3',
     name: 'Despesas Financeiras',
     type: 'expense',
     isActive: true,
@@ -2904,11 +3405,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.3.1',
-    code: '7.3.1',
+    id: 'exp-8.3.1',
+    code: '8.3.1',
     name: 'Juros e Encargos',
     type: 'expense',
-    parentId: 'exp-7.3',
+    parentId: 'exp-8.3',
     isActive: true,
     level: 1,
     hasChildren: true,
@@ -2916,11 +3417,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.3.1.1',
-    code: '7.3.1.1',
+    id: 'exp-8.3.1.1',
+    code: '8.3.1.1',
     name: 'Juros de Empréstimos',
     type: 'expense',
-    parentId: 'exp-7.3.1',
+    parentId: 'exp-8.3.1',
     isActive: true,
     level: 2,
     hasChildren: false,
@@ -2928,11 +3429,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.3.1.2',
-    code: '7.3.1.2',
+    id: 'exp-8.3.1.2',
+    code: '8.3.1.2',
     name: 'Multas e Juros de Atraso',
     type: 'expense',
-    parentId: 'exp-7.3.1',
+    parentId: 'exp-8.3.1',
     isActive: true,
     level: 2,
     hasChildren: false,
@@ -2940,11 +3441,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.3.2',
-    code: '7.3.2',
+    id: 'exp-8.3.2',
+    code: '8.3.2',
     name: 'Tarifas Bancárias',
     type: 'expense',
-    parentId: 'exp-7.3',
+    parentId: 'exp-8.3',
     isActive: true,
     level: 1,
     hasChildren: true,
@@ -2952,11 +3453,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.3.2.1',
-    code: '7.3.2.1',
+    id: 'exp-8.3.2.1',
+    code: '8.3.2.1',
     name: 'Tarifas de Conta Corrente',
     type: 'expense',
-    parentId: 'exp-7.3.2',
+    parentId: 'exp-8.3.2',
     isActive: true,
     level: 2,
     hasChildren: false,
@@ -2964,11 +3465,11 @@ const defaultAccounts: Account[] = [
     updatedAt: new Date()
   },
   {
-    id: 'exp-7.3.2.2',
-    code: '7.3.2.2',
+    id: 'exp-8.3.2.2',
+    code: '8.3.2.2',
     name: 'Taxa de Cartão de Crédito',
     type: 'expense',
-    parentId: 'exp-7.3.2',
+    parentId: 'exp-8.3.2',
     isActive: true,
     level: 2,
     hasChildren: false,
