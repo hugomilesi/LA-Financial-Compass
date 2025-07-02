@@ -19,9 +19,9 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login', onBac
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold">FM</span>
+              <span className="text-primary-foreground font-bold">SFI</span>
             </div>
-            <span className="text-2xl font-bold text-foreground">Financial Compass</span>
+            <span className="text-2xl font-bold text-foreground">Sistema Financeiro Inteligente</span>
           </div>
           <Button 
             variant="ghost" 

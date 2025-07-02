@@ -32,8 +32,8 @@ export const AppSidebar = ({ currentPage, onPageChange, onSignOut }: AppSidebarP
         <div className="flex items-center justify-between">
           {isExpanded && (
             <div className="flex flex-col">
-              <h1 className="text-xl font-bold text-primary-100">LA Music</h1>
-              <p className="text-sm text-primary-300">Sistema Financeiro</p>
+              <h1 className="text-xl font-bold text-primary-100">Sistema Financeiro Inteligente</h1>
+              <p className="text-sm text-primary-300">Gestão Financeira</p>
             </div>
           )}
           <button
@@ -93,7 +93,7 @@ export const AppSidebar = ({ currentPage, onPageChange, onSignOut }: AppSidebarP
         {isExpanded && (
           <div className="text-xs text-primary-300">
             <p>Versão 2.0</p>
-            <p>© 2024 Financial Compass</p>
+            <p>© 2024 Sistema Financeiro Inteligente</p>
           </div>
         )}
       </div>
