@@ -19,7 +19,7 @@ interface TicketMedioDetailModalProps {
 
 export const TicketMedioDetailModal = ({ isOpen, onClose }: TicketMedioDetailModalProps) => {
   const { selectedUnit, getUnitDisplayName } = useUnit();
-  const { getDisplayPeriod } = usePeriod();
+  const { periodFilter, getDisplayPeriod } = usePeriod();
   const historicalData = getHistoricalDataByUnit(selectedUnit);
   const { getGoal, updateGoal, resetToDefault, updating } = useKPIGoals(selectedUnit);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);

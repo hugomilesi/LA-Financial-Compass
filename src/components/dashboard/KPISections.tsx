@@ -54,9 +54,9 @@ export const KPISections = ({ onKPIClick }: KPISectionsProps) => {
     icon: iconMap[kpi.icon as keyof typeof iconMap]
   });
 
-  // Create unique keys that include all relevant state
+  // Create unique keys that include all relevant state including goals
   const createKPIKey = (type: string, index: number) => 
-    `${type}-${index}-${selectedUnit}-${periodFilter.year}-${periodFilter.month}-${periodFilter.viewType}-${Date.now()}`;
+    `${type}-${index}-${selectedUnit}-${periodFilter.year}-${periodFilter.month}-${periodFilter.viewType}-${JSON.stringify(goals)}`;
 
   return (
     <>

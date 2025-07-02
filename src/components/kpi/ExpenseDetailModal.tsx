@@ -19,9 +19,9 @@ interface ExpenseDetailModalProps {
 
 export const ExpenseDetailModal = ({ isOpen, onClose }: ExpenseDetailModalProps) => {
   const { selectedUnit, getUnitDisplayName } = useUnit();
-  const { getDisplayPeriod } = usePeriod();
-  const monthlyData = getMonthlyData(selectedUnit);
-  const costCenterData = getCostCenterData(selectedUnit);
+  const { periodFilter, getDisplayPeriod } = usePeriod();
+  const monthlyData = getMonthlyData(selectedUnit, periodFilter);
+  const costCenterData = getCostCenterData(selectedUnit, periodFilter);
   const { getGoal, updateGoal, resetToDefault, updating } = useKPIGoals(selectedUnit);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
