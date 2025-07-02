@@ -2,11 +2,15 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, TrendingDown, Receipt, Target, Calendar } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { TrendingUp, TrendingDown, Receipt, Target, Calendar, Settings } from 'lucide-react';
 import { useUnit } from '@/contexts/UnitContext';
 import { usePeriod } from '@/contexts/PeriodContext';
 import { getHistoricalDataByUnit } from '@/utils/unitData';
+import { useKPIGoals } from '@/hooks/useKPIGoals';
+import { EditGoalModal } from './EditGoalModal';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { useState } from 'react';
 
 interface TicketMedioDetailModalProps {
   isOpen: boolean;
@@ -17,6 +21,19 @@ export const TicketMedioDetailModal = ({ isOpen, onClose }: TicketMedioDetailMod
   const { selectedUnit, getUnitDisplayName } = useUnit();
   const { getDisplayPeriod } = usePeriod();
   const historicalData = getHistoricalDataByUnit(selectedUnit);
+  const { getGoal, updateGoal, resetToDefault, updating } = useKPIGoals(selectedUnit);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const kpiName = 'Ticket Médio';
+  const currentGoal = getGoal(kpiName);
+
+  const handleSaveGoal = async (newGoal: number) => {
+    return await updateGoal(kpiName, newGoal);
+  };
+
+  const handleResetGoal = async () => {
+    return await resetToDefault(kpiName);
+  };
 
   // Calculate ticket médio evolution
   const ticketData = historicalData.map(item => ({
@@ -40,11 +57,24 @@ export const TicketMedioDetailModal = ({ isOpen, onClose }: TicketMedioDetailMod
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Receipt className="w-5 h-5 text-blue-600" />
-            Ticket Médio - {getUnitDisplayName(selectedUnit)}
-          </DialogTitle>
-          <p className="text-sm text-gray-600">{getDisplayPeriod()}</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <DialogTitle className="flex items-center gap-2">
+                <Receipt className="w-5 h-5 text-blue-600" />
+                Ticket Médio - {getUnitDisplayName(selectedUnit)}
+              </DialogTitle>
+              <p className="text-sm text-gray-600">{getDisplayPeriod()}</p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsEditModalOpen(true)}
+              className="flex items-center gap-2"
+            >
+              <Settings className="w-4 h-4" />
+              Editar Meta
+            </Button>
+          </div>
         </DialogHeader>
         
         <div className="space-y-6">
@@ -172,6 +202,17 @@ export const TicketMedioDetailModal = ({ isOpen, onClose }: TicketMedioDetailMod
           </Card>
         </div>
       </DialogContent>
+
+      <EditGoalModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        kpiName={kpiName}
+        currentGoal={currentGoal}
+        unit="R$"
+        onSave={handleSaveGoal}
+        onReset={handleResetGoal}
+        isUpdating={updating}
+      />
     </Dialog>
   );
 };

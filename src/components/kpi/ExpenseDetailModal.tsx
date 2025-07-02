@@ -2,11 +2,15 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, TrendingDown, CreditCard, AlertTriangle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { TrendingUp, TrendingDown, CreditCard, AlertTriangle, Settings } from 'lucide-react';
 import { useUnit } from '@/contexts/UnitContext';
 import { usePeriod } from '@/contexts/PeriodContext';
 import { getMonthlyData, getCostCenterData } from '@/utils/dashboardData';
+import { useKPIGoals } from '@/hooks/useKPIGoals';
+import { EditGoalModal } from './EditGoalModal';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { useState } from 'react';
 
 interface ExpenseDetailModalProps {
   isOpen: boolean;
@@ -18,6 +22,19 @@ export const ExpenseDetailModal = ({ isOpen, onClose }: ExpenseDetailModalProps)
   const { getDisplayPeriod } = usePeriod();
   const monthlyData = getMonthlyData(selectedUnit);
   const costCenterData = getCostCenterData(selectedUnit);
+  const { getGoal, updateGoal, resetToDefault, updating } = useKPIGoals(selectedUnit);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const kpiName = 'Despesa Total';
+  const currentGoal = getGoal(kpiName);
+
+  const handleSaveGoal = async (newGoal: number) => {
+    return await updateGoal(kpiName, newGoal);
+  };
+
+  const handleResetGoal = async () => {
+    return await resetToDefault(kpiName);
+  };
 
   const currentExpense = monthlyData[monthlyData.length - 1]?.despesa || 0;
   const previousExpense = monthlyData[monthlyData.length - 2]?.despesa || 0;
@@ -42,11 +59,24 @@ export const ExpenseDetailModal = ({ isOpen, onClose }: ExpenseDetailModalProps)
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5 text-red-600" />
-            Despesas Totais - {getUnitDisplayName(selectedUnit)}
-          </DialogTitle>
-          <p className="text-sm text-gray-600">{getDisplayPeriod()}</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <DialogTitle className="flex items-center gap-2">
+                <CreditCard className="w-5 h-5 text-red-600" />
+                Despesas Totais - {getUnitDisplayName(selectedUnit)}
+              </DialogTitle>
+              <p className="text-sm text-gray-600">{getDisplayPeriod()}</p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsEditModalOpen(true)}
+              className="flex items-center gap-2"
+            >
+              <Settings className="w-4 h-4" />
+              Editar Meta
+            </Button>
+          </div>
         </DialogHeader>
         
         <div className="space-y-6">
@@ -203,6 +233,17 @@ export const ExpenseDetailModal = ({ isOpen, onClose }: ExpenseDetailModalProps)
           </Card>
         </div>
       </DialogContent>
+
+      <EditGoalModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        kpiName={kpiName}
+        currentGoal={currentGoal}
+        unit="R$"
+        onSave={handleSaveGoal}
+        onReset={handleResetGoal}
+        isUpdating={updating}
+      />
     </Dialog>
   );
 };

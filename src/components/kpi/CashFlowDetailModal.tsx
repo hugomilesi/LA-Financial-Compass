@@ -2,11 +2,15 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, TrendingDown, DollarSign, Target, Calendar } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { TrendingUp, TrendingDown, DollarSign, Target, Calendar, Settings } from 'lucide-react';
 import { useUnit } from '@/contexts/UnitContext';
 import { usePeriod } from '@/contexts/PeriodContext';
 import { getMonthlyData } from '@/utils/dashboardData';
+import { useKPIGoals } from '@/hooks/useKPIGoals';
+import { EditGoalModal } from './EditGoalModal';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { useState } from 'react';
 
 interface CashFlowDetailModalProps {
   isOpen: boolean;
@@ -17,6 +21,19 @@ export const CashFlowDetailModal = ({ isOpen, onClose }: CashFlowDetailModalProp
   const { selectedUnit, getUnitDisplayName } = useUnit();
   const { getDisplayPeriod } = usePeriod();
   const monthlyData = getMonthlyData(selectedUnit);
+  const { getGoal, updateGoal, resetToDefault, updating } = useKPIGoals(selectedUnit);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const kpiName = 'Geração de Caixa';
+  const currentGoal = getGoal(kpiName);
+
+  const handleSaveGoal = async (newGoal: number) => {
+    return await updateGoal(kpiName, newGoal);
+  };
+
+  const handleResetGoal = async () => {
+    return await resetToDefault(kpiName);
+  };
 
   const currentMonth = monthlyData[monthlyData.length - 1];
   const previousMonth = monthlyData[monthlyData.length - 2];
@@ -42,11 +59,24 @@ export const CashFlowDetailModal = ({ isOpen, onClose }: CashFlowDetailModalProp
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-green-600" />
-            Geração de Caixa - {getUnitDisplayName(selectedUnit)}
-          </DialogTitle>
-          <p className="text-sm text-gray-600">{getDisplayPeriod()}</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <DialogTitle className="flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-green-600" />
+                Geração de Caixa - {getUnitDisplayName(selectedUnit)}
+              </DialogTitle>
+              <p className="text-sm text-gray-600">{getDisplayPeriod()}</p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsEditModalOpen(true)}
+              className="flex items-center gap-2"
+            >
+              <Settings className="w-4 h-4" />
+              Editar Meta
+            </Button>
+          </div>
         </DialogHeader>
         
         <div className="space-y-6">
@@ -254,6 +284,17 @@ export const CashFlowDetailModal = ({ isOpen, onClose }: CashFlowDetailModalProp
           </div>
         </div>
       </DialogContent>
+
+      <EditGoalModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        kpiName={kpiName}
+        currentGoal={currentGoal}
+        unit="R$"
+        onSave={handleSaveGoal}
+        onReset={handleResetGoal}
+        isUpdating={updating}
+      />
     </Dialog>
   );
 };
