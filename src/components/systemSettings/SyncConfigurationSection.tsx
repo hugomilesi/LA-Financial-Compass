@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -7,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { SyncConfiguration } from '@/types/systemSettings';
+import { SyncConfigModal } from './SyncConfigModal';
 import { Play, Pause, Edit, Trash2, Plus, Clock, Database } from 'lucide-react';
 
 interface SyncConfigurationSectionProps {
@@ -17,6 +17,8 @@ export const SyncConfigurationSection = ({ syncConfigurations }: SyncConfigurati
   const { toast } = useToast();
   const [runningSyncs, setRunningSyncs] = useState<Set<string>>(new Set());
   const [pausingSyncs, setPausingSyncs] = useState<Set<string>>(new Set());
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedSync, setSelectedSync] = useState<SyncConfiguration | null>(null);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -122,13 +124,26 @@ export const SyncConfigurationSection = ({ syncConfigurations }: SyncConfigurati
     }
   };
 
+  const handleNewSync = () => {
+    console.log('➕ [SyncConfigurationSection] Opening new sync modal');
+    setSelectedSync(null);
+    setIsModalOpen(true);
+  };
+
   const handleEditSync = (sync: SyncConfiguration) => {
     console.log('✏️ [SyncConfigurationSection] Edit sync:', sync.name);
+    setSelectedSync(sync);
+    setIsModalOpen(true);
+  };
+
+  const handleSaveSync = (sync: SyncConfiguration) => {
+    console.log('💾 [SyncConfigurationSection] Save sync:', sync.name);
+    // In a real implementation, this would update the sync configurations
+    // For now, we'll just show a success message
     toast({
-      title: "Edição de Sincronização",
-      description: `Abrindo configurações para ${sync.name}`,
+      title: sync.id.startsWith('sync_') ? "Sincronização Criada" : "Sincronização Atualizada",
+      description: `${sync.name} foi ${sync.id.startsWith('sync_') ? 'criada' : 'atualizada'} com sucesso`,
     });
-    // In a real implementation, this would open a modal or navigate to edit form
   };
 
   const handleDeleteSync = (sync: SyncConfiguration) => {
@@ -158,7 +173,7 @@ export const SyncConfigurationSection = ({ syncConfigurations }: SyncConfigurati
             Configure e monitore a sincronização automática de dados entre sistemas.
           </p>
         </div>
-        <Button>
+        <Button onClick={handleNewSync}>
           <Plus className="h-4 w-4" />
           Nova Sincronização
         </Button>
@@ -332,6 +347,13 @@ export const SyncConfigurationSection = ({ syncConfigurations }: SyncConfigurati
           </Table>
         </CardContent>
       </Card>
+
+      <SyncConfigModal
+        syncConfig={selectedSync}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveSync}
+      />
     </div>
   );
 };
