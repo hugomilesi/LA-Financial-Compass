@@ -66,7 +66,9 @@ export default {
 					foreground: 'hsl(var(--card-foreground))'
 				},
 				success: {
-					DEFAULT: '#10B981',
+					DEFAULT: 'hsl(var(--success))',
+					light: 'hsl(var(--success-light))',
+					glow: 'hsl(var(--success-glow))',
 					50: '#ECFDF5',
 					100: '#D1FAE5',
 					500: '#10B981',
@@ -88,11 +90,6 @@ export default {
 					500: '#EF4444',
 					600: '#DC2626',
 					700: '#B91C1C',
-				},
-				success: {
-					DEFAULT: 'hsl(var(--success))',
-					light: 'hsl(var(--success-light))',
-					glow: 'hsl(var(--success-glow))',
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
