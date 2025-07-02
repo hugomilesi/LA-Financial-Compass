@@ -8,6 +8,7 @@ interface KPICardProps {
   previousValue?: string;
   change?: number;
   target?: number;
+  goalValue?: number;
   icon: LucideIcon;
   format?: 'currency' | 'percentage' | 'number';
   alert?: 'success' | 'warning' | 'danger';
@@ -21,6 +22,7 @@ export const KPICard = ({
   previousValue, 
   change, 
   target, 
+  goalValue,
   icon: Icon, 
   format = 'number',
   alert,
@@ -100,11 +102,14 @@ export const KPICard = ({
               </p>
             )}
             
-            {target && (
+            {goalValue && (
               <div className="space-y-1">
                 <p className="text-xs text-gray-500">
-                  {title === 'Inadimplência (%)' ? 'Meta máxima: ' : 'Meta: '}
-                  {target.toFixed(1)}%
+                  {title === 'Inadimplência (%)' || title === 'Despesa Total' || title === 'Custo por Aluno' ? 'Meta máxima: ' : 'Meta: '}
+                  {title === 'Inadimplência (%)' ? `${goalValue}%` : 
+                   title.includes('R$') || title === 'Despesa Total' || title === 'Custo por Aluno' || title === 'Receita Total' || title === 'Geração de Caixa' || title === 'Ticket Médio' ? `R$ ${goalValue.toLocaleString()}` :
+                   title === 'Margem Líquida' ? `${goalValue}%` :
+                   title === 'Alunos Ativos' ? `${goalValue} alunos` : goalValue}
                 </p>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div 
@@ -114,9 +119,7 @@ export const KPICard = ({
                       alert === 'warning' ? 'bg-warning-500' : 'bg-danger-500'
                     )}
                     style={{ 
-                      width: title === 'Inadimplência (%)' 
-                        ? `${Math.min(100, (parseFloat(value) / 8) * 100)}%`
-                        : `${Math.min(target, 100)}%` 
+                      width: `${Math.min(100, Math.max(0, target || 0))}%`
                     }}
                   />
                 </div>
