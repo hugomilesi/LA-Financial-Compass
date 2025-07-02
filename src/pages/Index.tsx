@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Dashboard } from '@/components/Dashboard';
 import { KPIsPage } from '@/components/KPIsPage';
@@ -12,18 +12,50 @@ import { LandingPage } from '@/components/LandingPage';
 import { AuthPage } from '@/components/auth/AuthPage';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 
 const Index = () => {
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [authMode, setAuthMode] = useState<'landing' | 'login' | 'signup'>('landing');
-  const { signOut } = useAuth();
+  const [logoutError, setLogoutError] = useState<string | null>(null);
+  const { signOut, user } = useAuth();
 
   const handleSignOut = async () => {
-    await signOut(() => {
+    try {
+      setLogoutError(null);
+      const { error } = await signOut(() => {
+        setAuthMode('landing');
+        setCurrentPage('dashboard');
+      });
+      
+      if (error) {
+        setLogoutError('Erro ao fazer logout. Redirecionando...');
+        toast.error('Erro ao fazer logout. Redirecionando...');
+        // Force redirect to landing even on error
+        setTimeout(() => {
+          setAuthMode('landing');
+          setCurrentPage('dashboard');
+        }, 2000);
+      }
+    } catch (error) {
+      console.error('Unexpected logout error:', error);
+      setLogoutError('Erro inesperado. Redirecionando...');
+      toast.error('Erro inesperado. Redirecionando...');
+      // Force redirect to landing even on error
+      setTimeout(() => {
+        setAuthMode('landing');
+        setCurrentPage('dashboard');
+      }, 2000);
+    }
+  };
+
+  // Effect to handle user changes and force redirect when user becomes null
+  useEffect(() => {
+    if (!user && authMode !== 'landing') {
       setAuthMode('landing');
       setCurrentPage('dashboard');
-    });
-  };
+    }
+  }, [user, authMode]);
 
   const renderPage = () => {
     switch (currentPage) {

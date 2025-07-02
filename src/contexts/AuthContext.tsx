@@ -6,6 +6,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  signingOut: boolean;
   signUp: (email: string, password: string, fullName?: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: (onSuccess?: () => void) => Promise<{ error: any }>;
@@ -25,6 +26,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [signingOut, setSigningOut] = useState(false);
 
   useEffect(() => {
     // Set up auth state listener
@@ -73,17 +75,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async (onSuccess?: () => void) => {
-    const { error } = await supabase.auth.signOut();
-    if (!error && onSuccess) {
-      onSuccess();
+    try {
+      setSigningOut(true);
+      const { error } = await supabase.auth.signOut();
+      
+      if (!error) {
+        // Execute callback only after successful logout
+        if (onSuccess) {
+          onSuccess();
+        }
+      }
+      
+      return { error };
+    } catch (error) {
+      console.error('Logout error:', error);
+      return { error };
+    } finally {
+      setSigningOut(false);
     }
-    return { error };
   };
 
   const value = {
     user,
     session,
     loading,
+    signingOut,
     signUp,
     signIn,
     signOut,
