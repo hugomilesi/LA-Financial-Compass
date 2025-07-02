@@ -103,8 +103,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onSignup
           <h1 className="text-6xl md:text-7xl font-bold mb-8 leading-tight">
             <span className="text-foreground">Transforme sua</span>
             <br />
-            <span className="bg-gradient-to-r from-primary via-primary-glow to-primary-dark bg-clip-text text-transparent animate-glow">
-              Gestão Financeira
+            <span className="bg-gradient-to-br from-primary via-primary-glow to-primary-dark bg-clip-text text-transparent relative">
+              <span className="absolute inset-0 bg-gradient-to-br from-primary via-primary-glow to-primary-dark bg-clip-text text-transparent blur-sm opacity-60 animate-pulse"></span>
+              <span className="relative">Gestão Financeira</span>
             </span>
           </h1>
           <p className="text-xl text-muted-foreground mb-12 max-w-4xl mx-auto leading-relaxed">
