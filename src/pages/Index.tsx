@@ -50,8 +50,10 @@ const Index = () => {
   };
 
   // Effect to handle user changes and force redirect when user becomes null
+  // Only redirect to landing if user becomes null AND we're not in an auth flow
   useEffect(() => {
-    if (!user && authMode !== 'landing') {
+    if (!user && authMode !== 'landing' && authMode !== 'login' && authMode !== 'signup') {
+      console.log('User became null, redirecting to landing from:', authMode);
       setAuthMode('landing');
       setCurrentPage('dashboard');
     }
