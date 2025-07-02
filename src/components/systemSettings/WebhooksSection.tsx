@@ -4,20 +4,24 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Webhook } from '@/types/systemSettings';
-import { Plus, Play, Edit, Trash2, AlertCircle, CheckCircle } from 'lucide-react';
+import { WebhookConfigModal } from './WebhookConfigModal';
+import { Plus, Play, Edit, Trash2, AlertCircle } from 'lucide-react';
 
 interface WebhooksSectionProps {
   webhooks: Webhook[];
+  onUpdateWebhook: (webhook: Webhook) => void;
+  onDeleteWebhook: (webhookId: string) => void;
+  onTestWebhook: (webhookId: string) => Promise<{ success: boolean; message: string }>;
 }
 
-export const WebhooksSection = ({ webhooks }: WebhooksSectionProps) => {
+export const WebhooksSection = ({ webhooks, onUpdateWebhook, onDeleteWebhook, onTestWebhook }: WebhooksSectionProps) => {
   const { toast } = useToast();
   const [testingWebhook, setTestingWebhook] = useState<string | null>(null);
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [selectedWebhook, setSelectedWebhook] = useState<Webhook | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -46,17 +50,20 @@ export const WebhooksSection = ({ webhooks }: WebhooksSectionProps) => {
   };
 
   const handleTestWebhook = async (webhook: Webhook) => {
+    console.log('🧪 [WebhooksSection] Testing webhook:', webhook.name);
     setTestingWebhook(webhook.id);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const result = await onTestWebhook(webhook.id);
+      console.log('✅ [WebhooksSection] Test result:', result);
       
       toast({
         title: "Teste de Webhook",
-        description: `Webhook ${webhook.name} testado com sucesso`,
+        description: result.message,
+        variant: result.success ? "default" : "destructive",
       });
     } catch (error) {
+      console.error('❌ [WebhooksSection] Test error:', error);
       toast({
         title: "Erro no Teste",
         description: `Falha ao testar webhook ${webhook.name}`,
@@ -65,6 +72,33 @@ export const WebhooksSection = ({ webhooks }: WebhooksSectionProps) => {
     } finally {
       setTestingWebhook(null);
     }
+  };
+
+  const handleEditWebhook = (webhook: Webhook) => {
+    console.log('✏️ [WebhooksSection] Edit webhook:', webhook.name);
+    setSelectedWebhook(webhook);
+    setIsModalOpen(true);
+  };
+
+  const handleNewWebhook = () => {
+    console.log('➕ [WebhooksSection] New webhook');
+    setSelectedWebhook(null);
+    setIsModalOpen(true);
+  };
+
+  const handleSaveWebhook = (webhook: Webhook) => {
+    console.log('💾 [WebhooksSection] Save webhook:', webhook.name);
+    onUpdateWebhook(webhook);
+    setIsModalOpen(false);
+  };
+
+  const handleDeleteWebhook = (webhook: Webhook) => {
+    console.log('🗑️ [WebhooksSection] Delete webhook:', webhook.name);
+    onDeleteWebhook(webhook.id);
+    toast({
+      title: "Webhook Removido",
+      description: `${webhook.name} foi removido com sucesso`,
+    });
   };
 
   const formatLastTriggered = (lastTriggered: string) => {
@@ -96,65 +130,11 @@ export const WebhooksSection = ({ webhooks }: WebhooksSectionProps) => {
             Configure endpoints para receber notificações automáticas de eventos do sistema.
           </p>
         </div>
-        <Button onClick={() => setShowAddForm(true)}>
+        <Button onClick={handleNewWebhook}>
           <Plus className="h-4 w-4" />
           Adicionar Webhook
         </Button>
       </div>
-
-      {showAddForm && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Adicionar Novo Webhook</CardTitle>
-            <CardDescription>
-              Configure um novo endpoint para receber notificações de eventos.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="webhook-name">Nome</Label>
-                <Input
-                  id="webhook-name"
-                  placeholder="Nome do webhook"
-                />
-              </div>
-              <div>
-                <Label htmlFor="webhook-method">Método</Label>
-                <select
-                  id="webhook-method"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                >
-                  <option value="POST">POST</option>
-                  <option value="GET">GET</option>
-                  <option value="PUT">PUT</option>
-                  <option value="DELETE">DELETE</option>
-                </select>
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="webhook-url">URL</Label>
-              <Input
-                id="webhook-url"
-                placeholder="https://api.exemplo.com/webhook"
-              />
-            </div>
-            <div>
-              <Label htmlFor="webhook-description">Descrição</Label>
-              <Input
-                id="webhook-description"
-                placeholder="Descrição do webhook"
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button>Salvar</Button>
-              <Button variant="outline" onClick={() => setShowAddForm(false)}>
-                Cancelar
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       <Card>
         <CardHeader>
@@ -221,6 +201,7 @@ export const WebhooksSection = ({ webhooks }: WebhooksSectionProps) => {
                         variant="outline"
                         onClick={() => handleTestWebhook(webhook)}
                         disabled={testingWebhook === webhook.id}
+                        title="Testar Webhook"
                       >
                         {testingWebhook === webhook.id ? (
                           <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary-600" />
@@ -228,12 +209,39 @@ export const WebhooksSection = ({ webhooks }: WebhooksSectionProps) => {
                           <Play className="h-3 w-3" />
                         )}
                       </Button>
-                      <Button size="sm" variant="outline">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => handleEditWebhook(webhook)}
+                        title="Editar Webhook"
+                      >
                         <Edit className="h-3 w-3" />
                       </Button>
-                      <Button size="sm" variant="outline">
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button size="sm" variant="outline" title="Excluir Webhook">
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Tem certeza que deseja remover o webhook "{webhook.name}"? 
+                              Esta ação não pode ser desfeita.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogAction 
+                              onClick={() => handleDeleteWebhook(webhook)}
+                              className="bg-red-600 hover:bg-red-700"
+                            >
+                              Remover
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -242,6 +250,14 @@ export const WebhooksSection = ({ webhooks }: WebhooksSectionProps) => {
           </Table>
         </CardContent>
       </Card>
+
+      <WebhookConfigModal
+        webhook={selectedWebhook}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveWebhook}
+        onTest={onTestWebhook}
+      />
     </div>
   );
 };

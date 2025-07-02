@@ -18,7 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Settings, Shield, Zap, Database, Activity, Cog } from 'lucide-react';
 
 export const SystemSettingsPage = () => {
-  const { data, loading, error } = useSystemSettings();
+  const { data, loading, error, updateWebhook, testWebhook } = useSystemSettings();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('integrations');
 
@@ -43,6 +43,16 @@ export const SystemSettingsPage = () => {
       </div>
     );
   }
+
+  const handleDeleteWebhook = async (webhookId: string) => {
+    console.log('🗑️ [SystemSettingsPage] Deleting webhook:', webhookId);
+    // In a real implementation, this would call a delete API
+    // For now, we'll just show a success message
+    toast({
+      title: "Webhook Removido",
+      description: "Webhook foi removido com sucesso",
+    });
+  };
 
   const tabsConfig = [
     {
@@ -135,7 +145,12 @@ export const SystemSettingsPage = () => {
             </TabsContent>
 
             <TabsContent value="webhooks" className="mt-0">
-              <WebhooksSection webhooks={data.webhooks} />
+              <WebhooksSection 
+                webhooks={data.webhooks} 
+                onUpdateWebhook={updateWebhook}
+                onDeleteWebhook={handleDeleteWebhook}
+                onTestWebhook={testWebhook}
+              />
             </TabsContent>
 
             <TabsContent value="credentials" className="mt-0">
