@@ -18,6 +18,13 @@ const Index = () => {
   const [authMode, setAuthMode] = useState<'landing' | 'login' | 'signup'>('landing');
   const { signOut } = useAuth();
 
+  const handleSignOut = async () => {
+    await signOut(() => {
+      setAuthMode('landing');
+      setCurrentPage('dashboard');
+    });
+  };
+
   const renderPage = () => {
     switch (currentPage) {
       case 'dashboard':
@@ -62,7 +69,7 @@ const Index = () => {
       <AppSidebar 
         currentPage={currentPage} 
         onPageChange={setCurrentPage}
-        onSignOut={signOut}
+        onSignOut={handleSignOut}
       />
       <main className="flex-1 overflow-auto">
         {renderPage()}
