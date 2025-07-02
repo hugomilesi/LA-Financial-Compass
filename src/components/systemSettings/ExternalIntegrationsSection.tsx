@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -58,10 +59,12 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
   };
 
   const handleTestConnection = async (integration: ExternalIntegration) => {
+    console.log('🔍 [ExternalIntegrationsSection] Testing connection for:', integration.name);
     setLoadingIntegration(integration.id);
     
     try {
       const result = await testConnection(integration.id);
+      console.log('✅ [ExternalIntegrationsSection] Test connection result:', result);
       
       toast({
         title: "Teste de Conexão",
@@ -69,6 +72,7 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
         variant: result.success ? "default" : "destructive",
       });
     } catch (error) {
+      console.error('❌ [ExternalIntegrationsSection] Test connection error:', error);
       toast({
         title: "Erro no Teste",
         description: `Falha ao testar conexão com ${integration.name}`,
@@ -80,31 +84,48 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
   };
 
   const handleToggleIntegration = async (integration: ExternalIntegration) => {
+    console.log('🔄 [ExternalIntegrationsSection] Toggling integration:', integration.name, 'Current status:', integration.status);
+    
     const newStatus = integration.status === 'connected' ? 'disconnected' : 'connected';
+    console.log('🔄 [ExternalIntegrationsSection] New status will be:', newStatus);
+    
     const updatedIntegration: ExternalIntegration = { 
       ...integration, 
       status: newStatus as 'connected' | 'disconnected' | 'error'
     };
     
-    await updateIntegration(updatedIntegration);
-    
-    toast({
-      title: "Integração Atualizada",
-      description: `${integration.name} foi ${newStatus === 'connected' ? 'conectado' : 'desconectado'}`,
-    });
+    try {
+      await updateIntegration(updatedIntegration);
+      console.log('✅ [ExternalIntegrationsSection] Integration updated successfully');
+      
+      toast({
+        title: "Integração Atualizada",
+        description: `${integration.name} foi ${newStatus === 'connected' ? 'conectado' : 'desconectado'}`,
+      });
+    } catch (error) {
+      console.error('❌ [ExternalIntegrationsSection] Error updating integration:', error);
+      toast({
+        title: "Erro",
+        description: "Falha ao atualizar integração",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleEditIntegration = (integration: ExternalIntegration) => {
+    console.log('✏️ [ExternalIntegrationsSection] Edit integration clicked:', integration.name);
     setSelectedIntegration(integration);
     setIsModalOpen(true);
   };
 
   const handleNewIntegration = () => {
+    console.log('➕ [ExternalIntegrationsSection] New integration clicked');
     setSelectedIntegration(null);
     setIsModalOpen(true);
   };
 
   const handleDeleteIntegration = async (integration: ExternalIntegration) => {
+    console.log('🗑️ [ExternalIntegrationsSection] Delete integration:', integration.name);
     // In a real implementation, this would call a delete API
     toast({
       title: "Integração Removida",
@@ -113,6 +134,7 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
   };
 
   const handleSaveIntegration = async (integration: ExternalIntegration) => {
+    console.log('💾 [ExternalIntegrationsSection] Save integration:', integration.name);
     await updateIntegration(integration);
     setIsModalOpen(false);
   };
@@ -121,6 +143,8 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
     const date = new Date(lastSync);
     return date.toLocaleString('pt-BR');
   };
+
+  console.log('🏗️ [ExternalIntegrationsSection] Rendering with integrations:', integrations.length);
 
   return (
     <div className="space-y-6">
@@ -163,7 +187,10 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
                   </div>
                   <Switch
                     checked={integration.status === 'connected'}
-                    onCheckedChange={() => handleToggleIntegration(integration)}
+                    onCheckedChange={(checked) => {
+                      console.log('🎚️ [Switch] onCheckedChange called with:', checked, 'for integration:', integration.name);
+                      handleToggleIntegration(integration);
+                    }}
                   />
                 </div>
               </CardHeader>
@@ -190,7 +217,10 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => handleTestConnection(integration)}
+                    onClick={() => {
+                      console.log('🧪 [Button] Test button clicked for:', integration.name);
+                      handleTestConnection(integration);
+                    }}
                     disabled={loadingIntegration === integration.id}
                   >
                     {loadingIntegration === integration.id ? (
@@ -204,7 +234,12 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
                   <Button 
                     size="sm" 
                     variant="outline"
-                    onClick={() => handleEditIntegration(integration)}
+                    onClick={(e) => {
+                      console.log('✏️ [Button] Edit button clicked for:', integration.name);
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleEditIntegration(integration);
+                    }}
                   >
                     <Edit className="h-4 w-4" />
                     Editar

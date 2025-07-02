@@ -12,12 +12,14 @@ export const useSystemSettings = () => {
     const loadData = async () => {
       try {
         setLoading(true);
+        console.log('🔄 [useSystemSettings] Loading system settings data...');
         const settingsData = await getSystemSettingsData();
+        console.log('✅ [useSystemSettings] Data loaded successfully:', settingsData);
         setData(settingsData);
         setError(null);
       } catch (err) {
+        console.error('❌ [useSystemSettings] Error loading system settings:', err);
         setError('Failed to load system settings');
-        console.error('Error loading system settings:', err);
       } finally {
         setLoading(false);
       }
@@ -27,19 +29,27 @@ export const useSystemSettings = () => {
   }, []);
 
   const updateIntegration = async (integration: ExternalIntegration) => {
-    if (!data) return;
+    console.log('🔄 [useSystemSettings] Updating integration:', integration.name);
+    if (!data) {
+      console.warn('⚠️ [useSystemSettings] No data available for update');
+      return;
+    }
     
     const updatedIntegrations = data.integrations.map(int => 
-      int.id === integration.id ? integration : int
+      int.id === integration.id ? { ...integration, lastSync: new Date().toISOString() } : int
     );
     
-    setData({
+    const updatedData = {
       ...data,
       integrations: updatedIntegrations
-    });
+    };
+    
+    console.log('✅ [useSystemSettings] Integration updated in state');
+    setData(updatedData);
   };
 
   const updateWebhook = async (webhook: Webhook) => {
+    console.log('🔄 [useSystemSettings] Updating webhook:', webhook.name);
     if (!data) return;
     
     const updatedWebhooks = data.webhooks.map(wh => 
@@ -53,6 +63,7 @@ export const useSystemSettings = () => {
   };
 
   const updateCredential = async (credential: Credential) => {
+    console.log('🔄 [useSystemSettings] Updating credential:', credential.name);
     if (!data) return;
     
     const updatedCredentials = data.credentials.map(cred => 
@@ -66,6 +77,7 @@ export const useSystemSettings = () => {
   };
 
   const updateSyncConfiguration = async (config: SyncConfiguration) => {
+    console.log('🔄 [useSystemSettings] Updating sync configuration:', config.name);
     if (!data) return;
     
     const updatedConfigs = data.syncConfigurations.map(sync => 
@@ -79,32 +91,39 @@ export const useSystemSettings = () => {
   };
 
   const updateSystemParameter = async (parameter: SystemParameter) => {
-    if (!data) return;
+    console.log('🔄 [useSystemSettings] Updating system parameter:', parameter.key);
+    if (!data) {
+      console.warn('⚠️ [useSystemSettings] No data available for parameter update');
+      return;
+    }
     
     const updatedParameters = data.parameters.map(param => 
-      param.id === parameter.id ? parameter : param
+      param.id === parameter.id ? { ...parameter, lastModified: new Date().toISOString() } : param
     );
     
-    setData({
+    const updatedData = {
       ...data,
       parameters: updatedParameters
-    });
+    };
+    
+    console.log('✅ [useSystemSettings] Parameter updated in state');
+    setData(updatedData);
   };
 
   const testWebhook = async (webhookId: string) => {
-    console.log('Testing webhook:', webhookId);
+    console.log('🧪 [useSystemSettings] Testing webhook:', webhookId);
     // Simulate webhook test
     return { success: true, message: 'Webhook test successful' };
   };
 
   const testConnection = async (integrationId: string) => {
-    console.log('Testing connection:', integrationId);
+    console.log('🧪 [useSystemSettings] Testing connection:', integrationId);
     // Simulate connection test
     return { success: true, message: 'Connection test successful' };
   };
 
   const runSync = async (syncId: string) => {
-    console.log('Running sync:', syncId);
+    console.log('🔄 [useSystemSettings] Running sync:', syncId);
     // Simulate sync run
     return { success: true, message: 'Sync completed successfully' };
   };

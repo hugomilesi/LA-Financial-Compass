@@ -27,6 +27,8 @@ export const SystemParametersSection = ({ parameters }: SystemParametersSectionP
   const [editValue, setEditValue] = useState('');
   const [visibleSensitive, setVisibleSensitive] = useState<Set<string>>(new Set());
 
+  console.log('🏗️ [SystemParametersSection] Rendering with parameters:', parameters.length);
+
   const filteredParameters = parameters.filter(param => {
     const matchesSearch = param.key.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          param.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -89,16 +91,19 @@ export const SystemParametersSection = ({ parameters }: SystemParametersSectionP
   };
 
   const handleNewParameter = () => {
+    console.log('➕ [SystemParametersSection] New parameter clicked');
     setSelectedParameter(null);
     setIsModalOpen(true);
   };
 
   const handleEditParameter = (parameter: SystemParameter) => {
+    console.log('✏️ [SystemParametersSection] Edit parameter clicked:', parameter.key);
     setSelectedParameter(parameter);
     setIsModalOpen(true);
   };
 
   const handleDeleteParameter = async (parameter: SystemParameter) => {
+    console.log('🗑️ [SystemParametersSection] Delete parameter:', parameter.key);
     // In a real implementation, this would call a delete API
     toast({
       title: "Parâmetro Removido",
@@ -107,33 +112,48 @@ export const SystemParametersSection = ({ parameters }: SystemParametersSectionP
   };
 
   const handleSaveParameter = async (parameter: SystemParameter) => {
+    console.log('💾 [SystemParametersSection] Save parameter:', parameter.key);
     await updateSystemParameter(parameter);
     setIsModalOpen(false);
   };
 
   const startInlineEdit = (parameter: SystemParameter) => {
+    console.log('✏️ [SystemParametersSection] Start inline edit for:', parameter.key);
     setEditingParameter(parameter.id);
     setEditValue(parameter.value);
   };
 
   const cancelInlineEdit = () => {
+    console.log('❌ [SystemParametersSection] Cancel inline edit');
     setEditingParameter(null);
     setEditValue('');
   };
 
   const saveInlineEdit = async (parameter: SystemParameter) => {
+    console.log('💾 [SystemParametersSection] Save inline edit for:', parameter.key, 'New value:', editValue);
     const updatedParameter = { ...parameter, value: editValue, lastModified: new Date().toISOString() };
-    await updateSystemParameter(updatedParameter);
-    setEditingParameter(null);
-    setEditValue('');
     
-    toast({
-      title: "Parâmetro Atualizado",
-      description: `${parameter.key} foi atualizado com sucesso`,
-    });
+    try {
+      await updateSystemParameter(updatedParameter);
+      setEditingParameter(null);
+      setEditValue('');
+      
+      toast({
+        title: "Parâmetro Atualizado",
+        description: `${parameter.key} foi atualizado com sucesso`,
+      });
+    } catch (error) {
+      console.error('❌ [SystemParametersSection] Error saving parameter:', error);
+      toast({
+        title: "Erro",
+        description: "Falha ao salvar parâmetro",
+        variant: "destructive",
+      });
+    }
   };
 
   const toggleSensitiveVisibility = (parameterId: string) => {
+    console.log('👁️ [SystemParametersSection] Toggle sensitive visibility for:', parameterId);
     const newVisible = new Set(visibleSensitive);
     if (newVisible.has(parameterId)) {
       newVisible.delete(parameterId);
@@ -263,7 +283,10 @@ export const SystemParametersSection = ({ parameters }: SystemParametersSectionP
                         />
                         <Button
                           size="sm"
-                          onClick={() => saveInlineEdit(parameter)}
+                          onClick={() => {
+                            console.log('💾 [Button] Save inline edit clicked for:', parameter.key);
+                            saveInlineEdit(parameter);
+                          }}
                           className="h-8 w-8 p-0"
                         >
                           <Save className="h-3 w-3" />
@@ -271,7 +294,10 @@ export const SystemParametersSection = ({ parameters }: SystemParametersSectionP
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={cancelInlineEdit}
+                          onClick={() => {
+                            console.log('❌ [Button] Cancel inline edit clicked');
+                            cancelInlineEdit();
+                          }}
                           className="h-8 w-8 p-0"
                         >
                           <X className="h-3 w-3" />
@@ -287,7 +313,10 @@ export const SystemParametersSection = ({ parameters }: SystemParametersSectionP
                             size="sm"
                             variant="ghost"
                             className="h-6 w-6 p-0"
-                            onClick={() => toggleSensitiveVisibility(parameter.id)}
+                            onClick={() => {
+                              console.log('👁️ [Button] Toggle visibility clicked for:', parameter.key);
+                              toggleSensitiveVisibility(parameter.id);
+                            }}
                           >
                             {visibleSensitive.has(parameter.id) ? (
                               <EyeOff className="h-3 w-3" />
@@ -316,7 +345,10 @@ export const SystemParametersSection = ({ parameters }: SystemParametersSectionP
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => startInlineEdit(parameter)}
+                          onClick={() => {
+                            console.log('✏️ [Button] Inline edit button clicked for:', parameter.key);
+                            startInlineEdit(parameter);
+                          }}
                           disabled={editingParameter === parameter.id}
                         >
                           <Edit className="h-3 w-3" />
@@ -325,7 +357,12 @@ export const SystemParametersSection = ({ parameters }: SystemParametersSectionP
                       <Button 
                         size="sm" 
                         variant="outline"
-                        onClick={() => handleEditParameter(parameter)}
+                        onClick={(e) => {
+                          console.log('✏️ [Button] Edit modal button clicked for:', parameter.key);
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleEditParameter(parameter);
+                        }}
                       >
                         <Edit className="h-3 w-3" />
                       </Button>
