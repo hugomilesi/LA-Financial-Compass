@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -49,6 +48,15 @@ export const LogExportModal = ({ isOpen, onClose, logs, currentFilters }: LogExp
       setSelectedServices(uniqueServices);
     }
   });
+
+  // Wrapper functions to handle CheckedState type
+  const handleIncludeCurrentFiltersChange = (checked: boolean | "indeterminate") => {
+    setIncludeCurrentFilters(checked === true);
+  };
+
+  const handleIncludeDetailsChange = (checked: boolean | "indeterminate") => {
+    setIncludeDetails(checked === true);
+  };
 
   const handleLevelToggle = (level: string) => {
     setSelectedLevels(prev => 
@@ -293,7 +301,7 @@ export const LogExportModal = ({ isOpen, onClose, logs, currentFilters }: LogExp
                 <Checkbox
                   id="current-filters"
                   checked={includeCurrentFilters}
-                  onCheckedChange={setIncludeCurrentFilters}
+                  onCheckedChange={handleIncludeCurrentFiltersChange}
                 />
                 <Label htmlFor="current-filters">
                   Aplicar filtros atuais da interface
@@ -366,7 +374,7 @@ export const LogExportModal = ({ isOpen, onClose, logs, currentFilters }: LogExp
                 <Checkbox
                   id="include-details"
                   checked={includeDetails}
-                  onCheckedChange={setIncludeDetails}
+                  onCheckedChange={handleIncludeDetailsChange}
                 />
                 <Label htmlFor="include-details">
                   Incluir detalhes técnicos (quando disponível)
