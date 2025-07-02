@@ -75,9 +75,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onSignup
             <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center animate-glow">
               <Sparkles className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
-              Sistema Financeiro Inteligente
-            </span>
+            <div className="flex flex-col">
+              <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
+                AfinaFinanças
+              </span>
+              <span className="text-xs text-muted-foreground">Sistema Financeiro Inteligente</span>
+            </div>
           </div>
           <div className="flex space-x-3">
             <Button variant="ghost" onClick={onLoginClick} className="hover-lift text-primary border-primary/20">
@@ -95,7 +98,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onSignup
         <div className={`container mx-auto text-center transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <Badge className="mb-8 bg-primary-100 text-primary-800 hover:bg-primary-200 animate-pulse">
             <Sparkles className="w-4 h-4 mr-2" />
-            Gestão Financeira Inteligente
+            AfinaFinanças - Gestão Inteligente
           </Badge>
           <h1 className="text-6xl md:text-7xl font-bold mb-8 leading-tight">
             <span className="text-foreground">Transforme sua</span>
@@ -196,9 +199,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onSignup
         <div className="container mx-auto">
           <div className="grid lg:grid-cols-2 gap-20 items-center">
             <div>
-              <h2 className="text-5xl font-bold text-foreground mb-8">
-                Por que escolher o Sistema Financeiro Inteligente?
-              </h2>
+          <h2 className="text-5xl font-bold text-foreground mb-8">
+            Por que escolher o AfinaFinanças?
+          </h2>
               <p className="text-xl text-muted-foreground mb-12">
                 Nossa plataforma oferece insights precisos e automação inteligente 
                 para maximizar seus resultados financeiros.
@@ -268,12 +271,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onSignup
             <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center">
               <Sparkles className="h-5 w-5 text-white" />
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
-              Sistema Financeiro Inteligente
-            </span>
+            <div className="flex flex-col items-center">
+              <span className="text-2xl font-bold bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
+                AfinaFinanças
+              </span>
+              <span className="text-sm text-muted-foreground">Sistema Financeiro Inteligente</span>
+            </div>
           </div>
           <p className="text-muted-foreground">
-            © 2024 Sistema Financeiro Inteligente. Todos os direitos reservados.
+            © 2024 AfinaFinanças. Todos os direitos reservados.
           </p>
         </div>
       </footer>
