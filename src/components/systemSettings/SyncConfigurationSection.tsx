@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { SyncConfiguration } from '@/types/systemSettings';
 import { Play, Pause, Edit, Trash2, Plus, Clock, Database } from 'lucide-react';
@@ -15,6 +16,7 @@ interface SyncConfigurationSectionProps {
 export const SyncConfigurationSection = ({ syncConfigurations }: SyncConfigurationSectionProps) => {
   const { toast } = useToast();
   const [runningSyncs, setRunningSyncs] = useState<Set<string>>(new Set());
+  const [pausingSyncs, setPausingSyncs] = useState<Set<string>>(new Set());
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -60,6 +62,7 @@ export const SyncConfigurationSection = ({ syncConfigurations }: SyncConfigurati
   };
 
   const handleRunSync = async (sync: SyncConfiguration) => {
+    console.log('🔄 [SyncConfigurationSection] Running sync:', sync.name);
     setRunningSyncs(prev => new Set(prev).add(sync.id));
     
     try {
@@ -71,6 +74,7 @@ export const SyncConfigurationSection = ({ syncConfigurations }: SyncConfigurati
         description: `${sync.name} foi executado com sucesso`,
       });
     } catch (error) {
+      console.error('❌ [SyncConfigurationSection] Sync error:', error);
       toast({
         title: "Erro na Sincronização",
         description: `Falha ao executar ${sync.name}`,
@@ -83,6 +87,57 @@ export const SyncConfigurationSection = ({ syncConfigurations }: SyncConfigurati
         return newSet;
       });
     }
+  };
+
+  const handleToggleSync = async (sync: SyncConfiguration) => {
+    console.log('⏯️ [SyncConfigurationSection] Toggling sync:', sync.name, 'current status:', sync.status);
+    setPausingSyncs(prev => new Set(prev).add(sync.id));
+    
+    try {
+      // Simulate API call to toggle sync status
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      const newStatus = sync.status === 'active' ? 'paused' : 'active';
+      const action = newStatus === 'active' ? 'ativada' : 'pausada';
+      
+      toast({
+        title: "Status Alterado",
+        description: `Sincronização ${sync.name} foi ${action}`,
+      });
+      
+      console.log('✅ [SyncConfigurationSection] Sync status changed to:', newStatus);
+    } catch (error) {
+      console.error('❌ [SyncConfigurationSection] Toggle error:', error);
+      toast({
+        title: "Erro",
+        description: `Falha ao alterar status de ${sync.name}`,
+        variant: "destructive",
+      });
+    } finally {
+      setPausingSyncs(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(sync.id);
+        return newSet;
+      });
+    }
+  };
+
+  const handleEditSync = (sync: SyncConfiguration) => {
+    console.log('✏️ [SyncConfigurationSection] Edit sync:', sync.name);
+    toast({
+      title: "Edição de Sincronização",
+      description: `Abrindo configurações para ${sync.name}`,
+    });
+    // In a real implementation, this would open a modal or navigate to edit form
+  };
+
+  const handleDeleteSync = (sync: SyncConfiguration) => {
+    console.log('🗑️ [SyncConfigurationSection] Delete sync:', sync.name);
+    toast({
+      title: "Sincronização Removida",
+      description: `${sync.name} foi removida com sucesso`,
+    });
+    // In a real implementation, this would call an API to delete the sync
   };
 
   const formatDate = (dateString: string) => {
@@ -213,6 +268,7 @@ export const SyncConfigurationSection = ({ syncConfigurations }: SyncConfigurati
                         variant="outline"
                         onClick={() => handleRunSync(sync)}
                         disabled={runningSyncs.has(sync.id)}
+                        title="Executar Sincronização"
                       >
                         {runningSyncs.has(sync.id) ? (
                           <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary-600" />
@@ -220,19 +276,54 @@ export const SyncConfigurationSection = ({ syncConfigurations }: SyncConfigurati
                           <Play className="h-3 w-3" />
                         )}
                       </Button>
-                      <Button size="sm" variant="outline">
-                        {sync.status === 'active' ? (
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => handleToggleSync(sync)}
+                        disabled={pausingSyncs.has(sync.id)}
+                        title={sync.status === 'active' ? 'Pausar Sincronização' : 'Ativar Sincronização'}
+                      >
+                        {pausingSyncs.has(sync.id) ? (
+                          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary-600" />
+                        ) : sync.status === 'active' ? (
                           <Pause className="h-3 w-3" />
                         ) : (
                           <Play className="h-3 w-3" />
                         )}
                       </Button>
-                      <Button size="sm" variant="outline">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => handleEditSync(sync)}
+                        title="Editar Sincronização"
+                      >
                         <Edit className="h-3 w-3" />
                       </Button>
-                      <Button size="sm" variant="outline">
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button size="sm" variant="outline" title="Excluir Sincronização">
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Tem certeza que deseja remover a sincronização "{sync.name}"? 
+                              Esta ação não pode ser desfeita e todos os dados de configuração serão perdidos.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogAction 
+                              onClick={() => handleDeleteSync(sync)}
+                              className="bg-red-600 hover:bg-red-700"
+                            >
+                              Remover
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </TableCell>
                 </TableRow>
