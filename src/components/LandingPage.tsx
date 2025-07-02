@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowDown, Check, ChevronDown, Sparkles, TrendingUp, BarChart3, Target, Zap, Shield, Star, Play, DollarSign } from 'lucide-react';
+import { ArrowDown, Check, ChevronDown, Sparkles, TrendingUp, BarChart3, Target, Zap, Shield, Star, Play } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 interface LandingPageProps {
@@ -66,9 +66,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick, onSignup
     <div className="min-h-screen gradient-purple-subtle">
       {/* Floating elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <DollarSign className="absolute top-20 left-10 w-16 h-16 text-success-light opacity-30 animate-float" />
-        <DollarSign className="absolute top-1/2 right-20 w-12 h-12 text-success opacity-40 animate-float" style={{ animationDelay: '-2s' }} />
-        <DollarSign className="absolute bottom-32 left-1/4 w-20 h-20 text-success-glow opacity-25 animate-float" style={{ animationDelay: '-4s' }} />
       </div>
 
       {/* Header */}
