@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,13 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
   const [loadingIntegration, setLoadingIntegration] = useState<string | null>(null);
   const [selectedIntegration, setSelectedIntegration] = useState<ExternalIntegration | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [localIntegrations, setLocalIntegrations] = useState<ExternalIntegration[]>([]);
+
+  // Sync local state with props
+  useEffect(() => {
+    console.log('🔄 [ExternalIntegrationsSection] Syncing integrations from props:', integrations.length);
+    setLocalIntegrations([...integrations]);
+  }, [integrations]);
 
   const getIntegrationIcon = (icon: string) => {
     const icons = {
@@ -93,6 +100,11 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
       ...integration, 
       status: newStatus as 'connected' | 'disconnected' | 'error'
     };
+
+    // Update local state immediately for instant UI feedback
+    setLocalIntegrations(prev => 
+      prev.map(int => int.id === integration.id ? updatedIntegration : int)
+    );
     
     try {
       await updateIntegration(updatedIntegration);
@@ -104,6 +116,12 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
       });
     } catch (error) {
       console.error('❌ [ExternalIntegrationsSection] Error updating integration:', error);
+      
+      // Revert local state on error
+      setLocalIntegrations(prev => 
+        prev.map(int => int.id === integration.id ? integration : int)
+      );
+      
       toast({
         title: "Erro",
         description: "Falha ao atualizar integração",
@@ -144,7 +162,7 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
     return date.toLocaleString('pt-BR');
   };
 
-  console.log('🏗️ [ExternalIntegrationsSection] Rendering with integrations:', integrations.length);
+  console.log('🏗️ [ExternalIntegrationsSection] Rendering with local integrations:', localIntegrations.length);
 
   return (
     <div className="space-y-6">
@@ -162,7 +180,7 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {integrations.map((integration) => {
+        {localIntegrations.map((integration) => {
           const IconComponent = getIntegrationIcon(integration.icon);
           
           return (

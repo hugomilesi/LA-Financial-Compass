@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { SystemSettingsData, ExternalIntegration, Webhook, Credential, SyncConfiguration, IntegrationLog, SystemParameter } from '@/types/systemSettings';
 import { getSystemSettingsData } from '@/utils/systemSettingsData';
@@ -29,23 +28,33 @@ export const useSystemSettings = () => {
   }, []);
 
   const updateIntegration = async (integration: ExternalIntegration) => {
-    console.log('🔄 [useSystemSettings] Updating integration:', integration.name);
+    console.log('🔄 [useSystemSettings] Updating integration:', integration.name, 'with status:', integration.status);
     if (!data) {
       console.warn('⚠️ [useSystemSettings] No data available for update');
       return;
     }
     
-    const updatedIntegrations = data.integrations.map(int => 
-      int.id === integration.id ? { ...integration, lastSync: new Date().toISOString() } : int
-    );
+    const updatedIntegrations = data.integrations.map(int => {
+      if (int.id === integration.id) {
+        const updated = { ...integration, lastSync: new Date().toISOString() };
+        console.log('✅ [useSystemSettings] Integration updated:', updated.name, 'new status:', updated.status);
+        return updated;
+      }
+      return int;
+    });
     
     const updatedData = {
       ...data,
       integrations: updatedIntegrations
     };
     
-    console.log('✅ [useSystemSettings] Integration updated in state');
+    console.log('✅ [useSystemSettings] Setting updated data in state');
     setData(updatedData);
+    
+    // Force a re-render by creating a completely new object
+    setTimeout(() => {
+      setData(prev => prev ? { ...prev } : null);
+    }, 0);
   };
 
   const updateWebhook = async (webhook: Webhook) => {
