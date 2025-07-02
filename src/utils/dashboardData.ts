@@ -131,21 +131,19 @@ export const getPrimaryKPIs = (unitId: string, period?: PeriodFilter, customGoal
   console.log('📊 [dashboardData.getPrimaryKPIs] Net Margin:', netMargin);
 
   // Traffic light system based on goals
-  const getTrafficLightStatus = (current: number, target: number, isPercentage = false, isReversed = false) => {
-    const threshold = isPercentage ? target : (target / 100) * (isPercentage ? 100 : 1);
-    const goodThreshold = isReversed ? threshold * 0.9 : threshold * 0.9;
-    const excellentThreshold = isReversed ? threshold * 0.8 : target;
+  const getTrafficLightStatus = (current: number, target: number, isReversed = false) => {
+    const percentage = isReversed ? (1 - (current / target)) * 100 : (current / target) * 100;
     
     if (isReversed) {
-      // For expenses - lower is better
-      if (current <= excellentThreshold) return 'success' as const;
-      if (current <= goodThreshold) return 'warning' as const;
-      return 'danger' as const;
+      // For expenses - lower is better (percentage represents savings from target)
+      if (percentage >= 10) return 'success' as const;  // 10%+ under budget
+      if (percentage >= 0) return 'warning' as const;   // On budget or slightly under
+      return 'danger' as const;  // Over budget
     } else {
       // For revenue, margin - higher is better
-      if (current >= excellentThreshold) return 'success' as const;
-      if (current >= goodThreshold) return 'warning' as const;
-      return 'danger' as const;
+      if (percentage >= 95) return 'success' as const;  // 95%+ of goal
+      if (percentage >= 80) return 'warning' as const;  // 80-94% of goal
+      return 'danger' as const;  // Less than 80% of goal
     }
   };
 
@@ -160,7 +158,7 @@ export const getPrimaryKPIs = (unitId: string, period?: PeriodFilter, customGoal
       title: 'Receita Total',
       value: `R$ ${totalRevenue.toLocaleString()}`,
       change: revenueChange,
-      target: Math.round((totalRevenue / revenueGoal) * 100),
+      target: Math.min(100, Math.round((totalRevenue / revenueGoal) * 100)),
       icon: 'DollarSign',
       alert: getTrafficLightStatus(totalRevenue, revenueGoal),
       subtitle: `Meta: R$ ${revenueGoal.toLocaleString()}`
@@ -169,16 +167,16 @@ export const getPrimaryKPIs = (unitId: string, period?: PeriodFilter, customGoal
       title: 'Despesa Total',
       value: `R$ ${totalExpenses.toLocaleString()}`,
       change: expenseChange,
-      target: Math.round((1 - (totalExpenses / expenseGoal)) * 100),
+      target: Math.max(0, Math.min(100, Math.round((1 - (totalExpenses / expenseGoal)) * 100))),
       icon: 'CreditCard',
-      alert: getTrafficLightStatus(totalExpenses, expenseGoal, false, true),
+      alert: getTrafficLightStatus(totalExpenses, expenseGoal, true),
       subtitle: `Limite: R$ ${expenseGoal.toLocaleString()}`
     },
     {
       title: 'Geração de Caixa',
       value: `R$ ${cashGeneration.toLocaleString()}`,
       change: cashChange,
-      target: Math.round((cashGeneration / cashGoal) * 100),
+      target: Math.min(100, Math.round((cashGeneration / cashGoal) * 100)),
       icon: 'TrendingUp',
       alert: getTrafficLightStatus(cashGeneration, cashGoal),
       subtitle: `Meta: R$ ${cashGoal.toLocaleString()}`
@@ -187,9 +185,9 @@ export const getPrimaryKPIs = (unitId: string, period?: PeriodFilter, customGoal
       title: 'Margem Líquida',
       value: `${netMargin.toFixed(1)}%`,
       change: marginChange,
-      target: Math.round((netMargin / marginGoal) * 100),
+      target: Math.min(100, Math.round((netMargin / marginGoal) * 100)),
       icon: 'Percent',
-      alert: getTrafficLightStatus(netMargin, marginGoal, true),
+      alert: getTrafficLightStatus(netMargin, marginGoal),
       subtitle: `Meta: ${marginGoal}%`
     }
   ];
@@ -260,19 +258,18 @@ export const getSecondaryKPIs = (unitId: string, period?: PeriodFilter, customGo
 
   // Traffic light system for secondary KPIs
   const getSecondaryTrafficLightStatus = (current: number, target: number, isReversed = false) => {
-    const goodThreshold = isReversed ? target * 1.1 : target * 0.9;
-    const excellentThreshold = isReversed ? target * 1.3 : target;
+    const percentage = isReversed ? (1 - (current / target)) * 100 : (current / target) * 100;
     
     if (isReversed) {
       // For cost per student, delinquency - lower is better
-      if (current <= excellentThreshold) return 'success' as const;
-      if (current <= goodThreshold) return 'warning' as const;
-      return 'danger' as const;
+      if (percentage >= 10) return 'success' as const;  // 10%+ under target
+      if (percentage >= 0) return 'warning' as const;   // At target or slightly under
+      return 'danger' as const;  // Over target
     } else {
       // For ticket, students - higher is better
-      if (current >= excellentThreshold) return 'success' as const;
-      if (current >= goodThreshold) return 'warning' as const;
-      return 'danger' as const;
+      if (percentage >= 95) return 'success' as const;  // 95%+ of goal
+      if (percentage >= 80) return 'warning' as const;  // 80-94% of goal
+      return 'danger' as const;  // Less than 80% of goal
     }
   };
 
@@ -287,7 +284,7 @@ export const getSecondaryKPIs = (unitId: string, period?: PeriodFilter, customGo
       title: 'Ticket Médio',
       value: `R$ ${averageTicket}`,
       change: ((averageTicket - previousAverageTicket) / previousAverageTicket) * 100,
-      target: Math.round((averageTicket / ticketGoal) * 100),
+      target: Math.min(100, Math.round((averageTicket / ticketGoal) * 100)),
       icon: 'Receipt',
       alert: getSecondaryTrafficLightStatus(averageTicket, ticketGoal),
       subtitle: `Meta: R$ ${ticketGoal}`
@@ -296,7 +293,7 @@ export const getSecondaryKPIs = (unitId: string, period?: PeriodFilter, customGo
       title: 'Custo por Aluno',
       value: `R$ ${costPerStudent}`,
       change: ((costPerStudent - previousCostPerStudent) / previousCostPerStudent) * 100,
-      target: Math.round((1 - (costPerStudent / costPerStudentGoal)) * 100),
+      target: Math.max(0, Math.min(100, Math.round((1 - (costPerStudent / costPerStudentGoal)) * 100))),
       icon: 'DollarSign',
       alert: getSecondaryTrafficLightStatus(costPerStudent, costPerStudentGoal, true),
       subtitle: `Máximo: R$ ${costPerStudentGoal}`
@@ -305,7 +302,7 @@ export const getSecondaryKPIs = (unitId: string, period?: PeriodFilter, customGo
       title: 'Alunos Ativos',
       value: currentActiveStudents.toLocaleString(),
       change: ((currentActiveStudents - previousActiveStudents) / previousActiveStudents) * 100,
-      target: Math.round((currentActiveStudents / studentsGoal) * 100),
+      target: Math.min(100, Math.round((currentActiveStudents / studentsGoal) * 100)),
       icon: 'Users',
       alert: getSecondaryTrafficLightStatus(currentActiveStudents, studentsGoal),
       subtitle: `Meta: ${studentsGoal} alunos`
@@ -314,10 +311,10 @@ export const getSecondaryKPIs = (unitId: string, period?: PeriodFilter, customGo
       title: 'Inadimplência (%)',
       value: `${currentDelinquency.toFixed(1)}%`,
       change: delinquencyChange,
-      target: Math.round((1 - (currentDelinquency / 8)) * 100), // Show progress towards 0% on 8% scale
+      target: Math.max(0, Math.min(100, Math.round((1 - (currentDelinquency / 8)) * 100))),
       icon: 'TrendingDown',
-      alert: currentDelinquency <= 3.0 ? 'success' as const : 
-             currentDelinquency <= 5.0 ? 'warning' as const : 'danger' as const,
+      alert: currentDelinquency <= delinquencyGoal ? 'success' as const : 
+             currentDelinquency <= delinquencyGoal * 1.5 ? 'warning' as const : 'danger' as const,
       subtitle: `Máximo: ${delinquencyGoal}%`
     }
   ];
