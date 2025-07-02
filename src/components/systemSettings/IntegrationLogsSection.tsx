@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -6,7 +5,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
 import { IntegrationLog } from '@/types/systemSettings';
+import { exportLogsToCSV } from '@/utils/logExport';
 import { Search, Filter, Download, AlertCircle, CheckCircle, Info, AlertTriangle } from 'lucide-react';
 
 interface IntegrationLogsSectionProps {
@@ -14,9 +15,11 @@ interface IntegrationLogsSectionProps {
 }
 
 export const IntegrationLogsSection = ({ logs }: IntegrationLogsSectionProps) => {
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [levelFilter, setLevelFilter] = useState('all');
   const [serviceFilter, setServiceFilter] = useState('all');
+  const [isExporting, setIsExporting] = useState(false);
 
   const getLevelColor = (level: string) => {
     switch (level) {
@@ -87,9 +90,33 @@ export const IntegrationLogsSection = ({ logs }: IntegrationLogsSectionProps) =>
 
   const uniqueServices = Array.from(new Set(logs.map(log => log.service)));
 
-  const handleExportLogs = () => {
-    // Simulate export functionality
-    console.log('Exporting logs...');
+  const handleExportLogs = async () => {
+    console.log('📊 [IntegrationLogsSection] Starting logs export...');
+    setIsExporting(true);
+    
+    try {
+      const filename = exportLogsToCSV(logs, {
+        search: searchTerm,
+        level: levelFilter,
+        service: serviceFilter
+      });
+      
+      toast({
+        title: "Logs Exportados",
+        description: `${filteredLogs.length} logs foram exportados para ${filename}`,
+      });
+      
+      console.log('✅ [IntegrationLogsSection] Export completed successfully');
+    } catch (error) {
+      console.error('❌ [IntegrationLogsSection] Export failed:', error);
+      toast({
+        title: "Erro na Exportação",
+        description: "Falha ao exportar os logs. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
@@ -101,9 +128,13 @@ export const IntegrationLogsSection = ({ logs }: IntegrationLogsSectionProps) =>
             Monitore e analise logs de todas as integrações e operações do sistema.
           </p>
         </div>
-        <Button onClick={handleExportLogs}>
-          <Download className="h-4 w-4" />
-          Exportar Logs
+        <Button onClick={handleExportLogs} disabled={isExporting}>
+          {isExporting ? (
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-600" />
+          ) : (
+            <Download className="h-4 w-4" />
+          )}
+          {isExporting ? 'Exportando...' : 'Exportar Logs'}
         </Button>
       </div>
 
