@@ -24,21 +24,21 @@ export const AppSidebar = ({ currentPage, onPageChange, onSignOut }: AppSidebarP
 
   return (
     <div className={cn(
-      "h-screen bg-primary-800 text-white flex flex-col transition-all duration-300 ease-in-out relative",
+      "h-screen bg-primary-600 text-primary-50 flex flex-col transition-all duration-300 ease-in-out relative",
       isExpanded ? "w-64" : "w-16"
     )}>
       {/* Header */}
-      <div className="p-4 border-b border-primary-700">
+      <div className="p-4 border-b border-primary-500">
         <div className="flex items-center justify-between">
           {isExpanded && (
             <div className="flex flex-col">
-              <h1 className="text-xl font-bold text-primary-100">Sistema Financeiro Inteligente</h1>
-              <p className="text-sm text-primary-300">Gestão Financeira</p>
+              <h1 className="text-xl font-bold text-white">Sistema Financeiro Inteligente</h1>
+              <p className="text-sm text-primary-200">Gestão Financeira</p>
             </div>
           )}
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-2 rounded-lg hover:bg-primary-700 transition-colors"
+            className="p-2 rounded-lg hover:bg-primary-500 transition-colors"
           >
             {isExpanded ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
           </button>
@@ -58,8 +58,8 @@ export const AppSidebar = ({ currentPage, onPageChange, onSignOut }: AppSidebarP
               className={cn(
                 "w-full flex items-center p-3 rounded-lg transition-all duration-200 group",
                 isActive 
-                  ? "bg-primary-600 text-white shadow-lg" 
-                  : "hover:bg-primary-700 text-primary-200 hover:text-white"
+                  ? "bg-primary-400 text-white shadow-lg" 
+                  : "hover:bg-primary-500 text-primary-100 hover:text-white"
               )}
             >
               <IconComponent size={20} className="flex-shrink-0" />
@@ -75,13 +75,13 @@ export const AppSidebar = ({ currentPage, onPageChange, onSignOut }: AppSidebarP
       </nav>
 
       {/* Footer */}
-      <div className="p-4 border-t border-primary-700">
+      <div className="p-4 border-t border-primary-500">
         {onSignOut && (
           <button
             onClick={onSignOut}
             className={cn(
               "w-full flex items-center p-3 rounded-lg transition-all duration-200 mb-2",
-              "hover:bg-primary-700 text-primary-200 hover:text-white"
+              "hover:bg-primary-500 text-primary-100 hover:text-white"
             )}
           >
             <LogOut size={20} className="flex-shrink-0" />
@@ -91,7 +91,7 @@ export const AppSidebar = ({ currentPage, onPageChange, onSignOut }: AppSidebarP
           </button>
         )}
         {isExpanded && (
-          <div className="text-xs text-primary-300">
+          <div className="text-xs text-primary-200">
             <p>Versão 2.0</p>
             <p>© 2024 Sistema Financeiro Inteligente</p>
           </div>
