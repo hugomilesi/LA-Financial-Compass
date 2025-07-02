@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -245,7 +244,7 @@ export const SystemParametersSection = ({ parameters }: SystemParametersSectionP
                         {parameter.key}
                       </code>
                       {parameter.sensitive && (
-                        <Lock className="h-4 w-4 text-amber-500" title="Parâmetro sensível" />
+                        <Lock className="h-4 w-4 text-amber-500" aria-label="Parâmetro sensível" />
                       )}
                     </div>
                   </TableCell>

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -82,7 +81,10 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
 
   const handleToggleIntegration = async (integration: ExternalIntegration) => {
     const newStatus = integration.status === 'connected' ? 'disconnected' : 'connected';
-    const updatedIntegration = { ...integration, status: newStatus };
+    const updatedIntegration: ExternalIntegration = { 
+      ...integration, 
+      status: newStatus as 'connected' | 'disconnected' | 'error'
+    };
     
     await updateIntegration(updatedIntegration);
     
