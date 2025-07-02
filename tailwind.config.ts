@@ -26,15 +26,20 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: '#1E40AF',
-					50: '#EFF6FF',
-					100: '#DBEAFE',
-					500: '#3B82F6',
-					600: '#2563EB',
-					700: '#1D4ED8',
-					800: '#1E40AF',
-					900: '#1E3A8A',
-					foreground: 'hsl(var(--primary-foreground))'
+					DEFAULT: 'hsl(var(--primary))',
+					50: 'hsl(280 100% 97%)',
+					100: 'hsl(280 100% 95%)',
+					200: 'hsl(280 100% 90%)',
+					300: 'hsl(280 100% 85%)',
+					400: 'hsl(280 100% 75%)',
+					500: 'hsl(268 83% 58%)',
+					600: 'hsl(268 83% 50%)',
+					700: 'hsl(268 83% 42%)',
+					800: 'hsl(268 83% 35%)',
+					900: 'hsl(268 83% 25%)',
+					foreground: 'hsl(var(--primary-foreground))',
+					glow: 'hsl(var(--primary-glow))',
+					dark: 'hsl(var(--primary-dark))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -142,7 +147,9 @@ export default {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'fade-in': 'fade-in 0.3s ease-out',
-				'pulse-glow': 'pulse-glow 2s ease-in-out infinite'
+				'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+				'float': 'float 6s ease-in-out infinite',
+				'glow': 'glow 2s ease-in-out infinite alternate'
 			}
 		}
 	},

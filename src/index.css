@@ -15,11 +15,13 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 268 83% 58%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 280 100% 85%;
+    --primary-dark: 268 83% 42%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 280 20% 96%;
+    --secondary-foreground: 268 83% 20%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
@@ -99,5 +101,51 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Custom gradients and animations */
+  .gradient-primary {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+  }
+  
+  .gradient-purple-subtle {
+    background: linear-gradient(135deg, hsl(var(--primary-glow) / 0.1), hsl(var(--primary) / 0.05));
+  }
+  
+  .gradient-purple-glass {
+    background: linear-gradient(135deg, hsl(var(--primary) / 0.1), hsl(var(--primary-glow) / 0.2));
+    backdrop-filter: blur(10px);
+    border: 1px solid hsl(var(--primary) / 0.2);
+  }
+  
+  .glow-purple {
+    box-shadow: 0 0 40px hsl(var(--primary-glow) / 0.3);
+  }
+  
+  .hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px hsl(var(--primary) / 0.15);
+  }
+  
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+  
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+  
+  @keyframes glow {
+    from { box-shadow: 0 0 20px hsl(var(--primary-glow) / 0.4); }
+    to { box-shadow: 0 0 40px hsl(var(--primary-glow) / 0.8); }
   }
 }
