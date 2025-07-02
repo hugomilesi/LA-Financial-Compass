@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight, Home, TrendingUp, FileText, Target, Settings, Building, DollarSign, BookOpen } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Home, TrendingUp, FileText, Target, Settings, Building, DollarSign, BookOpen, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface AppSidebarProps {
   currentPage: string;
   onPageChange: (page: string) => void;
+  onSignOut?: () => void;
 }
 
-export const AppSidebar = ({ currentPage, onPageChange }: AppSidebarProps) => {
+export const AppSidebar = ({ currentPage, onPageChange, onSignOut }: AppSidebarProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
 
   const menuItems = [
@@ -75,10 +76,24 @@ export const AppSidebar = ({ currentPage, onPageChange }: AppSidebarProps) => {
 
       {/* Footer */}
       <div className="p-4 border-t border-primary-700">
+        {onSignOut && (
+          <button
+            onClick={onSignOut}
+            className={cn(
+              "w-full flex items-center p-3 rounded-lg transition-all duration-200 mb-2",
+              "hover:bg-primary-700 text-primary-200 hover:text-white"
+            )}
+          >
+            <LogOut size={20} className="flex-shrink-0" />
+            {isExpanded && (
+              <span className="ml-3 text-sm font-medium">Sair</span>
+            )}
+          </button>
+        )}
         {isExpanded && (
           <div className="text-xs text-primary-300">
             <p>Versão 2.0</p>
-            <p>© 2024 LA Music</p>
+            <p>© 2024 Financial Compass</p>
           </div>
         )}
       </div>

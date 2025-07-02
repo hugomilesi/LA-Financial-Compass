@@ -8,9 +8,15 @@ import { ChartOfAccountsPage } from '@/components/ChartOfAccountsPage';
 import { CostCenterCategoriesPage } from '@/components/CostCenterCategoriesPage';
 import { UnitPerformancePage } from '@/components/UnitPerformancePage';
 import { SystemSettingsPage } from '@/components/SystemSettingsPage';
+import { LandingPage } from '@/components/LandingPage';
+import { AuthPage } from '@/components/auth/AuthPage';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Index = () => {
   const [currentPage, setCurrentPage] = useState('dashboard');
+  const [authMode, setAuthMode] = useState<'landing' | 'login' | 'signup'>('landing');
+  const { signOut } = useAuth();
 
   const renderPage = () => {
     switch (currentPage) {
@@ -35,13 +41,39 @@ const Index = () => {
     }
   };
 
-  return (
+  const renderAuthContent = () => {
+    switch (authMode) {
+      case 'login':
+        return <AuthPage initialMode="login" onBack={() => setAuthMode('landing')} />;
+      case 'signup':
+        return <AuthPage initialMode="signup" onBack={() => setAuthMode('landing')} />;
+      default:
+        return (
+          <LandingPage
+            onLoginClick={() => setAuthMode('login')}
+            onSignupClick={() => setAuthMode('signup')}
+          />
+        );
+    }
+  };
+
+  const dashboardContent = (
     <div className="min-h-screen flex w-full bg-gray-50">
-      <AppSidebar currentPage={currentPage} onPageChange={setCurrentPage} />
+      <AppSidebar 
+        currentPage={currentPage} 
+        onPageChange={setCurrentPage}
+        onSignOut={signOut}
+      />
       <main className="flex-1 overflow-auto">
         {renderPage()}
       </main>
     </div>
+  );
+
+  return (
+    <ProtectedRoute fallback={renderAuthContent()}>
+      {dashboardContent}
+    </ProtectedRoute>
   );
 };
 
