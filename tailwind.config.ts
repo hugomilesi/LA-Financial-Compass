@@ -89,6 +89,11 @@ export default {
 					600: '#DC2626',
 					700: '#B91C1C',
 				},
+				success: {
+					DEFAULT: 'hsl(var(--success))',
+					light: 'hsl(var(--success-light))',
+					glow: 'hsl(var(--success-glow))',
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
