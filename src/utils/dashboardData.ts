@@ -68,7 +68,7 @@ const getMonthlyDataPoint = (unitId: string, year: number, month: number) => {
 };
 
 // Dynamic KPI calculations based on selected unit and period
-export const getPrimaryKPIs = (unitId: string, period?: PeriodFilter) => {
+export const getPrimaryKPIs = (unitId: string, period?: PeriodFilter, customGoals?: Record<string, number>) => {
   console.log('🎯 [dashboardData.getPrimaryKPIs] Starting calculation for unit:', unitId, 'Period:', period);
   
   const historicalData = getHistoricalDataByUnit(unitId);
@@ -149,11 +149,11 @@ export const getPrimaryKPIs = (unitId: string, period?: PeriodFilter) => {
     }
   };
 
-  // Define goals for each KPI
-  const revenueGoal = 800000; // R$ 800K monthly goal
-  const expenseGoal = 600000; // R$ 600K expense limit
-  const cashGoal = 200000; // R$ 200K cash generation goal
-  const marginGoal = 25; // 25% margin goal
+  // Define goals for each KPI (use custom goals if provided, otherwise defaults)
+  const revenueGoal = customGoals?.['Receita Total'] || 800000; // R$ 800K monthly goal
+  const expenseGoal = customGoals?.['Despesa Total'] || 600000; // R$ 600K expense limit
+  const cashGoal = customGoals?.['Geração de Caixa'] || 200000; // R$ 200K cash generation goal
+  const marginGoal = customGoals?.['Margem Líquida'] || 25; // 25% margin goal
 
   const result = [
     {
@@ -198,7 +198,7 @@ export const getPrimaryKPIs = (unitId: string, period?: PeriodFilter) => {
   return result;
 };
 
-export const getSecondaryKPIs = (unitId: string, period?: PeriodFilter) => {
+export const getSecondaryKPIs = (unitId: string, period?: PeriodFilter, customGoals?: Record<string, number>) => {
   console.log('🎯 [dashboardData.getSecondaryKPIs] Starting calculation for unit:', unitId, 'Period:', period);
   
   const data = getDataByUnit(unitId);
@@ -276,11 +276,11 @@ export const getSecondaryKPIs = (unitId: string, period?: PeriodFilter) => {
     }
   };
 
-  // Define goals for secondary KPIs
-  const ticketGoal = 850; // R$ 850 ticket goal
-  const costPerStudentGoal = 380; // R$ 380 max cost per student
-  const studentsGoal = 500; // 500 students goal
-  const delinquencyGoal = 3.0; // 3% max delinquency
+  // Define goals for secondary KPIs (use custom goals if provided, otherwise defaults)
+  const ticketGoal = customGoals?.['Ticket Médio'] || 850; // R$ 850 ticket goal
+  const costPerStudentGoal = customGoals?.['Custo por Aluno'] || 380; // R$ 380 max cost per student
+  const studentsGoal = customGoals?.['Alunos Ativos'] || 500; // 500 students goal
+  const delinquencyGoal = customGoals?.['Inadimplência (%)'] || 3.0; // 3% max delinquency
 
   const result = [
     {

@@ -4,6 +4,7 @@ import { DollarSign, Users, TrendingUp, Percent, Target, CreditCard, Receipt, Tr
 import { getPrimaryKPIs, getSecondaryKPIs } from '@/utils/dashboardData';
 import { useUnit } from '@/contexts/UnitContext';
 import { usePeriod } from '@/contexts/PeriodContext';
+import { useKPIGoals } from '@/hooks/useKPIGoals';
 import { useEffect, useMemo } from 'react';
 
 interface KPISectionsProps {
@@ -24,6 +25,7 @@ const iconMap = {
 export const KPISections = ({ onKPIClick }: KPISectionsProps) => {
   const { selectedUnit } = useUnit();
   const { periodFilter } = usePeriod();
+  const { goals, loading: goalsLoading } = useKPIGoals(selectedUnit);
   
   useEffect(() => {
     console.log('🔄 [KPISections] Unit changed to:', selectedUnit);
@@ -36,13 +38,13 @@ export const KPISections = ({ onKPIClick }: KPISectionsProps) => {
   // Use useMemo to recalculate KPIs when dependencies change
   const primaryKPIs = useMemo(() => {
     console.log('🔄 [KPISections] Recalculating primary KPIs...');
-    return getPrimaryKPIs(selectedUnit, periodFilter);
-  }, [selectedUnit, periodFilter]);
+    return getPrimaryKPIs(selectedUnit, periodFilter, goals);
+  }, [selectedUnit, periodFilter, goals]);
   
   const secondaryKPIs = useMemo(() => {
     console.log('🔄 [KPISections] Recalculating secondary KPIs...');
-    return getSecondaryKPIs(selectedUnit, periodFilter);
-  }, [selectedUnit, periodFilter]);
+    return getSecondaryKPIs(selectedUnit, periodFilter, goals);
+  }, [selectedUnit, periodFilter, goals]);
 
   console.log('📊 [KPISections] Primary KPIs:', primaryKPIs);
   console.log('📊 [KPISections] Secondary KPIs:', secondaryKPIs);

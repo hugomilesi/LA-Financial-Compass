@@ -2,11 +2,15 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, TrendingDown, DollarSign, Target, Calendar } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { TrendingUp, TrendingDown, DollarSign, Target, Calendar, Settings } from 'lucide-react';
 import { useUnit } from '@/contexts/UnitContext';
 import { usePeriod } from '@/contexts/PeriodContext';
+import { useKPIGoals } from '@/hooks/useKPIGoals';
 import { getMonthlyData } from '@/utils/dashboardData';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { EditGoalModal } from './EditGoalModal';
+import { useState } from 'react';
 
 interface RevenueDetailModalProps {
   isOpen: boolean;
@@ -16,11 +20,14 @@ interface RevenueDetailModalProps {
 export const RevenueDetailModal = ({ isOpen, onClose }: RevenueDetailModalProps) => {
   const { selectedUnit, getUnitDisplayName } = useUnit();
   const { getDisplayPeriod } = usePeriod();
+  const { getGoal, updateGoal, resetToDefault, updating } = useKPIGoals(selectedUnit);
+  const [isEditGoalOpen, setIsEditGoalOpen] = useState(false);
   const monthlyData = getMonthlyData(selectedUnit);
 
   const currentRevenue = monthlyData[monthlyData.length - 1]?.receita || 0;
   const previousRevenue = monthlyData[monthlyData.length - 2]?.receita || 0;
   const revenueChange = ((currentRevenue - previousRevenue) / previousRevenue) * 100;
+  const revenueGoal = getGoal('Receita Total');
 
   // Revenue breakdown
   const revenueBreakdown = [
@@ -32,8 +39,16 @@ export const RevenueDetailModal = ({ isOpen, onClose }: RevenueDetailModalProps)
   const chartData = monthlyData.map(item => ({
     month: item.month,
     receita: item.receita,
-    meta: Math.round(item.receita * 1.08)
+    meta: revenueGoal
   }));
+
+  const handleSaveGoal = async (newGoal: number) => {
+    return await updateGoal('Receita Total', newGoal);
+  };
+
+  const handleResetGoal = async () => {
+    return await resetToDefault('Receita Total');
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -72,16 +87,26 @@ export const RevenueDetailModal = ({ isOpen, onClose }: RevenueDetailModalProps)
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">Meta Mensal</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-medium text-gray-600">Meta Mensal</CardTitle>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsEditGoalOpen(true)}
+                    className="h-6 w-6 p-0"
+                  >
+                    <Settings className="w-3 h-3" />
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-blue-600 mb-1">
-                  R$ {Math.round(currentRevenue * 1.08).toLocaleString()}
+                  R$ {revenueGoal.toLocaleString()}
                 </div>
                 <div className="flex items-center gap-1">
                   <Target className="w-4 h-4 text-blue-500" />
                   <span className="text-sm text-blue-600">
-                    {((currentRevenue / (currentRevenue * 1.08)) * 100).toFixed(1)}% atingido
+                    {((currentRevenue / revenueGoal) * 100).toFixed(1)}% atingido
                   </span>
                 </div>
               </CardContent>
@@ -171,6 +196,18 @@ export const RevenueDetailModal = ({ isOpen, onClose }: RevenueDetailModalProps)
           </Card>
         </div>
       </DialogContent>
+
+      {/* Edit Goal Modal */}
+      <EditGoalModal
+        isOpen={isEditGoalOpen}
+        onClose={() => setIsEditGoalOpen(false)}
+        kpiName="Receita Total"
+        currentGoal={revenueGoal}
+        unit="R$"
+        onSave={handleSaveGoal}
+        onReset={handleResetGoal}
+        isUpdating={updating}
+      />
     </Dialog>
   );
 };
