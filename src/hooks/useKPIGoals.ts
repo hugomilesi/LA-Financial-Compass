@@ -37,11 +37,11 @@ export const useKPIGoals = (unitId: string = 'all') => {
     }
 
     try {
-      const { data, error } = await supabase
-        .from('kpi_goals')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('unit_id', unitId);
+      let query = supabase.from('goals').select('*');
+      if (unitId !== 'all') {
+        query = query.eq('unit_id', unitId);
+      }
+      const { data, error } = await query;
 
       if (error) {
         console.error('Error fetching KPI goals:', error);
@@ -51,7 +51,7 @@ export const useKPIGoals = (unitId: string = 'all') => {
 
       // Merge custom goals with defaults
       const customGoals = data?.reduce((acc, goal) => {
-        acc[goal.kpi_name] = goal.goal_value;
+        acc[goal.kpi_name] = goal.goal_value; // Changed from goal.name to goal.kpi_name and goal.target_value to goal.goal_value
         return acc;
       }, {} as Record<string, number>) || {};
 
@@ -73,14 +73,14 @@ export const useKPIGoals = (unitId: string = 'all') => {
     setUpdating(true);
     try {
       const { error } = await supabase
-        .from('kpi_goals')
+        .from('goals')
         .upsert({
-          user_id: user.id,
-          kpi_name: kpiName,
-          goal_value: goalValue,
-          unit_id: unitId
+          kpi_name: kpiName, // Changed from name to kpi_name
+          goal_value: goalValue, // Changed from target_value to goal_value
+          unit_id: unitId === 'all' ? null : unitId, // Handle 'all' case
+          user_id: user.id // Added user_id
         }, {
-          onConflict: 'user_id,kpi_name,unit_id'
+          onConflict: 'kpi_name,unit_id' // Changed from name,unit_id to kpi_name,unit_id
         });
 
       if (error) {
@@ -118,12 +118,11 @@ export const useKPIGoals = (unitId: string = 'all') => {
 
     setUpdating(true);
     try {
-      const { error } = await supabase
-        .from('kpi_goals')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('kpi_name', kpiName)
-        .eq('unit_id', unitId);
+      let query = supabase.from('goals').delete().eq('kpi_name', kpiName); // Changed from name to kpi_name
+      if (unitId !== 'all') {
+        query = query.eq('unit_id', unitId);
+      }
+      const { error } = await query;
 
       if (error) {
         console.error('Error deleting KPI goal:', error);
@@ -142,7 +141,6 @@ export const useKPIGoals = (unitId: string = 'all') => {
     } catch (error) {
       console.error('Error in resetToDefault:', error);
       toast.error('Erro ao resetar meta do KPI');
-      return false;
     } finally {
       setUpdating(false);
     }

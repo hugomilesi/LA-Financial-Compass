@@ -1,0 +1,209 @@
+prompt criação de dashboard
+
+
+preciso que crie um dashboard com as seguintes especificações
+
+Detalhes do menu:
+- menu lateral retrátil com o titulo:
+ # LA Music
+ sistema financeiro
+
+
+- Paginas do menu lateral. Cada pagina deve ter um nome e um ícone que faça sentido:
+	-pagina "Dashboard" - visão geral
+	-pagina "KPIs" - indicarores chave
+	-pagina "Relatórios & DRE" - demonstrativos
+	-pagina "Plano de Contas" - contas contábeis
+	-pagina "Planejamento" - metas e objetivos
+	-pagina "Centro de Custos" - categorias
+	-pagina "Por Unidade" - desempenho
+	-pagina "Configurações" - sistema
+
+- Elementos da Página "Dashboard"
+	- filtros de data e unidade.
+	- card de receita total , despesa total, geração caixa, margem liquida, ticket medio, custo por aluno, alunos 	ativos, % inadimplencia.
+	-  Todos os cards devem ser interativos e ter um botao de "clique para mais detalhes".
+	- cada card deve ter a variação em percentual referente ao mês anterior, uma barra de meta e mostrando a progressão e a porcentagem completa.
+	- Os cards também devem ter cores baseados de semáforo financeiro, se a meta foi atingida, então verde, se próximo da meta, então amarelo,
+    	  se estiver muito longe da meta, então vermelho.
+	- cada card deve ter um ícone que faça sentido com o titulo do card
+	- Gráfico de colunas de receita vs despesa baseado nos meses.
+	- Grafico de pizza demonstrando a distribuição do centro de custos.
+	- Um campo de insights do consultor IA, criando 3 tópicos detalhando os insights. os insights devem ter cores de fundo baseado no topo de insight: se positivo, 	  verde, se for alerta amarelo, se for ruim vermelho. Os insights devem conter também uma ação de melhoria, por exemplo:: "Ação: reduzir bônus variáveis em 15%"
+	- um campo de Ações rápidas ao final da pagina, contedo 4 cards: exportar DRE, definir metas, ver relatórios e análise de unidades.
+
+- Elementos da Página "KPIs"
+	- Filtro de Mês e um botão de exportar relatório
+	- Cards de CAC médio, LTV médio, Ticket Médio, Retenção, CRC médio
+	- Os cards devem ter cores, valores de comparação com mês anterior e ícones.
+	- Um gráfico de tabela por unidade (Campo Grande, Barra, Recreio), contendo o valor dos indicadores com cores referente ao semáforo.
+	- Grafico de linha com Evolução CAC vs LTV
+	- Grafico comparativo de CAC por Unidade 
+	- Metas vs Realizado: CAC target, LTV Target e Retenção Target, contendo a porcentagem de cada meta com 	cores do semáforo
+
+- Elementos da Pagina "Relatórios & DRE"
+	- Filtro de mês e botão de exportar relatório.
+	- Aba de DRE Gerencial
+		- Tabela de DRE Detalhada - 2024 contendo demonstrativo do resultado do Exercício. As tabelas devem 		conter as seguintes colunas: item(Receita bruta, deduções, receita liq, CAC, Lucro Bruto, Despesas 		eracionais, EBITIDA, etc. Valores negativos em vermelho, verde para valores positivos.
+	- Grafico de Colunas da Evolução Mensal (Receitas vs Despesas vc Lucro Bruto)
+	- Aba de Relatórios
+		- Card contendo o total de relatórios e o adicional de relatórios criados referente ao mês passado
+		- Card de contagem de relatórios em análise (aguardando revisao)
+		- Card de Valor total do período atual
+		- Tabela de Relatório de Despesas: Tabela contendo as seguintes colunas:
+			- Tipo de Relatório: Despesas administrativas, custos operacionais, despesas de vendas, 			despesas financeiras 
+			- Perido (mês/ano)
+			- Valor
+			- Status: Finalizado(verde), Em análise(amarelo)
+			- Ações: Botao para download
+	- Aba de Centro de Custos:
+		- Grafico de pizza de distribuicao por centro de custo(analise de custos por departamento-				marketing, vendas, administrativo, operacional)
+		- Tabela de Detalhamentos de custos:
+			-  coluna de centro de custo combinando com as fatias do grafico de pizza referente a cada 			departamento
+			- coluna de valor
+			- coluna de %Total
+	- Aba de Análises
+		- Grafico de linha de Tendencia de Lucro(Evolucao de lucro liquido mensal)
+		- Indicadores financeiros(principais metricas do periodo):
+			- Margem bruta - pct
+			- Margem EBITDA - pct
+			- Margem Liquida - pct
+			- ROI - pct
+			- Crescimento vs Mês Anterior - PCT
+	
+- Elementos da pagina "Plano de Contas" 
+	- Botao de Adicionar nova conta, filtro por unidade e um campo de busca de contas por nome ou codigo
+	- Card de contagem de contas encontradas.
+	- Campo com receitas, sendo possivel editar ou remove-las
+	- Campo Com despesas, sendo possivel editar ou remove-las
+	- Campo com Ativo(bens e direitos), sendo possivel editar ou remove-las 
+
+- Elementos da Página "Planejamento Financeiro"
+	- Filtros de periodo (ano e mes) e  unidade
+	- Aba de Dashboard:
+			- Cards de receita mensal (com meta, e aumento percentual mensal)
+			- Cards de Margem de lucro (com meta, e aumento percentual mensal)
+			- Cards de custos operacionais (com meta, e aumento percentual mensal)
+			- Cards de Alunos ativos (com meta, e aumento percentual mensal)
+		- Resumo de metas:
+			- Metas atingidas
+			- Media de atingimento
+			- Projecao Proximo Mes
+		- Proximas ações
+			- Exemplo(Revisao meta de receita)
+			- Exemplo(Analisar custos operacionais)
+			- Exemplo(Definir Estratégia de captação)
+			Observacao: todos com cores referente ao semaforo
+
+	- Aba de Metas Mensais: 
+		- Receita mensal (ativa), contendo a meta e a data de atualizacao
+		- Margem de lucro (Ativa), contendo a meta, data de atualizacao e o percentual de margem de lucro 		liq
+		- Alunos ativos(ativa), contendo a meta, data de atualizacao e o total de alunos ativos
+		Observacoes: todos os campos devem ter um botao de editar e exibir o histórico
+	- Aba de Projeções:
+		- card com próximos 3 meses contendo receita projetada
+		- card com próximos 6 meses contendo receita projetada
+		- card com proximo ano contendo receita projetada
+		- Cenários de projeção:
+			- cenário otimista e o valor (25% de probabilidade)
+			- cenário realista e o valor (50% de probabilidade)
+			- cenário conservador e o valor (25% de probabilidade)	
+		- Fatores de influencia:
+			Fatores Positivos
+				• Lançamento de novos produtos
+				• Expansão de mercado
+				• Melhoria na eficiência operacional
+			Riscos Identificados
+				• Instabilidade econômica
+				• Aumento da concorrência
+				• Flutuações sazonais
+	- Aba de Observações
+		- botão para criar uma nova observação
+		- filtro de categoria e prioridade
+		- Analise de performance Q1:
+			João Silva
+			19/06/2024
+			tag de Estratégico
+			Os resultados do primeiro trimestre superaram as expectativas em 15%. Principais fatores: 			aumento das vendas online e otimização de custos operacionais.
+		- Ajuste de Metas - Unidade Norte
+			- Maria Santos
+			- 17/06/2024
+			- tag de Operacional
+			- Necessário revisar as metas da Unidade Norte devido à sazonalidade do mercado local. 				- Proposta de redução de 8% na meta mensal.
+
+		- Alerta: Aumento de Custos
+			- Carlos Oliveira
+			- 14/06/2024
+			- Alerta
+			- Identificado aumento significativo nos custos de matéria-prima. Impacto estimado de R$ 				50.000 no orçamento mensal.
+
+		- Oportunidade de Expansão
+			- Ana Costa
+			- 11/06/2024
+			- Estratégico
+			- Análise de mercado indica oportunidade de expansão para região Sul. ROI estimado em 18 			meses.
+		Observações: deve conter uma accent bar com cores do semáforo, todos os campos devem ser possíveis 		editar ou remover. As tags devem também ser decoradas com cores do semáforo.
+
+As outras paginas ainda estão em desenvolvimento, então coloque apenas "Em deselvolvimento..."
+
+
+[indicadores]
+curl -X 'GET' \
+  'https://app.nocodb.com/api/v2/tables/mh8akh34j8ky09a/records?limit=25&shuffle=0&offset=0' \
+  -H 'accept: application/json' \
+  -H 'xc-token: RnIDA9hDi-kMnm-knGOyX0AWId86Hu9uSehGaQLN'
+
+
+fluxo caixa
+curl -X 'GET' \
+  'https://app.nocodb.com/api/v2/tables/m8n1q52ewmhjglb/records?limit=1000&shuffle=0&offset=0' \
+  -H 'accept: application/json' \
+  -H 'xc-token: RnIDA9hDi-kMnm-knGOyX0AWId86Hu9uSehGaQLN'
+
+
+
+[Funcionalidade dos Cards]
+where=(Unidade,eq,CG)~and(Mês,eq,jan./25)~and(Indicador,eq,LTV Valor)
+where=(Unidade,eq,CG)
+
+
+exemplo: coletar o falor do LTV para unidade CG para a data jan/25
+curl -X 'GET' \
+  'https://app.nocodb.com/api/v2/tables/mjuud56uv9pxs2p/records?viewId=vw9lfjl10l3srnwr&where=where%3D%28Unidade%2Ceq%2CCG%29~and%28M%C3%AAs%2Ceq%2Cjan.%2F25%29~and%28Indicador%2Ceq%2CLTV%20Valor%29&limit=25&shuffle=0&offset=0' \
+  -H 'accept: application/json' \
+  -H 'xc-token: RnIDA9hDi-kMnm-knGOyX0AWId86Hu9uSehGaQLN'
+
+preciso que colete o valor do campo para colocar no card e os filtros fiquem responsivos
+
+
+
+all the information needed to config this json is inside the .env file. If you need some more info, please let me know.          
+
+
+
+- the api has a 100 rows limit per page. To workaround this limitation, i will filter by specific indicator
+- this is the curl to get data of the indicator named "LTV Valor"
+curl -X 'GET' \
+  'https://app.nocodb.com/api/v2/tables/mjuud56uv9pxs2p/records?viewId=vw9lfjl10l3srnwr&where=where%3D%28Indicador%2Ceq%2CLTV%20Valor%29&limit=2000&shuffle=0&offset=0' \
+  -H 'accept: application/json' \
+  -H 'xc-token: RnIDA9hDi-kMnm-knGOyX0AWId86Hu9uSehGaQLN'
+
+here is the list of indicator for the dashboard section = [Receita (R$), R$ Despesas Fixas (R$), Geração de Caixa (R$, Margem de Contribuição (%), Ticket Médio (Parcelas), ]
+
+
+
+
+
+
+
+email_supabase = la.supabase@gmail.com
+supabase_senha = pQ7!z@3#RkL$9vW
+
+supabase_project_id= wicibyyfypcgldlzuxbk
+supabase_token = sbp_e0d1afbb58e9047e8f095682f0ab2a9176e3f9c1
+supabase_project_url = https://wicibyyfypcgldlzuxbk.supabase.co
+supabase_anon_key = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpY2lieXlmeXBjZ2xkbHp1eGJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NzIzMzEsImV4cCI6MjA2NzA0ODMzMX0.SsGa0sedWeCgoplgtFQ7WbknbMbL_5ddRZjsinUrHDI
+database_password = tE2tLupt82NfK2X5
+
+
+this are my credentials. i want you to create a database schema in supabase with sample data for this app and integrate the database to the frontend. First, analyse all the data needed by checking all the sections of the app, then create a database schema in supabase. You can delete all existing table in supabase to start brand new.

@@ -12,6 +12,8 @@ interface AccountFormProps {
   accounts: Account[];
   onSave: (account: Omit<Account, 'id' | 'createdAt' | 'updatedAt'>) => void;
   onCancel: () => void;
+  loading?: boolean;
+  error?: string | null;
 }
 
 export const AccountForm = ({ account, accounts, onSave, onCancel }: AccountFormProps) => {
@@ -181,13 +183,28 @@ export const AccountForm = ({ account, accounts, onSave, onCancel }: AccountForm
       </div>
 
       <div className="flex gap-2 pt-4">
-        <Button type="submit">
-          {account ? 'Atualizar' : 'Criar'} Conta
+        <Button type="submit" disabled={loading}>
+          {loading ? (
+            <span className="flex items-center">
+              <span className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-primary mr-2"></span>
+              Salvando...
+            </span>
+          ) : (
+            account ? 'Atualizar' : 'Criar' + ' Conta'
+          )}
         </Button>
-        <Button type="button" variant="outline" onClick={onCancel}>
+        <Button type="button" variant="outline" onClick={onCancel} disabled={loading}>
           Cancelar
         </Button>
       </div>
+
+      {/* Feedback de erro do hook */}
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4" role="alert">
+          <strong className="font-bold">Erro: </strong>
+          <span className="block sm:inline">{error}</span>
+        </div>
+      )}
     </form>
   );
 };

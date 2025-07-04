@@ -7,7 +7,7 @@ import { ChartOfAccountsFilters } from '@/components/chartOfAccounts/ChartOfAcco
 import { ChartOfAccountsContent } from '@/components/chartOfAccounts/ChartOfAccountsContent';
 
 export const ChartOfAccountsPage = () => {
-  const { accounts, addAccount, updateAccount, deleteAccount } = useChartOfAccounts();
+  const { accounts, loading, error, addAccount, updateAccount, deleteAccount } = useChartOfAccounts();
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [expandedAccounts, setExpandedAccounts] = useState<Set<string>>(new Set());
@@ -77,20 +77,41 @@ export const ChartOfAccountsPage = () => {
         accountCount={filteredAccounts.length}
       />
 
-      <ChartOfAccountsContent
-        accounts={accounts}
-        filteredAccounts={filteredAccounts}
-        expandedAccounts={expandedAccounts}
-        editingAccount={editingAccount}
-        showAddForm={showAddForm}
-        searchTerm={searchTerm}
-        selectedUnit={selectedUnit}
-        onToggleExpanded={toggleExpanded}
-        onEdit={setEditingAccount}
-        onDelete={deleteAccount}
-        onSaveAccount={handleSaveAccount}
-        onCancelForm={handleCancelForm}
-      />
+      {/* Loading Spinner */}
+      {loading && (
+        <div className="flex justify-center items-center py-8">
+          <span className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></span>
+          <span className="ml-3 text-gray-500">Carregando plano de contas...</span>
+        </div>
+      )}
+
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <strong className="font-bold">Erro: </strong>
+          <span className="block sm:inline">{error}</span>
+        </div>
+      )}
+
+      {/* Conteúdo principal só aparece se não estiver carregando */}
+      {!loading && (
+        <ChartOfAccountsContent
+          accounts={accounts}
+          filteredAccounts={filteredAccounts}
+          expandedAccounts={expandedAccounts}
+          editingAccount={editingAccount}
+          showAddForm={showAddForm}
+          searchTerm={searchTerm}
+          selectedUnit={selectedUnit}
+          onToggleExpanded={toggleExpanded}
+          onEdit={setEditingAccount}
+          onDelete={deleteAccount}
+          onSaveAccount={handleSaveAccount}
+          onCancelForm={handleCancelForm}
+          loading={loading}
+          error={error}
+        />
+      )}
     </div>
   );
 };
