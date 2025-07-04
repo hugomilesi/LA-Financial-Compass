@@ -7,6 +7,7 @@ import { TrendingUp, TrendingDown, CreditCard, AlertTriangle, Settings } from 'l
 import { useUnit } from '@/contexts/UnitContext';
 import { usePeriod } from '@/contexts/PeriodContext';
 import { getMonthlyData, getCostCenterData } from '@/utils/dashboardData';
+import { useQuery } from '@tanstack/react-query';
 import { useKPIGoals } from '@/hooks/useKPIGoals';
 import { EditGoalModal } from './EditGoalModal';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
@@ -20,10 +21,21 @@ interface ExpenseDetailModalProps {
 export const ExpenseDetailModal = ({ isOpen, onClose }: ExpenseDetailModalProps) => {
   const { selectedUnit, getUnitDisplayName } = useUnit();
   const { periodFilter, getDisplayPeriod } = usePeriod();
-  const monthlyData = getMonthlyData(selectedUnit, periodFilter);
-  const costCenterData = getCostCenterData(selectedUnit, periodFilter);
+  const { data: monthlyData, isLoading: isMonthlyDataLoading } = useQuery({
+    queryKey: ['monthlyData', selectedUnit, periodFilter],
+    queryFn: () => getMonthlyData(selectedUnit, periodFilter),
+  });
+  const { data: costCenterData, isLoading: isCostCenterDataLoading } = useQuery({
+    queryKey: ['costCenterData', selectedUnit, periodFilter],
+    queryFn: () => getCostCenterData(selectedUnit, periodFilter),
+  });
+
   const { getGoal, updateGoal, resetToDefault, updating } = useKPIGoals(selectedUnit);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  if (isMonthlyDataLoading || isCostCenterDataLoading || !monthlyData || !costCenterData) {
+    return <div>Loading...</div>;
+  }
 
   const kpiName = 'Despesa Total';
   const currentGoal = getGoal(kpiName);
@@ -88,7 +100,7 @@ export const ExpenseDetailModal = ({ isOpen, onClose }: ExpenseDetailModalProps)
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-red-600 mb-1">
-                  R$ {currentExpense.toLocaleString()}
+                  R$ {Number(currentExpense).toLocaleString()}
                 </div>
                 <div className="flex items-center gap-1">
                   {expenseChange < 0 ? (
@@ -109,7 +121,7 @@ export const ExpenseDetailModal = ({ isOpen, onClose }: ExpenseDetailModalProps)
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-blue-600 mb-1">
-                  R$ {Math.round(currentExpense * 0.95).toLocaleString()}
+                  R$ {Number(Math.round(currentExpense * 0.95)).toLocaleString()}
                 </div>
                 <div className="flex items-center gap-1">
                   <AlertTriangle className="w-4 h-4 text-orange-500" />
@@ -129,7 +141,7 @@ export const ExpenseDetailModal = ({ isOpen, onClose }: ExpenseDetailModalProps)
                   {pieData[0]?.name}
                 </div>
                 <div className="text-sm text-gray-600">
-                  R$ {pieData[0]?.amount.toLocaleString()} ({pieData[0]?.value}%)
+                  R$ {Number(pieData[0]?.amount).toLocaleString()} ({pieData[0]?.value}%)
                 </div>
               </CardContent>
             </Card>
@@ -181,7 +193,7 @@ export const ExpenseDetailModal = ({ isOpen, onClose }: ExpenseDetailModalProps)
                         <span className="font-medium">{item.name}</span>
                       </div>
                       <div className="text-right">
-                        <div className="font-semibold">R$ {item.amount.toLocaleString()}</div>
+                        <div className="font-semibold">R$ {Number(item.amount).toLocaleString()}</div>
                         <Badge variant="secondary" className="text-xs">
                           {item.value}%
                         </Badge>

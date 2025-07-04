@@ -19,6 +19,10 @@ import { TicketMedioDetailModal } from './kpi/TicketMedioDetailModal';
 import { CustoPorAlunoDetailModal } from './kpi/CustoPorAlunoDetailModal';
 import { AlunosAtivosDetailModal } from './kpi/AlunosAtivosDetailModal';
 import { InadimplenciaDetailModal } from './kpi/InadimplenciaDetailModal';
+import { useQuery } from '@tanstack/react-query';
+import { getKPIsByUnit, getHistoricalDataByUnit } from '@/utils/kpiData';
+import { getCostCenterCategories } from '@/utils/costCenterData';
+import { getDataByUnit } from '@/utils/unitData';
 
 export const Dashboard = () => {
   const [selectedKPIId, setSelectedKPIId] = useState<string | null>(null);
@@ -26,7 +30,44 @@ export const Dashboard = () => {
   const [selectedAction, setSelectedAction] = useState<'export-dre' | 'set-goals' | 'view-reports' | 'unit-analysis' | null>(null);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [selectedKPIType, setSelectedKPIType] = useState<'revenue' | 'expense' | 'cashflow' | 'margin' | 'ticket-medio' | 'custo-por-aluno' | 'alunos-ativos' | 'inadimplencia' | null>(null);
-  const { selectedUnit } = useUnit();
+  const { selectedUnit, getUnitDisplayName } = useUnit();
+
+  const kpiConfig = {
+    primary: [
+      'Receita Total',
+      'Despesa Total',
+      'Geração de Caixa',
+      'Margem Líquida',
+    ],
+    secondary: [
+      'Ticket Médio',
+      'Custo por Aluno',
+      'Alunos Ativos',
+      'Inadimplência (%)',
+    ],
+  };
+
+  const { data: fetchedKpis, isLoading: kpisLoading } = useQuery({
+    queryKey: ['kpis', selectedUnit],
+    queryFn: () => getKPIsByUnit(selectedUnit, getUnitDisplayName),
+  });
+
+  const kpis = fetchedKpis ? {
+    primary: fetchedKpis.filter(kpi => kpiConfig.primary.includes(kpi.title)),
+    secondary: fetchedKpis.filter(kpi => kpiConfig.secondary.includes(kpi.title)),
+  } : { primary: [], secondary: [] };
+  const { data: historicalData, isLoading: historicalDataLoading } = useQuery({
+    queryKey: ['historicalData', selectedUnit],
+    queryFn: () => getHistoricalDataByUnit(selectedUnit),
+  });
+  const { data: costCenterCategories, isLoading: costCenterCategoriesLoading } = useQuery({
+    queryKey: ['costCenterCategories', selectedUnit],
+    queryFn: () => getCostCenterCategories(selectedUnit),
+  });
+  const { data: unitData, isLoading: unitDataLoading } = useQuery({
+    queryKey: ['unitData', selectedUnit],
+    queryFn: () => getDataByUnit(selectedUnit),
+  });
 
   const handleKPIClick = (kpi: any) => {
     console.log('🎯 [Dashboard] KPI clicked:', kpi);
@@ -75,6 +116,10 @@ export const Dashboard = () => {
     setSelectedReport(null);
   };
 
+  if (kpisLoading || historicalDataLoading || costCenterCategoriesLoading || unitDataLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <>
       <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
@@ -82,10 +127,10 @@ export const Dashboard = () => {
         <DashboardHeader />
 
         {/* KPI Sections */}
-        <KPISections onKPIClick={handleKPIClick} />
+        <KPISections onKPIClick={handleKPIClick} kpis={kpis} />
 
         {/* Charts Section */}
-        <ChartsSection onChartClick={handleChartClick} />
+        <ChartsSection onChartClick={handleChartClick} historicalData={historicalData} costCenterCategories={costCenterCategories} />
 
         {/* AI Insights */}
         <AIInsights />

@@ -2,7 +2,8 @@
 import { useState, useEffect } from 'react';
 import { CostCenterCategory, CostCenterMetrics } from '@/types/costCenter';
 import { DEFAULT_COST_CENTER_CATEGORIES, CostCenterAlert, generateSmartAlerts } from '@/utils/costCenterData';
-import { getCostCenterDataByUnit, getDataByUnit } from '@/utils/unitData';
+import { getCostCenterDataByUnit } from '@/utils/costCenterData';
+import { getDataByUnit } from '@/utils/unitData';
 
 const STORAGE_KEY = 'la-music-cost-center-categories';
 const ALERTS_STORAGE_KEY = 'la-music-cost-center-alerts';
@@ -97,17 +98,17 @@ export const useCostCenterCategories = () => {
     saveToStorage(updatedCategories);
   };
 
-  const getCategoryMetrics = (unitId: string = 'all'): CostCenterMetrics => {
+  const getCategoryMetrics = async (unitId: string = 'all'): Promise<CostCenterMetrics> => {
     console.log('🔍 [getCategoryMetrics] Calculating metrics for unit:', unitId);
     
     // Get unit-specific financial data
-    const unitData = getDataByUnit(unitId);
-    const totalExpenses = unitData.despesa;
+    const unitData = await getDataByUnit(unitId);
+    const totalExpenses = unitData?.despesa || 0;
     
     console.log('💸 [getCategoryMetrics] Total expenses from unit data:', totalExpenses);
     
     // Get unit-specific categories
-    const unitCategories = getCategoriesByUnit(unitId);
+    const unitCategories = await getCategoriesByUnit(unitId);
     const activeCategories = unitCategories.filter(cat => cat.isActive);
     
     const sortedByAmount = [...activeCategories].sort((a, b) => b.totalAmount - a.totalAmount);
@@ -115,7 +116,7 @@ export const useCostCenterCategories = () => {
     const metrics = {
       totalExpenses,
       categoryCount: activeCategories.length,
-      averagePerCategory: totalExpenses / activeCategories.length,
+      averagePerCategory: totalExpenses / (activeCategories.length || 1),
       highestCategory: {
         name: sortedByAmount[0]?.name || '',
         amount: sortedByAmount[0]?.totalAmount || 0,
@@ -133,11 +134,11 @@ export const useCostCenterCategories = () => {
     return metrics;
   };
 
-  const getCategoriesByUnit = (unitId: string) => {
+  const getCategoriesByUnit = async (unitId: string) => {
     console.log('🔍 [getCategoriesByUnit] Getting categories for unit:', unitId);
     
     // Get dynamic cost center data for the unit
-    const unitCostData = getCostCenterDataByUnit(unitId);
+    const unitCostData = await getCostCenterDataByUnit(unitId);
     console.log('📊 [getCategoriesByUnit] Unit cost data:', unitCostData);
     
     // Map the categories to match the cost center data

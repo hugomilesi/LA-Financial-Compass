@@ -5,7 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Download, Target, FileText, Building2, TrendingUp, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useQuickActions, ExportConfig } from '@/hooks/useQuickActions';
-import { monthlyData, costCenterData, getDREData, getConsolidatedDREData } from '@/utils/dashboardData';
+import { monthlyData, costCenterData, getDREData, getConsolidatedDREData, getMonthlyData } from '@/utils/dashboardData';
 import { useReports, Report } from '@/hooks/useReports';
 import { useUnit } from '@/contexts/UnitContext';
 import { usePeriod } from '@/contexts/PeriodContext';
@@ -23,16 +23,24 @@ const unitAnalysisData = [
   { unit: 'Barra', receita: 60080, despesa: 46700, lucro: 13380 }
 ];
 
-const reportsData = monthlyData.map(item => ({
-  mes: item.month.substring(0, 3),
-  dre: item.receita - item.despesa,
-  fluxo: (item.receita - item.despesa) * 0.95
-}));
+  export const QuickActionModal = ({ isOpen, onClose, actionType, onReportClick }: QuickActionModalProps) => {
+  const [reportsData, setReportsData] = useState([]);
 
-export const QuickActionModal = ({ isOpen, onClose, actionType, onReportClick }: QuickActionModalProps) => {
+  useEffect(() => {
+    const fetchReportsData = async () => {
+      const data = await getMonthlyData('all'); // Assuming 'all' for consolidated view
+      setReportsData(data.map(item => ({
+        mes: item.month.substring(0, 3),
+        dre: item.receita - item.despesa,
+        fluxo: (item.receita - item.despesa) * 0.95
+      })));
+    };
+    fetchReportsData();
+  }, []);
+
   const { goals, isLoading, exportDRE, updateGoal, addGoal, generateReport } = useQuickActions();
   const { getRelatedReports } = useReports();
-  const { selectedUnit, getUnitDisplayName } = useUnit();
+  const { selectedUnit, getUnitDisplayName, units } = useUnit();
   const { periodFilter } = usePeriod();
   
   const [exportConfig, setExportConfig] = useState<ExportConfig>({
@@ -190,11 +198,7 @@ export const QuickActionModal = ({ isOpen, onClose, actionType, onReportClick }:
                     />
                     <span>Todas as Unidades</span>
                   </label>
-                  {[
-                    { id: 'campo-grande', name: 'Campo Grande' },
-                    { id: 'recreio', name: 'Recreio' },
-                    { id: 'barra', name: 'Barra' }
-                  ].map(unit => (
+                  {units.filter(unit => unit.id !== 'all').map(unit => (
                     <label key={unit.id} className="flex items-center gap-2">
                       <input 
                         type="checkbox" 

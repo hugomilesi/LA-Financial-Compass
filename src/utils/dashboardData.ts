@@ -1,4 +1,6 @@
-import { getDataByUnit, getHistoricalDataByUnit, getCostCenterDataByUnit } from './unitData';
+import { getDataByUnit } from './unitData';
+import { getHistoricalDataByUnit } from './kpiData';
+import { getCostCenterDataByUnit } from './costCenterData';
 import { PeriodFilter } from '@/contexts/PeriodContext';
 
 // Dynamic cost center data based on selected unit and period
@@ -450,5 +452,4 @@ export const getConsolidatedDREData = (unitIds: string[], period?: PeriodFilter)
   return consolidated;
 };
 
-// Legacy exports for backward compatibility
-export const monthlyData = getMonthlyData('all');
+

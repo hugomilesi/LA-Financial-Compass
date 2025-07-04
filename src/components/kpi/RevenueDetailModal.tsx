@@ -8,6 +8,7 @@ import { useUnit } from '@/contexts/UnitContext';
 import { usePeriod } from '@/contexts/PeriodContext';
 import { useKPIGoals } from '@/hooks/useKPIGoals';
 import { getMonthlyData } from '@/utils/dashboardData';
+import { useQuery } from '@tanstack/react-query';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { EditGoalModal } from './EditGoalModal';
 import { useState } from 'react';
@@ -22,7 +23,14 @@ export const RevenueDetailModal = ({ isOpen, onClose }: RevenueDetailModalProps)
   const { getDisplayPeriod } = usePeriod();
   const { getGoal, updateGoal, resetToDefault, updating } = useKPIGoals(selectedUnit);
   const [isEditGoalOpen, setIsEditGoalOpen] = useState(false);
-  const monthlyData = getMonthlyData(selectedUnit);
+  const { data: monthlyData, isLoading: isMonthlyDataLoading } = useQuery({
+    queryKey: ['monthlyData', selectedUnit],
+    queryFn: () => getMonthlyData(selectedUnit),
+  });
+
+  if (isMonthlyDataLoading || !monthlyData) {
+    return <div>Loading...</div>;
+  }
 
   const currentRevenue = monthlyData[monthlyData.length - 1]?.receita || 0;
   const previousRevenue = monthlyData[monthlyData.length - 2]?.receita || 0;
@@ -70,7 +78,7 @@ export const RevenueDetailModal = ({ isOpen, onClose }: RevenueDetailModalProps)
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-green-600 mb-1">
-                  R$ {currentRevenue.toLocaleString()}
+                  R$ {Number(currentRevenue).toLocaleString()}
                 </div>
                 <div className="flex items-center gap-1">
                   {revenueChange > 0 ? (
@@ -101,7 +109,7 @@ export const RevenueDetailModal = ({ isOpen, onClose }: RevenueDetailModalProps)
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-blue-600 mb-1">
-                  R$ {revenueGoal.toLocaleString()}
+                  R$ {Number(revenueGoal).toLocaleString()}
                 </div>
                 <div className="flex items-center gap-1">
                   <Target className="w-4 h-4 text-blue-500" />
@@ -145,7 +153,7 @@ export const RevenueDetailModal = ({ isOpen, onClose }: RevenueDetailModalProps)
                       <span className="font-medium">{item.category}</span>
                     </div>
                     <div className="text-right">
-                      <div className="font-semibold">R$ {item.value.toLocaleString()}</div>
+                      <div className="font-semibold">R$ {Number(item.value).toLocaleString()}</div>
                       <Badge variant="secondary" className="text-xs">
                         {item.percentage}%
                       </Badge>

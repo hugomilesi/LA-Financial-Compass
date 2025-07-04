@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Filter, Download, BarChart3, Bell, Target, Building } from 'lucide-react';
 import { useCostCenterCategories } from '@/hooks/useCostCenterCategories';
-import { useUnit, UNITS } from '@/contexts/UnitContext';
+import { useUnit } from '@/contexts/UnitContext';
 import { usePeriod } from '@/contexts/PeriodContext';
 import { CostCenterCategoryCard } from './costCenter/CostCenterCategoryCard';
 import { CostCenterMetrics } from './costCenter/CostCenterMetrics';
@@ -30,7 +30,7 @@ export const CostCenterCategoriesPage = () => {
     dismissAlert,
     refreshAlerts
   } = useCostCenterCategories();
-  const { selectedUnit, setSelectedUnit, getUnitDisplayName } = useUnit();
+  const { selectedUnit, setSelectedUnit, getUnitDisplayName, units } = useUnit();
   const { getDisplayPeriod } = usePeriod();
 
   const [showAddForm, setShowAddForm] = useState(false);
@@ -120,7 +120,7 @@ export const CostCenterCategoriesPage = () => {
                 <SelectValue placeholder="Selecionar unidade" />
               </SelectTrigger>
               <SelectContent>
-                {UNITS.map((unit) => (
+                {units.map((unit) => (
                   <SelectItem key={unit.id} value={unit.id}>
                     {unit.displayName}
                   </SelectItem>

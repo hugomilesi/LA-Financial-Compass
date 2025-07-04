@@ -1,30 +1,20 @@
 
 import { Card } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { getMonthlyData, getCostCenterData } from '@/utils/dashboardData';
-import { useUnit } from '@/contexts/UnitContext';
-import { usePeriod } from '@/contexts/PeriodContext';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 
 interface ChartsSectionProps {
   onChartClick: (chartType: 'revenue' | 'cost-center') => void;
+  historicalData: any[];
+  costCenterCategories: any[];
 }
 
-export const ChartsSection = ({ onChartClick }: ChartsSectionProps) => {
-  const { selectedUnit } = useUnit();
-  const { periodFilter } = usePeriod();
+export const ChartsSection = ({ onChartClick, historicalData, costCenterCategories }: ChartsSectionProps) => {
   const [hoveredSlice, setHoveredSlice] = useState<number | null>(null);
-  
-  // Use useMemo to recalculate data when dependencies change
-  const monthlyData = useMemo(() => {
-    console.log('📊 [ChartsSection] Recalculating monthly data for:', selectedUnit, periodFilter);
-    return getMonthlyData(selectedUnit, periodFilter);
-  }, [selectedUnit, periodFilter]);
-  
-  const costCenterData = useMemo(() => {
-    console.log('📊 [ChartsSection] Recalculating cost center data for:', selectedUnit, periodFilter);
-    return getCostCenterData(selectedUnit, periodFilter);
-  }, [selectedUnit, periodFilter]);
+
+  if (!historicalData || historicalData.length === 0 || !costCenterCategories || costCenterCategories.length === 0) {
+    return null; // Or a placeholder/message indicating no data
+  }
 
   const handleMouseEnter = (data: any, index: number) => {
     setHoveredSlice(index);
@@ -34,15 +24,13 @@ export const ChartsSection = ({ onChartClick }: ChartsSectionProps) => {
     setHoveredSlice(null);
   };
 
-  console.log('📈 [ChartsSection] Rendering charts with data:', { monthlyData, costCenterData });
-
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Revenue Evolution */}
       <Card className="p-6 cursor-pointer hover:shadow-lg transition-shadow" onClick={() => onChartClick('revenue')}>
         <h3 className="text-lg font-semibold mb-4 text-gray-900">Evolução Receita vs Despesa</h3>
         <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={monthlyData} key={`revenue-chart-${selectedUnit}-${periodFilter.year}-${periodFilter.month}`}>
+          <BarChart data={historicalData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="month" />
             <YAxis />
@@ -58,18 +46,18 @@ export const ChartsSection = ({ onChartClick }: ChartsSectionProps) => {
       <Card className="p-6 cursor-pointer hover:shadow-lg transition-shadow" onClick={() => onChartClick('cost-center')}>
         <h3 className="text-lg font-semibold mb-4 text-gray-900">Distribuição Centro de Custos</h3>
         <ResponsiveContainer width="100%" height={300}>
-          <PieChart key={`cost-chart-${selectedUnit}-${periodFilter.year}-${periodFilter.month}`}>
+          <PieChart>
             <Pie
-              data={costCenterData}
+              data={costCenterCategories}
               cx="50%"
               cy="50%"
               outerRadius={100}
-              dataKey="value"
+              dataKey="percentage"
               label={({ name, value }) => `${name}: ${value}%`}
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
             >
-              {costCenterData.map((entry, index) => (
+              {costCenterCategories.map((entry, index) => (
                 <Cell 
                   key={`cell-${index}`} 
                   fill={entry.color}

@@ -1,5 +1,6 @@
 
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface PeriodFilter {
   year: number;
@@ -19,6 +20,8 @@ interface PeriodContextType {
   updateViewType: (viewType: 'monthly' | 'ytd') => void;
   updateDateRange: (dateRange?: { start: Date; end: Date }) => void;
   getDisplayPeriod: () => string;
+  availableYears: number[];
+  availableMonths: { value: number; label: string }[];
 }
 
 const PeriodContext = createContext<PeriodContextType | undefined>(undefined);
@@ -42,6 +45,49 @@ export const PeriodProvider = ({ children }: PeriodProviderProps) => {
     month: currentDate.getMonth() + 1, // JavaScript months are 0-indexed
     viewType: 'monthly'
   });
+  const [availableYears, setAvailableYears] = useState<number>([]);
+  const [availableMonths, setAvailableMonths] = useState<{ value: number; label: string }[]>([]);
+
+  useEffect(() => {
+    const fetchAvailableDates = async () => {
+      const { data, error } = await supabase
+        .from('kpis_data')
+        .select('date_ref')
+        .order('date_ref', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching available dates:', error);
+        return;
+      }
+
+      if (data) {
+        const uniqueDates = Array.from(new Set(data.map(item => item.date_ref)));
+        const years = Array.from(new Set(uniqueDates.map(dateStr => new Date(dateStr).getFullYear()))).sort((a, b) => a - b);
+        setAvailableYears(years);
+
+        const monthNames = [
+          'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+          'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+        ];
+        const months = Array.from(new Set(uniqueDates.map(dateStr => new Date(dateStr).getMonth() + 1)))
+          .sort((a, b) => a - b)
+          .map(monthNum => ({ value: monthNum, label: monthNames[monthNum - 1] }));
+        setAvailableMonths(months);
+
+        // Set initial filter to the latest available month/year if data exists
+        if (uniqueDates.length > 0) {
+          const latestDate = new Date(uniqueDates[uniqueDates.length - 1]);
+          setPeriodFilter(prev => ({
+            ...prev,
+            year: latestDate.getFullYear(),
+            month: latestDate.getMonth() + 1,
+          }));
+        }
+      }
+    };
+
+    fetchAvailableDates();
+  }, []);
 
   const updateMonth = (month: number) => {
     console.log('🔄 [PeriodContext] Updating month to:', month);
@@ -113,7 +159,9 @@ export const PeriodProvider = ({ children }: PeriodProviderProps) => {
         updateYear,
         updateViewType,
         updateDateRange,
-        getDisplayPeriod
+        getDisplayPeriod,
+        availableYears,
+        availableMonths,
       }}
     >
       {children}

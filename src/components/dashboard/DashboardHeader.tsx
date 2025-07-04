@@ -1,13 +1,13 @@
 
 import { Calendar } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useUnit, UNITS } from '@/contexts/UnitContext';
+import { useUnit } from '@/contexts/UnitContext';
 import { usePeriod } from '@/contexts/PeriodContext';
 import { PeriodFilter } from './PeriodFilter';
 import { useEffect } from 'react';
 
 export const DashboardHeader = () => {
-  const { selectedUnit, setSelectedUnit, getUnitDisplayName } = useUnit();
+  const { selectedUnit, setSelectedUnit, getUnitDisplayName, units } = useUnit();
   const { getDisplayPeriod } = usePeriod();
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export const DashboardHeader = () => {
               <SelectValue placeholder="Selecionar unidade" />
             </SelectTrigger>
             <SelectContent>
-              {UNITS.map((unit) => (
+              {units.map((unit) => (
                 <SelectItem key={unit.id} value={unit.id}>
                   {unit.displayName}
                 </SelectItem>

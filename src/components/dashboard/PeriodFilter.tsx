@@ -17,29 +17,13 @@ export const PeriodFilter = () => {
     updateYear, 
     updateViewType, 
     updateDateRange,
-    getDisplayPeriod 
+    getDisplayPeriod,
+    availableYears,
+    availableMonths
   } = usePeriod();
   
   const [isOpen, setIsOpen] = useState(false);
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
-
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i);
-  
-  const months = [
-    { value: 1, label: 'Janeiro' },
-    { value: 2, label: 'Fevereiro' },
-    { value: 3, label: 'Março' },
-    { value: 4, label: 'Abril' },
-    { value: 5, label: 'Maio' },
-    { value: 6, label: 'Junho' },
-    { value: 7, label: 'Julho' },
-    { value: 8, label: 'Agosto' },
-    { value: 9, label: 'Setembro' },
-    { value: 10, label: 'Outubro' },
-    { value: 11, label: 'Novembro' },
-    { value: 12, label: 'Dezembro' }
-  ];
 
   const handleViewTypeChange = (viewType: 'monthly' | 'ytd') => {
     updateViewType(viewType);
@@ -118,7 +102,7 @@ export const PeriodFilter = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {months.map((month) => (
+                      {availableMonths.map((month) => (
                         <SelectItem key={month.value} value={month.value.toString()}>
                           {month.label}
                         </SelectItem>
@@ -137,7 +121,7 @@ export const PeriodFilter = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {years.map((year) => (
+                      {availableYears.map((year) => (
                         <SelectItem key={year} value={year.toString()}>
                           {year}
                         </SelectItem>
@@ -191,7 +175,7 @@ export const PeriodFilter = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {years.map((year) => (
+                  {availableYears.map((year) => (
                     <SelectItem key={year} value={year.toString()}>
                       {year}
                     </SelectItem>

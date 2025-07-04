@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { UnitPerformanceData, UnitAlert, UnitComparison, UnitRanking } from '@/types/unitPerformance';
-import { getDataByUnit, getHistoricalDataByUnit } from '@/utils/unitData';
-import { UNITS } from '@/contexts/UnitContext';
+import { getDataByUnit } from '@/utils/unitData';
+import { getHistoricalDataByUnit } from '@/utils/kpiData';
+import { useUnit } from '@/contexts/UnitContext';
 
 export const useUnitPerformance = () => {
   console.log('🔍 [useUnitPerformance] Hook initialized');
+  const { units } = useUnit();
   
   const [performanceData, setPerformanceData] = useState<UnitPerformanceData[]>([]);
   const [comparisons, setComparisons] = useState<UnitComparison[]>([]);
@@ -15,7 +17,7 @@ export const useUnitPerformance = () => {
   useEffect(() => {
     console.log('🚀 [useUnitPerformance] useEffect triggered, calling generatePerformanceData');
     generatePerformanceData();
-  }, []);
+  }, [units]); // Add units to dependency array
 
   const generatePerformanceData = async () => {
     console.log('🔍 [useUnitPerformance] Generating performance data...');
@@ -23,10 +25,10 @@ export const useUnitPerformance = () => {
     setError(null);
     
     try {
-      // Verify UNITS data
-      console.log('📋 [useUnitPerformance] Available UNITS:', UNITS);
+      // Verify units data
+      console.log('📋 [useUnitPerformance] Available units:', units);
       
-      const availableUnits = UNITS.filter(unit => unit.id !== 'all');
+      const availableUnits = units.filter(unit => unit.id !== 'all');
       console.log('🏢 [useUnitPerformance] Filtered units:', availableUnits);
       
       if (availableUnits.length === 0) {

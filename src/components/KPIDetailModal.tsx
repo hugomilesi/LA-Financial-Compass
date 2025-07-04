@@ -1,8 +1,8 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card } from '@/components/ui/card';
 import { getKPIDetails } from '@/utils/kpiData';
 import { TrendingUp, TrendingDown, Target, AlertCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 interface KPIDetailModalProps {
   isOpen: boolean;
@@ -12,10 +12,18 @@ interface KPIDetailModalProps {
 }
 
 export const KPIDetailModal = ({ isOpen, onClose, kpiId, unitId }: KPIDetailModalProps) => {
-  if (!kpiId) return null;
-  
-  const kpiData = getKPIDetails(kpiId, unitId);
-  
+  const [kpiData, setKpiData] = useState<any>(null);
+
+  useEffect(() => {
+    if (kpiId) {
+      const fetchData = async () => {
+        const data = await getKPIDetails(kpiId, unitId);
+        setKpiData(data);
+      };
+      fetchData();
+    }
+  }, [kpiId, unitId]);
+
   if (!kpiData) return null;
   
   const getTrendIcon = (trend: string) => {

@@ -40,7 +40,9 @@ export const ChartOfAccountsContent = ({
   onEdit,
   onDelete,
   onSaveAccount,
-  onCancelForm
+  onCancelForm,
+  loading,
+  error
 }: ChartOfAccountsContentProps) => {
   const getUnitDisplayName = () => {
     switch (selectedUnit) {

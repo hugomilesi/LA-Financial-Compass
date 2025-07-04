@@ -1,14 +1,10 @@
 
 import { KPICard } from '@/components/KPICard';
 import { DollarSign, Users, TrendingUp, Percent, Target, CreditCard, Receipt, TrendingDown } from 'lucide-react';
-import { getPrimaryKPIs, getSecondaryKPIs } from '@/utils/dashboardData';
-import { useUnit } from '@/contexts/UnitContext';
-import { usePeriod } from '@/contexts/PeriodContext';
-import { useKPIGoals } from '@/hooks/useKPIGoals';
-import { useEffect, useMemo } from 'react';
 
 interface KPISectionsProps {
   onKPIClick: (kpi: any) => void;
+  kpis: any;
 }
 
 const iconMap = {
@@ -22,50 +18,39 @@ const iconMap = {
   TrendingDown
 };
 
-export const KPISections = ({ onKPIClick }: KPISectionsProps) => {
-  const { selectedUnit } = useUnit();
-  const { periodFilter } = usePeriod();
-  const { goals, loading: goalsLoading } = useKPIGoals(selectedUnit);
-  
-  useEffect(() => {
-    console.log('🔄 [KPISections] Unit changed to:', selectedUnit);
-    console.log('🔄 [KPISections] Period changed to:', periodFilter);
-    console.log('🔄 [KPISections] Force refresh triggered');
-  }, [selectedUnit, periodFilter]);
-  
-  console.log('🎯 [KPISections] Rendering with unit:', selectedUnit, 'and period:', periodFilter);
-  
-  // Use useMemo to recalculate KPIs when dependencies change
-  const primaryKPIs = useMemo(() => {
-    console.log('🔄 [KPISections] Recalculating primary KPIs...');
-    return getPrimaryKPIs(selectedUnit, periodFilter, goals);
-  }, [selectedUnit, periodFilter, goals]);
-  
-  const secondaryKPIs = useMemo(() => {
-    console.log('🔄 [KPISections] Recalculating secondary KPIs...');
-    return getSecondaryKPIs(selectedUnit, periodFilter, goals);
-  }, [selectedUnit, periodFilter, goals]);
+const kpiConfig = {
+  primary: [
+    { title: 'Receita Total', icon: 'DollarSign' },
+    { title: 'Despesa Total', icon: 'CreditCard' },
+    { title: 'Geração de Caixa', icon: 'TrendingUp' },
+    { title: 'Margem Líquida', icon: 'Percent' },
+  ],
+  secondary: [
+    { title: 'Ticket Médio', icon: 'Receipt' },
+    { title: 'Custo por Aluno', icon: 'DollarSign' },
+    { title: 'Alunos Ativos', icon: 'Users' },
+    { title: 'Inadimplência (%)', icon: 'TrendingDown' },
+  ]
+}
 
-  console.log('📊 [KPISections] Primary KPIs:', primaryKPIs);
-  console.log('📊 [KPISections] Secondary KPIs:', secondaryKPIs);
+export const KPISections = ({ onKPIClick, kpis }: KPISectionsProps) => {
+  if (!kpis || !kpis.primary || !kpis.secondary) {
+    return null; // Or a loading spinner/skeleton
+  }
 
-  const mapKPIWithIcon = (kpi: any) => ({
+  const mapKPIWithIcon = (kpi: any, type: 'primary' | 'secondary') => ({
     ...kpi,
-    icon: iconMap[kpi.icon as keyof typeof iconMap]
+    ...kpiConfig[type].find(c => c.title === kpi.title),
   });
-
-  // Create unique keys that include all relevant state including goals
-  const createKPIKey = (type: string, index: number) => 
-    `${type}-${index}-${selectedUnit}-${periodFilter.year}-${periodFilter.month}-${periodFilter.viewType}-${JSON.stringify(goals)}`;
 
   return (
     <>
       {/* Primary KPIs - Top 4 metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {primaryKPIs.map((kpi, index) => (
+        {kpis.primary.map((kpi: any, index: number) => (
           <KPICard 
-            key={createKPIKey('primary', index)} 
-            {...mapKPIWithIcon(kpi)} 
+            key={`primary-${index}`}
+            {...mapKPIWithIcon(kpi, 'primary')} 
             onClick={() => onKPIClick(kpi)} 
           />
         ))}
@@ -73,10 +58,10 @@ export const KPISections = ({ onKPIClick }: KPISectionsProps) => {
 
       {/* Secondary KPIs - Additional metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {secondaryKPIs.map((kpi, index) => (
+        {kpis.secondary.map((kpi: any, index: number) => (
           <KPICard 
-            key={createKPIKey('secondary', index)} 
-            {...mapKPIWithIcon(kpi)} 
+            key={`secondary-${index}`}
+            {...mapKPIWithIcon(kpi, 'secondary')} 
             onClick={() => onKPIClick(kpi)} 
           />
         ))}

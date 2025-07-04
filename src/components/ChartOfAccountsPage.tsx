@@ -93,9 +93,7 @@ export const ChartOfAccountsPage = () => {
         </div>
       )}
 
-      {/* Conteúdo principal só aparece se não estiver carregando */}
-      {!loading && (
-        <ChartOfAccountsContent
+      <ChartOfAccountsContent
           accounts={accounts}
           filteredAccounts={filteredAccounts}
           expandedAccounts={expandedAccounts}
@@ -111,7 +109,6 @@ export const ChartOfAccountsPage = () => {
           loading={loading}
           error={error}
         />
-      )}
     </div>
   );
 };

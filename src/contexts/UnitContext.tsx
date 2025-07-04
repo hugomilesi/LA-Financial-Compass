@@ -1,5 +1,6 @@
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface Unit {
   id: string;
@@ -7,16 +8,10 @@ export interface Unit {
   displayName: string;
 }
 
-export const UNITS: Unit[] = [
-  { id: 'all', name: 'all', displayName: 'Todas as Unidades' },
-  { id: 'campo-grande', name: 'campo-grande', displayName: 'Campo Grande' },
-  { id: 'recreio', name: 'recreio', displayName: 'Recreio' },
-  { id: 'barra', name: 'barra', displayName: 'Barra' }
-];
-
 interface UnitContextType {
   selectedUnit: string;
   setSelectedUnit: (unitId: string) => void;
+  units: Unit[];
   getUnitDisplayName: (unitId: string) => string;
 }
 
@@ -24,9 +19,31 @@ const UnitContext = createContext<UnitContextType | undefined>(undefined);
 
 export const UnitProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [selectedUnit, setSelectedUnit] = useState<string>('all');
+  const [units, setUnits] = useState<Unit[]>([{ id: 'all', name: 'all', displayName: 'Todas as Unidades' }]);
+
+  useEffect(() => {
+    const fetchUnits = async () => {
+      const { data, error } = await supabase
+        .from('units')
+        .select('id, name, display_name');
+
+      if (error) {
+        console.error('Error fetching units:', error);
+      } else if (data) {
+        const fetchedUnits: Unit[] = data.map(unit => ({
+          id: unit.id,
+          name: unit.name,
+          displayName: unit.display_name,
+        }));
+        setUnits([{ id: 'all', name: 'all', displayName: 'Todas as Unidades' }, ...fetchedUnits]);
+      }
+    };
+
+    fetchUnits();
+  }, []);
 
   const getUnitDisplayName = (unitId: string): string => {
-    const unit = UNITS.find(u => u.id === unitId);
+    const unit = units.find(u => u.id === unitId);
     return unit?.displayName || 'Unidade Desconhecida';
   };
 
@@ -34,6 +51,7 @@ export const UnitProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <UnitContext.Provider value={{
       selectedUnit,
       setSelectedUnit,
+      units,
       getUnitDisplayName
     }}>
       {children}

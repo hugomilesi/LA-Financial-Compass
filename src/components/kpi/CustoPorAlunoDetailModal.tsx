@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { TrendingUp, TrendingDown, DollarSign, Target, Calendar, Settings } from 'lucide-react';
 import { useUnit } from '@/contexts/UnitContext';
 import { usePeriod } from '@/contexts/PeriodContext';
-import { getHistoricalDataByUnit } from '@/utils/unitData';
+import { getHistoricalDataByUnit } from '@/utils/kpiData';
+import { useQuery } from '@tanstack/react-query';
 import { useKPIGoals } from '@/hooks/useKPIGoals';
 import { EditGoalModal } from './EditGoalModal';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
@@ -20,9 +21,16 @@ interface CustoPorAlunoDetailModalProps {
 export const CustoPorAlunoDetailModal = ({ isOpen, onClose }: CustoPorAlunoDetailModalProps) => {
   const { selectedUnit, getUnitDisplayName } = useUnit();
   const { getDisplayPeriod } = usePeriod();
-  const historicalData = getHistoricalDataByUnit(selectedUnit);
+  const { data: historicalData, isLoading: isHistoricalDataLoading } = useQuery({
+    queryKey: ['historicalData', selectedUnit],
+    queryFn: () => getHistoricalDataByUnit(selectedUnit),
+  });
   const { getGoal, updateGoal, resetToDefault, updating } = useKPIGoals(selectedUnit);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  if (isHistoricalDataLoading || !historicalData) {
+    return <div>Loading...</div>;
+  }
 
   const kpiName = 'Custo por Aluno';
   const currentGoal = getGoal(kpiName);

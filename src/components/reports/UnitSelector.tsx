@@ -2,7 +2,7 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { UNITS } from '@/contexts/UnitContext';
+import { useUnit } from '@/contexts/UnitContext';
 import { Building2, X } from 'lucide-react';
 
 interface UnitSelectorProps {
@@ -11,6 +11,7 @@ interface UnitSelectorProps {
 }
 
 export const UnitSelector = ({ selectedUnits, onUnitsChange }: UnitSelectorProps) => {
+  const { units } = useUnit();
   const handleUnitSelect = (unitId: string) => {
     if (unitId === 'all') {
       onUnitsChange(['all']);
@@ -37,7 +38,7 @@ export const UnitSelector = ({ selectedUnits, onUnitsChange }: UnitSelectorProps
     }
     
     if (selectedUnits.length === 1) {
-      const unit = UNITS.find(u => u.id === selectedUnits[0]);
+      const unit = units.find(u => u.id === selectedUnits[0]);
       return unit?.displayName || 'Unidade Selecionada';
     }
     
@@ -52,7 +53,7 @@ export const UnitSelector = ({ selectedUnits, onUnitsChange }: UnitSelectorProps
           <SelectValue placeholder={getDisplayText()} />
         </SelectTrigger>
         <SelectContent>
-          {UNITS.map(unit => (
+          {units.map(unit => (
             <SelectItem key={unit.id} value={unit.id}>
               <div className="flex items-center justify-between w-full">
                 <span>{unit.displayName}</span>
@@ -70,7 +71,7 @@ export const UnitSelector = ({ selectedUnits, onUnitsChange }: UnitSelectorProps
       {!selectedUnits.includes('all') && selectedUnits.length > 0 && (
         <div className="flex items-center gap-1 max-w-96 overflow-x-auto">
           {selectedUnits.map(unitId => {
-            const unit = UNITS.find(u => u.id === unitId);
+            const unit = units.find(u => u.id === unitId);
             return unit && (
               <Badge key={unitId} variant="outline" className="flex items-center gap-1">
                 {unit.displayName}

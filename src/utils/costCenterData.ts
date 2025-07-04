@@ -1,222 +1,188 @@
-
-import { CostCenterCategory } from '@/types/costCenter';
+import { supabase } from '@/integrations/supabase/client';
+import { CostCenterCategory, CostCenterAlert } from '@/types/costCenter';
 
 export const DEFAULT_COST_CENTER_CATEGORIES: CostCenterCategory[] = [
   {
-    id: 'cc-pessoal',
+    id: '1',
     name: 'Pessoal',
-    description: 'Salários, encargos sociais e benefícios dos colaboradores',
-    color: '#EF4444',
-    icon: 'Users',
+    description: 'Despesas relacionadas a salários, encargos e benefícios de funcionários.',
+    type: 'expense',
+    isEssential: true,
     isActive: true,
-    totalAmount: 165519,
-    percentage: 52.1,
-    unitBreakdown: [
-      { unitId: 'campo-grande', unitName: 'Campo Grande', amount: 68451, percentage: 60.1 },
-      { unitId: 'recreio', unitName: 'Recreio', amount: 58100, percentage: 57.2 },
-      { unitId: 'barra', unitName: 'Barra', amount: 38968, percentage: 55.8 }
-    ],
-    accounts: ['exp-4.1.1.1', 'exp-4.2.1.1'],
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-06-15')
+    totalAmount: 0,
+    percentage: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
   {
-    id: 'cc-aluguel',
+    id: '2',
     name: 'Aluguel e Ocupação',
-    description: 'Aluguel, condomínio e taxas relacionadas ao espaço físico',
-    color: '#F59E0B',
-    icon: 'Building',
+    description: 'Custos com aluguel, condomínio, IPTU e outras despesas de ocupação.',
+    type: 'expense',
+    isEssential: true,
     isActive: true,
-    totalAmount: 52405,
-    percentage: 16.5,
-    unitBreakdown: [
-      { unitId: 'campo-grande', unitName: 'Campo Grande', amount: 19938, percentage: 17.5 },
-      { unitId: 'recreio', unitName: 'Recreio', amount: 19401, percentage: 19.1 },
-      { unitId: 'barra', unitName: 'Barra', amount: 13066, percentage: 18.7 }
-    ],
-    accounts: ['exp-4.1.2.1.1', 'exp-4.1.2.1.2', 'exp-4.1.2.2.1', 'exp-4.1.2.2.2', 'exp-4.1.2.3.1', 'exp-4.1.2.3.2'],
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-06-15')
+    totalAmount: 0,
+    percentage: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
   {
-    id: 'cc-marketing',
+    id: '3',
     name: 'Marketing e Comunicação',
-    description: 'Publicidade, material gráfico e eventos promocionais',
-    color: '#10B981',
-    icon: 'Megaphone',
+    description: 'Investimentos em publicidade, campanhas e comunicação.',
+    type: 'expense',
+    isEssential: false,
     isActive: true,
-    totalAmount: 38217,
-    percentage: 12.0,
-    unitBreakdown: [
-      { unitId: 'campo-grande', unitName: 'Campo Grande', amount: 14583, percentage: 12.8 },
-      { unitId: 'recreio', unitName: 'Recreio', amount: 13712, percentage: 13.5 },
-      { unitId: 'barra', unitName: 'Barra', amount: 9922, percentage: 14.2 }
-    ],
-    accounts: ['exp-4.2.2.1', 'exp-4.2.2.2', 'exp-4.2.2.3'],
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-06-15')
+    totalAmount: 0,
+    percentage: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
   {
-    id: 'cc-tecnologia',
+    id: '4',
     name: 'Tecnologia',
-    description: 'Software, hardware, licenças e infraestrutura de TI',
-    color: '#3B82F6',
-    icon: 'Monitor',
+    description: 'Gastos com softwares, hardwares, licenças e serviços de TI.',
+    type: 'expense',
+    isEssential: true,
     isActive: true,
-    totalAmount: 28950,
-    percentage: 9.1,
-    unitBreakdown: [
-      { unitId: 'campo-grande', unitName: 'Campo Grande', amount: 11580, percentage: 10.2 },
-      { unitId: 'recreio', unitName: 'Recreio', amount: 10440, percentage: 10.3 },
-      { unitId: 'barra', unitName: 'Barra', amount: 6930, percentage: 9.9 }
-    ],
-    accounts: ['exp-4.2.3.1', 'exp-4.2.3.2'],
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-06-15')
+    totalAmount: 0,
+    percentage: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
   {
-    id: 'cc-manutencao',
+    id: '5',
     name: 'Manutenção',
-    description: 'Reparos, conservação e manutenção preventiva',
-    color: '#8B5CF6',
-    icon: 'Wrench',
+    description: 'Despesas com reparos, conservação e manutenção de equipamentos e instalações.',
+    type: 'expense',
+    isEssential: true,
     isActive: true,
-    totalAmount: 19680,
-    percentage: 6.2,
-    unitBreakdown: [
-      { unitId: 'campo-grande', unitName: 'Campo Grande', amount: 7872, percentage: 6.9 },
-      { unitId: 'recreio', unitName: 'Recreio', amount: 7077, percentage: 7.0 },
-      { unitId: 'barra', unitName: 'Barra', amount: 4731, percentage: 6.8 }
-    ],
-    accounts: ['exp-4.1.2.1.4', 'exp-4.1.2.2.4', 'exp-4.1.2.3.4'],
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-06-15')
+    totalAmount: 0,
+    percentage: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
   {
-    id: 'cc-administrativa',
+    id: '6',
     name: 'Administrativa',
-    description: 'Despesas administrativas, contabilidade e consultoria',
-    color: '#06B6D4',
-    icon: 'FileText',
+    description: 'Custos com materiais de escritório, serviços de apoio e outras despesas administrativas.',
+    type: 'expense',
+    isEssential: true,
     isActive: true,
-    totalAmount: 15840,
-    percentage: 5.0,
-    unitBreakdown: [
-      { unitId: 'campo-grande', unitName: 'Campo Grande', amount: 6336, percentage: 5.6 },
-      { unitId: 'recreio', unitName: 'Recreio', amount: 5702, percentage: 5.6 },
-      { unitId: 'barra', unitName: 'Barra', amount: 3802, percentage: 5.4 }
-    ],
-    accounts: ['exp-4.2.5.1', 'exp-4.2.5.2'],
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-06-15')
+    totalAmount: 0,
+    percentage: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
   {
-    id: 'cc-operacional',
+    id: '7',
     name: 'Despesas Operacionais',
-    description: 'Utilities, material de ensino e despesas gerais',
-    color: '#84CC16',
-    icon: 'Settings',
+    description: 'Custos diretos relacionados à operação principal do negócio.',
+    type: 'expense',
+    isEssential: true,
     isActive: true,
-    totalAmount: 23893,
-    percentage: 7.5,
-    unitBreakdown: [
-      { unitId: 'campo-grande', unitName: 'Campo Grande', amount: 9001, percentage: 7.9 },
-      { unitId: 'recreio', unitName: 'Recreio', amount: 8532, percentage: 8.4 },
-      { unitId: 'barra', unitName: 'Barra', amount: 6360, percentage: 9.1 }
-    ],
-    accounts: ['exp-4.1.2.1.3', 'exp-4.1.2.2.3', 'exp-4.1.2.3.3', 'exp-4.1.1.2', 'exp-4.2.4'],
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-06-15')
+    totalAmount: 0,
+    percentage: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
   {
-    id: 'cc-outros',
+    id: '8',
     name: 'Outros',
-    description: 'Despesas diversas e não categorizadas',
-    color: '#6B7280',
-    icon: 'MoreHorizontal',
+    description: 'Categorias de despesas diversas não classificadas nas anteriores.',
+    type: 'expense',
+    isEssential: false,
     isActive: true,
-    totalAmount: 5341,
-    percentage: 1.7,
-    unitBreakdown: [
-      { unitId: 'campo-grande', unitName: 'Campo Grande', amount: 1957, percentage: 1.7 },
-      { unitId: 'recreio', unitName: 'Recreio', amount: 1829, percentage: 1.8 },
-      { unitId: 'barra', unitName: 'Barra', amount: 1555, percentage: 2.2 }
-    ],
-    accounts: ['exp-4.3'],
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-06-15')
-  }
+    totalAmount: 0,
+    percentage: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
 ];
 
-export interface CostCenterAlert {
-  id: string;
-  type: 'warning' | 'critical' | 'info';
-  title: string;
-  message: string;
-  categoryId?: string;
-  unitId?: string;
-  threshold?: number;
-  currentValue?: number;
-  createdAt: Date;
-  isRead: boolean;
-}
+export const getCostCenterCategories = async (unitId: string): Promise<CostCenterCategory[]> => {
+    let query = supabase.from('cost_center_categories').select('*');
+
+    // If unit_id is not 'all', filter by unit_id. Otherwise, fetch all categories.
+    // This assumes that if unit_id column exists, it's used for filtering.
+    // If unit_id column does not exist, this filter will be ignored.
+    if (unitId !== 'all') {
+        query = query.eq('unit_id', unitId);
+    }
+
+    const { data, error } = await query;
+    if (error) {
+        console.error('Error fetching cost center categories:', error);
+        return [];
+    }
+    return data;
+};
+
+export const getCostCenterDataByUnit = async (unitId: string) => {
+    let costCentersQuery = supabase
+        .from('cost_centers')
+        .select('*');
+
+    if (unitId !== 'all') {
+        costCentersQuery = costCentersQuery.eq('unit_id', unitId);
+    }
+
+    const { data: costCentersData, error: costCentersError } = await costCentersQuery;
+
+    if (costCentersError) {
+        console.error(`Error fetching cost center data for unit ${unitId}:`, costCentersError);
+        return [];
+    }
+
+    const { data: categoriesData, error: categoriesError } = await supabase
+        .from('cost_center_categories')
+        .select('id, name');
+
+    if (categoriesError) {
+        console.error('Error fetching cost center categories:', categoriesError);
+        return [];
+    }
+
+    const categoryMap = new Map(categoriesData.map(cat => [cat.id, cat.name]));
+
+    return costCentersData.map(item => ({
+        name: categoryMap.get(item.category_id) || 'Unknown Category',
+        amount: item.amount,
+        value: item.value
+    }));
+};
 
 export const generateSmartAlerts = (categories: CostCenterCategory[]): CostCenterAlert[] => {
+  // Placeholder for smart alert generation logic
+  // This function would typically analyze category data and generate alerts based on predefined rules
+  console.log('Generating smart alerts for categories:', categories);
   const alerts: CostCenterAlert[] = [];
-  
-  // Alerta para categoria com crescimento alto
-  const highGrowthCategory = categories.find(cat => cat.percentage > 50);
-  if (highGrowthCategory) {
+
+  // Example: Alert if 'Pessoal' expenses are too high
+  const pessoalCategory = categories.find(cat => cat.name === 'Pessoal');
+  if (pessoalCategory && pessoalCategory.percentage > 60) {
     alerts.push({
-      id: 'alert-high-growth',
+      id: 'pessoal-high',
       type: 'warning',
-      title: 'Categoria com Alto Percentual',
-      message: `A categoria "${highGrowthCategory.name}" representa ${highGrowthCategory.percentage.toFixed(1)}% dos custos totais.`,
-      categoryId: highGrowthCategory.id,
-      threshold: 50,
-      currentValue: highGrowthCategory.percentage,
+      message: `As despesas com Pessoal (${pessoalCategory.percentage.toFixed(1)}%) estão acima do ideal.`,
+      category: 'Pessoal',
       createdAt: new Date(),
-      isRead: false
+      isRead: false,
     });
   }
 
-  // Alerta para categorias com baixo investimento
-  const lowInvestmentCategories = categories.filter(cat => cat.percentage < 3 && cat.isActive);
-  lowInvestmentCategories.forEach(cat => {
+  // Example: Alert if 'Marketing' expenses are too low
+  const marketingCategory = categories.find(cat => cat.name === 'Marketing e Comunicação');
+  if (marketingCategory && marketingCategory.percentage < 5) {
     alerts.push({
-      id: `alert-low-investment-${cat.id}`,
+      id: 'marketing-low',
       type: 'info',
-      title: 'Categoria com Baixo Investimento',
-      message: `A categoria "${cat.name}" representa apenas ${cat.percentage.toFixed(1)}% dos custos totais.`,
-      categoryId: cat.id,
-      threshold: 3,
-      currentValue: cat.percentage,
+      message: `O investimento em Marketing (${marketingCategory.percentage.toFixed(1)}%) parece baixo. Considere aumentar para impulsionar o crescimento.`,
+      category: 'Marketing e Comunicação',
       createdAt: new Date(),
-      isRead: false
+      isRead: false,
     });
-  });
-
-  // Alerta para variação entre unidades
-  categories.forEach(category => {
-    const percentages = category.unitBreakdown.map(unit => unit.percentage);
-    const maxPercentage = Math.max(...percentages);
-    const minPercentage = Math.min(...percentages);
-    const variation = maxPercentage - minPercentage;
-    
-    if (variation > 5) {
-      alerts.push({
-        id: `alert-unit-variation-${category.id}`,
-        type: 'warning',
-        title: 'Variação Significativa entre Unidades',
-        message: `A categoria "${category.name}" apresenta variação de ${variation.toFixed(1)}% entre as unidades.`,
-        categoryId: category.id,
-        threshold: 5,
-        currentValue: variation,
-        createdAt: new Date(),
-        isRead: false
-      });
-    }
-  });
+  }
 
   return alerts;
 };

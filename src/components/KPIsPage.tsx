@@ -1,12 +1,11 @@
-
 import { Card } from '@/components/ui/card';
 import { DollarSign, TrendingUp, Clock, TrendingDown, CreditCard } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { getKPIsByUnit, getHistoricalDataByUnit } from '@/utils/kpiData';
+import { getKPIsByUnit, getHistoricalDataByUnit, KPIData } from '@/utils/kpiData';
 import { KPIDetailModal } from './KPIDetailModal';
 import { CustomTooltip } from './kpi/CustomTooltip';
 import { StrategicTooltip } from './kpi/StrategicTooltip';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUnit } from '@/contexts/UnitContext';
 
 const iconMap = {
@@ -20,9 +19,34 @@ const iconMap = {
 export const KPIsPage = () => {
   const { selectedUnit, setSelectedUnit, getUnitDisplayName } = useUnit();
   const [selectedKPI, setSelectedKPI] = useState<string | null>(null);
-  
-  const kpis = getKPIsByUnit(selectedUnit);
-  const historicalData = getHistoricalDataByUnit(selectedUnit);
+  const [kpis, setKpis] = useState<KPIData[]>([]);
+  const [historicalData, setHistoricalData] = useState<any[]>([]);
+  const [comparisonData, setComparisonData] = useState<Record<string, KPIData[]>>({});
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const [kpisData, historical] = await Promise.all([
+        getKPIsByUnit(selectedUnit),
+        getHistoricalDataByUnit(selectedUnit)
+      ]);
+      setKpis(kpisData);
+      setHistoricalData(historical);
+    };
+    fetchData();
+  }, [selectedUnit]);
+
+  useEffect(() => {
+    const fetchComparisonData = async () => {
+      const units = ['campo-grande', 'recreio', 'barra'];
+      const data = await Promise.all(units.map(unitId => getKPIsByUnit(unitId)));
+      const comparison = units.reduce((acc, unitId, index) => {
+        acc[unitId] = data[index];
+        return acc;
+      }, {} as Record<string, KPIData[]>);
+      setComparisonData(comparison);
+    };
+    fetchComparisonData();
+  }, []);
   
   const handleKPIClick = (kpiId: string) => {
     setSelectedKPI(kpiId);
@@ -74,7 +98,7 @@ export const KPIsPage = () => {
       {/* Main KPIs - 5 cards in responsive grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {kpis.map((kpi) => {
-          const IconComponent = iconMap[kpi.icon as keyof typeof iconMap];
+          const IconComponent = iconMap[kpi.icon as keyof typeof iconMap] || DollarSign;
           const changeColor = kpi.change > 0 ? 'text-green-600' : kpi.change < 0 ? 'text-red-600' : 'text-gray-600';
           
           return (
@@ -245,20 +269,18 @@ export const KPIsPage = () => {
               </tr>
             </thead>
             <tbody>
-              {['campo-grande', 'recreio', 'barra'].map((unitId) => {
-                const unitKPIs = getKPIsByUnit(unitId);
+              {Object.entries(comparisonData).map(([unitId, unitKPIs]) => {
                 const unitName = getUnitDisplayName(unitId);
-                
                 return (
                   <tr key={unitId} className="border-b border-gray-100 hover:bg-gray-50">
                     <td className="py-3 px-4">
                       <span className="font-medium">{unitName}</span>
                     </td>
-                    <td className="text-right py-3 px-4">{unitKPIs[0].value}</td>
-                    <td className="text-right py-3 px-4">{unitKPIs[1].value}</td>
-                    <td className="text-right py-3 px-4">{unitKPIs[2].value}</td>
-                    <td className="text-right py-3 px-4">{unitKPIs[3].value}</td>
-                    <td className="text-right py-3 px-4">{unitKPIs[4].value}</td>
+                    <td className="text-right py-3 px-4">{unitKPIs.find(k => k.id === 'cac')?.value || 'N/A'}</td>
+                    <td className="text-right py-3 px-4">{unitKPIs.find(k => k.id === 'crc')?.value || 'N/A'}</td>
+                    <td className="text-right py-3 px-4">{unitKPIs.find(k => k.id === 'ltv')?.value || 'N/A'}</td>
+                    <td className="text-right py-3 px-4">{unitKPIs.find(k => k.id === 'churn-rate')?.value || 'N/A'}</td>
+                    <td className="text-right py-3 px-4">{unitKPIs.find(k => k.id === 'tempo-de-permanencia')?.value || 'N/A'}</td>
                   </tr>
                 );
               })}

@@ -3,18 +3,19 @@ export interface CostCenterCategory {
   id: string;
   name: string;
   description: string;
-  color: string;
-  icon: string;
+  type: 'income' | 'expense';
+  color?: string;
+  icon?: string;
   isActive: boolean;
   totalAmount: number;
   percentage: number;
-  unitBreakdown: {
+  unitBreakdown?: {
     unitId: string;
     unitName: string;
     amount: number;
     percentage: number;
   }[];
-  accounts: string[]; // Array of account IDs from chart of accounts
+  accounts?: string[]; // Array of account IDs from chart of accounts
   createdAt: Date;
   updatedAt: Date;
 }
@@ -39,10 +40,11 @@ export interface CostCenterMetrics {
 export interface CostCenterFormData {
   name: string;
   description: string;
-  color: string;
-  icon: string;
+  type: 'income' | 'expense';
+  color?: string;
+  icon?: string;
   isActive: boolean;
-  accounts: string[];
+  accounts?: string[];
 }
 
 export interface UnitCostBreakdown {

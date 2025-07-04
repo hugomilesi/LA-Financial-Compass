@@ -6,6 +6,7 @@ import { Percent, TrendingUp, TrendingDown, Target, AlertCircle } from 'lucide-r
 import { useUnit } from '@/contexts/UnitContext';
 import { usePeriod } from '@/contexts/PeriodContext';
 import { getMonthlyData } from '@/utils/dashboardData';
+import { useQuery } from '@tanstack/react-query';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 
 interface MarginDetailModalProps {
@@ -16,18 +17,25 @@ interface MarginDetailModalProps {
 export const MarginDetailModal = ({ isOpen, onClose }: MarginDetailModalProps) => {
   const { selectedUnit, getUnitDisplayName } = useUnit();
   const { getDisplayPeriod } = usePeriod();
-  const monthlyData = getMonthlyData(selectedUnit);
+  const { data: monthlyData, isLoading: isMonthlyDataLoading } = useQuery({
+    queryKey: ['monthlyData', selectedUnit],
+    queryFn: () => getMonthlyData(selectedUnit),
+  });
 
-  const currentMonth = monthlyData[monthlyData.length - 1];
-  const previousMonth = monthlyData[monthlyData.length - 2];
+  if (isMonthlyDataLoading || !monthlyData) {
+    return <div>Loading...</div>;
+  }
+
+  const currentMonth = monthlyData[monthlyData.length - 1] || {};
+  const previousMonth = monthlyData[monthlyData.length - 2] || {};
   
-  const currentMargin = ((currentMonth.receita - currentMonth.despesa) / currentMonth.receita) * 100;
-  const previousMargin = ((previousMonth.receita - previousMonth.despesa) / previousMonth.receita) * 100;
+  const currentMargin = (((currentMonth.receita || 0) - (currentMonth.despesa || 0)) / (currentMonth.receita || 1)) * 100;
+  const previousMargin = (((previousMonth.receita || 0) - (previousMonth.despesa || 0)) / (previousMonth.receita || 1)) * 100;
   const marginChange = currentMargin - previousMargin;
 
   const chartData = monthlyData.map(item => ({
     month: item.month,
-    margin: ((item.receita - item.despesa) / item.receita) * 100,
+    margin: (((item.receita || 0) - (item.despesa || 0)) / (item.receita || 1)) * 100,
     target: 20 // Target margin of 20%
   }));
 

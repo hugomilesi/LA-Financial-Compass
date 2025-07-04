@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, Building } from 'lucide-react';
-import { useUnit, UNITS } from '@/contexts/UnitContext';
+import { useUnit } from '@/contexts/UnitContext';
 
 interface PlanningFiltersProps {
   selectedPeriod: { year: number; month: number };
@@ -14,7 +14,7 @@ export const PlanningFilters = ({
   selectedPeriod, 
   onPeriodChange
 }: PlanningFiltersProps) => {
-  const { selectedUnit, setSelectedUnit } = useUnit();
+  const { selectedUnit, setSelectedUnit, units } = useUnit();
   
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i);
@@ -84,7 +84,7 @@ export const PlanningFilters = ({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {UNITS.map((unit) => (
+              {units.map((unit) => (
                 <SelectItem key={unit.id} value={unit.id}>
                   {unit.displayName}
                 </SelectItem>

@@ -7,6 +7,7 @@ import { TrendingUp, TrendingDown, DollarSign, Target, Calendar, Settings } from
 import { useUnit } from '@/contexts/UnitContext';
 import { usePeriod } from '@/contexts/PeriodContext';
 import { getMonthlyData } from '@/utils/dashboardData';
+import { useQuery } from '@tanstack/react-query';
 import { useKPIGoals } from '@/hooks/useKPIGoals';
 import { EditGoalModal } from './EditGoalModal';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
@@ -20,9 +21,16 @@ interface CashFlowDetailModalProps {
 export const CashFlowDetailModal = ({ isOpen, onClose }: CashFlowDetailModalProps) => {
   const { selectedUnit, getUnitDisplayName } = useUnit();
   const { getDisplayPeriod } = usePeriod();
-  const monthlyData = getMonthlyData(selectedUnit);
+  const { data: monthlyData, isLoading: isMonthlyDataLoading } = useQuery({
+    queryKey: ['monthlyData', selectedUnit],
+    queryFn: () => getMonthlyData(selectedUnit),
+  });
   const { getGoal, updateGoal, resetToDefault, updating } = useKPIGoals(selectedUnit);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  if (isMonthlyDataLoading || !monthlyData) {
+    return <div>Loading...</div>;
+  }
 
   const kpiName = 'Geração de Caixa';
   const currentGoal = getGoal(kpiName);
@@ -35,18 +43,18 @@ export const CashFlowDetailModal = ({ isOpen, onClose }: CashFlowDetailModalProp
     return await resetToDefault(kpiName);
   };
 
-  const currentMonth = monthlyData[monthlyData.length - 1];
-  const previousMonth = monthlyData[monthlyData.length - 2];
+  const currentMonth = monthlyData[monthlyData.length - 1] || {};
+  const previousMonth = monthlyData[monthlyData.length - 2] || {};
   
-  const currentCashFlow = currentMonth.receita - currentMonth.despesa;
-  const previousCashFlow = previousMonth.receita - previousMonth.despesa;
-  const cashFlowChange = ((currentCashFlow - previousCashFlow) / previousCashFlow) * 100;
+  const currentCashFlow = (currentMonth.receita || 0) - (currentMonth.despesa || 0);
+  const previousCashFlow = (previousMonth.receita || 0) - (previousMonth.despesa || 0);
+  const cashFlowChange = previousCashFlow !== 0 ? ((currentCashFlow - previousCashFlow) / previousCashFlow) * 100 : 0;
 
   const chartData = monthlyData.map(item => ({
     month: item.month,
-    receita: item.receita,
-    despesa: item.despesa,
-    cashFlow: item.receita - item.despesa
+    receita: item.receita || 0,
+    despesa: item.despesa || 0,
+    cashFlow: (item.receita || 0) - (item.despesa || 0)
   }));
 
   const cumulativeCashFlow = chartData.reduce((acc, current, index) => {
@@ -109,7 +117,7 @@ export const CashFlowDetailModal = ({ isOpen, onClose }: CashFlowDetailModalProp
               </CardHeader>
               <CardContent>
                 <div className="text-xl font-bold text-blue-600 mb-1">
-                  R$ {currentMonth.receita.toLocaleString()}
+                  R$ {(currentMonth.receita || 0).toLocaleString()}
                 </div>
                 <div className="text-xs text-gray-600">Entrada do mês</div>
               </CardContent>
@@ -121,7 +129,7 @@ export const CashFlowDetailModal = ({ isOpen, onClose }: CashFlowDetailModalProp
               </CardHeader>
               <CardContent>
                 <div className="text-xl font-bold text-red-600 mb-1">
-                  R$ {currentMonth.despesa.toLocaleString()}
+                  R$ {(currentMonth.despesa || 0).toLocaleString()}
                 </div>
                 <div className="text-xs text-gray-600">Saída do mês</div>
               </CardContent>
