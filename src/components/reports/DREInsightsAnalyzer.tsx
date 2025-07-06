@@ -36,7 +36,7 @@ export const DREInsightsAnalyzer = ({
       const analysisResult = await onGenerateInsights(dreData);
       setAnalysis(analysisResult);
     } catch (error) {
-      console.error('Error generating insights:', error);
+      
     } finally {
       setIsAnalyzing(false);
     }

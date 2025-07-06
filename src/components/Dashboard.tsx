@@ -11,6 +11,7 @@ import { useState } from 'react';
 import { ReportDetailModal } from './ReportDetailModal';
 import { useReports, Report } from '@/hooks/useReports';
 import { useUnit } from '@/contexts/UnitContext';
+import { usePeriod } from '@/contexts/PeriodContext';
 import { RevenueDetailModal } from './kpi/RevenueDetailModal';
 import { ExpenseDetailModal } from './kpi/ExpenseDetailModal';
 import { CashFlowDetailModal } from './kpi/CashFlowDetailModal';
@@ -19,10 +20,7 @@ import { TicketMedioDetailModal } from './kpi/TicketMedioDetailModal';
 import { CustoPorAlunoDetailModal } from './kpi/CustoPorAlunoDetailModal';
 import { AlunosAtivosDetailModal } from './kpi/AlunosAtivosDetailModal';
 import { InadimplenciaDetailModal } from './kpi/InadimplenciaDetailModal';
-import { useQuery } from '@tanstack/react-query';
-import { getKPIsByUnit, getHistoricalDataByUnit } from '@/utils/kpiData';
-import { getCostCenterCategories } from '@/utils/costCenterData';
-import { getDataByUnit } from '@/utils/unitData';
+import { useDashboardData } from '@/hooks/useDashboardData';
 
 export const Dashboard = () => {
   const [selectedKPIId, setSelectedKPIId] = useState<string | null>(null);
@@ -31,6 +29,7 @@ export const Dashboard = () => {
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [selectedKPIType, setSelectedKPIType] = useState<'revenue' | 'expense' | 'cashflow' | 'margin' | 'ticket-medio' | 'custo-por-aluno' | 'alunos-ativos' | 'inadimplencia' | null>(null);
   const { selectedUnit, getUnitDisplayName } = useUnit();
+  const { selectedPeriod } = usePeriod();
 
   const kpiConfig = {
     primary: [
@@ -47,30 +46,9 @@ export const Dashboard = () => {
     ],
   };
 
-  const { data: fetchedKpis, isLoading: kpisLoading } = useQuery({
-    queryKey: ['kpis', selectedUnit],
-    queryFn: () => getKPIsByUnit(selectedUnit, getUnitDisplayName),
-  });
-
-  const kpis = fetchedKpis ? {
-    primary: fetchedKpis.filter(kpi => kpiConfig.primary.includes(kpi.title)),
-    secondary: fetchedKpis.filter(kpi => kpiConfig.secondary.includes(kpi.title)),
-  } : { primary: [], secondary: [] };
-  const { data: historicalData, isLoading: historicalDataLoading } = useQuery({
-    queryKey: ['historicalData', selectedUnit],
-    queryFn: () => getHistoricalDataByUnit(selectedUnit),
-  });
-  const { data: costCenterCategories, isLoading: costCenterCategoriesLoading } = useQuery({
-    queryKey: ['costCenterCategories', selectedUnit],
-    queryFn: () => getCostCenterCategories(selectedUnit),
-  });
-  const { data: unitData, isLoading: unitDataLoading } = useQuery({
-    queryKey: ['unitData', selectedUnit],
-    queryFn: () => getDataByUnit(selectedUnit),
-  });
 
   const handleKPIClick = (kpi: any) => {
-    console.log('🎯 [Dashboard] KPI clicked:', kpi);
+    
     
     // Map KPI titles to modal types
     const kpiTypeMap: Record<string, 'revenue' | 'expense' | 'cashflow' | 'margin' | 'ticket-medio' | 'custo-por-aluno' | 'alunos-ativos' | 'inadimplencia'> = {
@@ -87,11 +65,11 @@ export const Dashboard = () => {
     const kpiType = kpiTypeMap[kpi.title];
     
     if (kpiType) {
-      console.log('🎯 [Dashboard] Opening detailed modal for:', kpiType);
+      
       setSelectedKPIType(kpiType);
     } else {
       // Fallback to original KPI modal for other KPIs
-      console.log('🎯 [Dashboard] Opening original KPI modal for:', kpi.id);
+      
       setSelectedKPIId(kpi.id);
     }
   };
@@ -116,8 +94,8 @@ export const Dashboard = () => {
     setSelectedReport(null);
   };
 
-  if (kpisLoading || historicalDataLoading || costCenterCategoriesLoading || unitDataLoading) {
-    return <div>Loading...</div>;
+  if (loading) {
+    return <div>Carregando dados do dashboard...</div>;
   }
 
   return (
@@ -130,7 +108,7 @@ export const Dashboard = () => {
         <KPISections onKPIClick={handleKPIClick} kpis={kpis} />
 
         {/* Charts Section */}
-        <ChartsSection onChartClick={handleChartClick} historicalData={historicalData} costCenterCategories={costCenterCategories} />
+        <ChartsSection onChartClick={handleChartClick} historicalData={monthlyFinancials} costCenterCategories={costCenterDistribution} />
 
         {/* AI Insights */}
         <AIInsights />

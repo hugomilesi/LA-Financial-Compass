@@ -14,7 +14,7 @@ export const getDataByUnit = async (unitId: string): Promise<UnitFinancialData |
     if (unitId === 'all') {
         const { data, error } = await supabase.from('units').select('receita, despesa, alunos, matriculas, ticket_medio, capacidade, ocupacao');
         if (error) {
-            console.error('Error fetching consolidated unit data:', error);
+            
             return null;
         }
 
@@ -34,7 +34,7 @@ export const getDataByUnit = async (unitId: string): Promise<UnitFinancialData |
     } else {
         const { data, error } = await supabase.from('units').select('*').eq('id', unitId).single();
         if (error) {
-            console.error(`Error fetching data for unit ${unitId}:`, error);
+            
             return null;
         }
         return data;

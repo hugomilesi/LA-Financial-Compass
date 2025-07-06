@@ -1,6 +1,6 @@
 
 export interface CostCenterCategory {
-  id: string;
+  categoryId: string;
   name: string;
   description: string;
   type: 'income' | 'expense';

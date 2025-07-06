@@ -54,7 +54,7 @@ export const KPICard = ({
 
   const handleClick = () => {
     if (onClick) {
-      console.log('🎯 [KPICard] Card clicked:', title);
+      
       onClick();
     }
   };

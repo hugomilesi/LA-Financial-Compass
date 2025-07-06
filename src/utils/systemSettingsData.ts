@@ -5,7 +5,7 @@ import { SystemSettingsData } from '@/types/systemSettings';
 export const getSystemSettingsData = async (): Promise<SystemSettingsData> => {
     const { data, error } = await supabase.from('system_settings').select('key, value');
     if (error) {
-        console.error('Error fetching system settings:', error);
+        
         return {} as SystemSettingsData;
     }
 

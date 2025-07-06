@@ -294,7 +294,7 @@ export const ReportsDREPage = () => {
   };
 
   const handleSaveReportTemplate = (template: any) => {
-    console.log('Saving template:', template);
+    
     toast({
       title: "Template salvo",
       description: "O template foi salvo com sucesso"
@@ -302,7 +302,7 @@ export const ReportsDREPage = () => {
   };
 
   const handlePreviewReport = (template: any) => {
-    console.log('Previewing report:', template);
+    
     toast({
       title: "Visualização gerada",
       description: "Confira a prévia do seu relatório"
@@ -310,7 +310,7 @@ export const ReportsDREPage = () => {
   };
 
   const handleEditReport = (report: any) => {
-    console.log('Editing report:', report);
+    
     toast({
       title: "Editando relatório",
       description: `Abrindo editor para ${report.name}`
@@ -342,7 +342,7 @@ export const ReportsDREPage = () => {
   };
 
   const handleGenerateReport = (report: any) => {
-    console.log('Generating report:', report);
+    
     toast({
       title: "Gerando relatório",
       description: `Processando ${report.name}...`
@@ -390,17 +390,17 @@ export const ReportsDREPage = () => {
   };
 
   const handleExport = (options: any) => {
-    console.log('Exporting with options:', options);
+    
     // Implementation would call the enhanced fileDownload utility
   };
 
   const handleWhatsAppShare = (whatsappOptions: any, exportOptions: any) => {
-    console.log('WhatsApp share:', { whatsappOptions, exportOptions });
+    
     // Implementation would integrate with WhatsApp Business API
   };
 
   const handleEmailShare = (emailOptions: any, exportOptions: any) => {
-    console.log('Email share:', { emailOptions, exportOptions });
+    
     // Implementation would use email service
   };
 

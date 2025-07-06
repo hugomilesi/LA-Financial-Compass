@@ -40,16 +40,16 @@ export const UnitAIInsights = ({ performanceData, selectedUnit }: UnitAIInsights
   }, [performanceData, selectedUnit]);
 
   const generateInsights = async () => {
-    console.log('🧠 [UnitAIInsights] Generating AI insights...');
+    
     setIsLoading(true);
     
     try {
       const aiService = new AIInsightService();
       const generatedInsights = await aiService.generateInsights(performanceData, selectedUnit);
       setInsights(generatedInsights);
-      console.log('✅ [UnitAIInsights] Generated insights:', generatedInsights.length);
+      
     } catch (error) {
-      console.error('❌ [UnitAIInsights] Error generating insights:', error);
+      
       setInsights([]);
     } finally {
       setIsLoading(false);

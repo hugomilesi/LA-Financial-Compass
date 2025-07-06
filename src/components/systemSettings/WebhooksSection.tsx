@@ -50,12 +50,12 @@ export const WebhooksSection = ({ webhooks, onUpdateWebhook, onDeleteWebhook, on
   };
 
   const handleTestWebhook = async (webhook: Webhook) => {
-    console.log('🧪 [WebhooksSection] Testing webhook:', webhook.name);
+    
     setTestingWebhook(webhook.id);
     
     try {
       const result = await onTestWebhook(webhook.id);
-      console.log('✅ [WebhooksSection] Test result:', result);
+      
       
       toast({
         title: "Teste de Webhook",
@@ -63,7 +63,7 @@ export const WebhooksSection = ({ webhooks, onUpdateWebhook, onDeleteWebhook, on
         variant: result.success ? "default" : "destructive",
       });
     } catch (error) {
-      console.error('❌ [WebhooksSection] Test error:', error);
+      
       toast({
         title: "Erro no Teste",
         description: `Falha ao testar webhook ${webhook.name}`,
@@ -75,25 +75,25 @@ export const WebhooksSection = ({ webhooks, onUpdateWebhook, onDeleteWebhook, on
   };
 
   const handleEditWebhook = (webhook: Webhook) => {
-    console.log('✏️ [WebhooksSection] Edit webhook:', webhook.name);
+    
     setSelectedWebhook(webhook);
     setIsModalOpen(true);
   };
 
   const handleNewWebhook = () => {
-    console.log('➕ [WebhooksSection] New webhook');
+    
     setSelectedWebhook(null);
     setIsModalOpen(true);
   };
 
   const handleSaveWebhook = (webhook: Webhook) => {
-    console.log('💾 [WebhooksSection] Save webhook:', webhook.name);
+    
     onUpdateWebhook(webhook);
     setIsModalOpen(false);
   };
 
   const handleDeleteWebhook = (webhook: Webhook) => {
-    console.log('🗑️ [WebhooksSection] Delete webhook:', webhook.name);
+    
     onDeleteWebhook(webhook.id);
     toast({
       title: "Webhook Removido",

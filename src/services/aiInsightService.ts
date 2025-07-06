@@ -9,7 +9,7 @@ export class AIInsightService {
   }
 
   async generateInsights(performanceData: UnitPerformanceData[], selectedUnit?: string): Promise<any[]> {
-    console.log('🤖 [AIInsightService] Generating insights for:', selectedUnit, 'with', performanceData.length, 'units');
+    
     
     // Simulate AI processing time
     await new Promise(resolve => setTimeout(resolve, 2000));
@@ -19,13 +19,13 @@ export class AIInsightService {
       // For now, we'll generate intelligent mock insights based on the actual data
       return this.generateIntelligentInsights(performanceData, selectedUnit);
     } catch (error) {
-      console.error('❌ [AIInsightService] Error:', error);
+      
       throw error;
     }
   }
 
   private generateIntelligentInsights(performanceData: UnitPerformanceData[], selectedUnit?: string) {
-    console.log('📊 [AIInsightService] Analyzing performance data...');
+    
     
     const insights = [];
     const filteredData = selectedUnit === 'all' 
@@ -185,14 +185,14 @@ export class AIInsightService {
       });
     }
 
-    console.log('✅ [AIInsightService] Generated', insights.length, 'intelligent insights');
+    
     return insights;
   }
 
   async callAIService(prompt: string, data: any): Promise<string> {
     // This would be the actual AI API call
     // For demonstration, we'll return a simulated response
-    console.log('🤖 [AIInsightService] AI API call with prompt:', prompt.substring(0, 100) + '...');
+    
     
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 1500));

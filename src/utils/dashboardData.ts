@@ -5,15 +5,15 @@ import { PeriodFilter } from '@/contexts/PeriodContext';
 
 // Dynamic cost center data based on selected unit and period
 export const getCostCenterData = (unitId: string, period?: PeriodFilter) => {
-  console.log('📊 [dashboardData.getCostCenterData] Requested unit:', unitId, 'Period:', period);
+  
   const result = getCostCenterDataByUnit(unitId);
-  console.log('📈 [dashboardData.getCostCenterData] Result:', result);
+  
   return result;
 };
 
 // Dynamic cost center detail data based on selected unit and period
 export const getCostCenterDetailData = (unitId: string, period?: PeriodFilter) => {
-  console.log('📊 [dashboardData.getCostCenterDetailData] Requested unit:', unitId, 'Period:', period);
+  
   const costCenterData = getCostCenterDataByUnit(unitId);
   
   const result = costCenterData.map(item => ({
@@ -22,7 +22,7 @@ export const getCostCenterDetailData = (unitId: string, period?: PeriodFilter) =
     percentual: item.value
   }));
   
-  console.log('📈 [dashboardData.getCostCenterDetailData] Result:', result);
+  
   return result;
 };
 
@@ -37,7 +37,7 @@ export const costCenterData = [
 
 // Dynamic monthly data based on selected unit and period
 export const getMonthlyData = (unitId: string, period?: PeriodFilter) => {
-  console.log('📊 [dashboardData.getMonthlyData] Requested unit:', unitId, 'Period:', period);
+  
   
   let result = getHistoricalDataByUnit(unitId);
   
@@ -45,18 +45,18 @@ export const getMonthlyData = (unitId: string, period?: PeriodFilter) => {
   if (period) {
     if (period.viewType === 'monthly' && !period.dateRange) {
       // For monthly view without custom date range, show all months but highlight current
-      console.log('📅 Monthly view - showing all data with focus on:', period.month, period.year);
+      
     } else if (period.dateRange) {
       // Handle custom date range - for now, keep all data
       // In a real implementation, you would filter based on the date range
-      console.log('📅 Custom date range filtering not fully implemented yet');
+      
     } else if (period.viewType === 'ytd') {
       // For YTD, show data up to current month
-      console.log('📅 YTD view - showing year-to-date data for:', period.year);
+      
     }
   }
   
-  console.log('📈 [dashboardData.getMonthlyData] Result:', result);
+  
   return result;
 };
 
@@ -71,10 +71,10 @@ const getMonthlyDataPoint = (unitId: string, year: number, month: number) => {
 
 // Dynamic KPI calculations based on selected unit and period
 export const getPrimaryKPIs = (unitId: string, period?: PeriodFilter, customGoals?: Record<string, number>) => {
-  console.log('🎯 [dashboardData.getPrimaryKPIs] Starting calculation for unit:', unitId, 'Period:', period);
+  
   
   const historicalData = getHistoricalDataByUnit(unitId);
-  console.log('📈 [dashboardData.getPrimaryKPIs] Historical data:', historicalData);
+  
   
   let currentMonth, previousMonth;
   
@@ -86,7 +86,7 @@ export const getPrimaryKPIs = (unitId: string, period?: PeriodFilter, customGoal
     const prevYear = period.month === 1 ? period.year - 1 : period.year;
     previousMonth = getMonthlyDataPoint(unitId, prevYear, prevMonth);
     
-    console.log('📅 [getPrimaryKPIs] Specific month data - Current:', currentMonth, 'Previous:', previousMonth);
+    
   } else if (period && period.viewType === 'ytd') {
     // For YTD, calculate accumulated values up to current date
     const currentDate = new Date();
@@ -105,33 +105,32 @@ export const getPrimaryKPIs = (unitId: string, period?: PeriodFilter, customGoal
     
     previousMonth = { receita: prevTotalReceita, despesa: prevTotalDespesa };
     
-    console.log('📅 [getPrimaryKPIs] YTD data - Current:', currentMonth, 'Previous:', previousMonth);
+    
   } else {
     // Default behavior - use latest month
     currentMonth = historicalData[historicalData.length - 1];
     previousMonth = historicalData[historicalData.length - 2];
-    console.log('📅 [getPrimaryKPIs] Default data - Current:', currentMonth, 'Previous:', previousMonth);
+    
   }
   
   const totalRevenue = currentMonth.receita;
   const totalExpenses = currentMonth.despesa;
   const cashGeneration = totalRevenue - totalExpenses;
-  const netMargin = ((cashGeneration / totalRevenue) * 100);
+  const netMargin = (totalRevenue > 0) ? ((cashGeneration / totalRevenue) * 100) : 0;
   
   const previousCashGeneration = previousMonth.receita - previousMonth.despesa;
-  const previousNetMargin = ((previousCashGeneration / previousMonth.receita) * 100);
+  const previousNetMargin = (previousMonth.receita > 0) ? ((previousCashGeneration / previousMonth.receita) * 100) : 0;
 
   // Calculate percentage changes
-  const revenueChange = ((totalRevenue - previousMonth.receita) / previousMonth.receita) * 100;
-  const expenseChange = ((totalExpenses - previousMonth.despesa) / previousMonth.despesa) * 100;
-  const cashChange = ((cashGeneration - previousCashGeneration) / previousCashGeneration) * 100;
+  const revenueChange = (previousMonth.receita > 0) ? ((totalRevenue - previousMonth.receita) / previousMonth.receita) * 100 : 0;
+  const expenseChange = (previousMonth.despesa > 0) ? ((totalExpenses - previousMonth.despesa) / previousMonth.despesa) * 100 : 0;
+  const cashChange = (previousCashGeneration > 0) ? ((cashGeneration - previousCashGeneration) / previousCashGeneration) * 100 : 0;
   const marginChange = netMargin - previousNetMargin;
 
-  console.log('💰 [dashboardData.getPrimaryKPIs] Total Revenue:', totalRevenue);
-  console.log('💸 [dashboardData.getPrimaryKPIs] Total Expenses:', totalExpenses);
-  console.log('💵 [dashboardData.getPrimaryKPIs] Cash Generation:', cashGeneration);
-  console.log('📊 [dashboardData.getPrimaryKPIs] Net Margin:', netMargin);
-
+  
+  
+  
+  
   // Traffic light system based on goals
   const getTrafficLightStatus = (current: number, target: number, isReversed = false) => {
     if (isReversed) {
@@ -141,7 +140,7 @@ export const getPrimaryKPIs = (unitId: string, period?: PeriodFilter, customGoal
       return 'danger' as const;  // Over budget
     } else {
       // For revenue, margin - higher is better
-      const percentage = (current / target) * 100;
+      const percentage = (target > 0) ? (current / target) * 100 : (current > 0 ? 100 : 0);
       if (percentage >= 95) return 'success' as const;  // 95%+ of goal
       if (percentage >= 80) return 'warning' as const;  // 80-94% of goal
       return 'danger' as const;  // Less than 80% of goal
@@ -197,16 +196,11 @@ export const getPrimaryKPIs = (unitId: string, period?: PeriodFilter, customGoal
     }
   ];
 
-  console.log('✅ [dashboardData.getPrimaryKPIs] Final result:', result);
   return result;
 };
 
 export const getSecondaryKPIs = (unitId: string, period?: PeriodFilter, customGoals?: Record<string, number>) => {
-  console.log('🎯 [dashboardData.getSecondaryKPIs] Starting calculation for unit:', unitId, 'Period:', period);
-  
   const data = getDataByUnit(unitId);
-  console.log('📊 [dashboardData.getSecondaryKPIs] Unit data:', data);
-  
   const historicalData = getHistoricalDataByUnit(unitId);
   
   let currentMonth, previousMonth;
@@ -256,11 +250,6 @@ export const getSecondaryKPIs = (unitId: string, period?: PeriodFilter, customGo
   const previousDelinquency = currentDelinquency + 0.3; // Previous month was slightly higher
   const delinquencyChange = currentDelinquency - previousDelinquency;
 
-  console.log('🎫 [dashboardData.getSecondaryKPIs] Average Ticket:', averageTicket);
-  console.log('💰 [dashboardData.getSecondaryKPIs] Cost per Student:', costPerStudent);
-  console.log('👥 [dashboardData.getSecondaryKPIs] Active Students:', currentActiveStudents);
-  console.log('⚠️ [dashboardData.getSecondaryKPIs] Delinquency Rate:', currentDelinquency);
-
   // Traffic light system for secondary KPIs
   const getSecondaryTrafficLightStatus = (current: number, target: number, isReversed = false) => {
     if (isReversed) {
@@ -270,7 +259,7 @@ export const getSecondaryKPIs = (unitId: string, period?: PeriodFilter, customGo
       return 'danger' as const;  // Over target
     } else {
       // For ticket, students - higher is better
-      const percentage = (current / target) * 100;
+      const percentage = (target > 0) ? (current / target) * 100 : (current > 0 ? 100 : 0);
       if (percentage >= 95) return 'success' as const;  // 95%+ of goal
       if (percentage >= 80) return 'warning' as const;  // 80-94% of goal
       return 'danger' as const;  // Less than 80% of goal
@@ -327,13 +316,12 @@ export const getSecondaryKPIs = (unitId: string, period?: PeriodFilter, customGo
     }
   ];
 
-  console.log('✅ [dashboardData.getSecondaryKPIs] Final result:', result);
   return result;
 };
 
 // Dynamic DRE data calculation
 export const getDREData = (unitId: string, period?: PeriodFilter) => {
-  console.log('📊 [dashboardData.getDREData] Calculating DRE for unit:', unitId, 'Period:', period);
+  
   
   const historicalData = getHistoricalDataByUnit(unitId);
   const costCenterData = getCostCenterDataByUnit(unitId);
@@ -388,12 +376,8 @@ export const getDREData = (unitId: string, period?: PeriodFilter) => {
   const operacional = despesasPorCategoria['Operacional'] || Math.round(totalDespesa * 0.087);
   const outros = totalDespesa - pessoal - aluguel - marketing - operacional;
   
-  console.log('📈 [dashboardData.getDREData] Calculated DRE:', {
-    totalReceita,
-    totalDespesa,
-    lucroLiquido,
-    periodLabel
-  });
+  
+    
   
   return {
     periodLabel,
@@ -417,7 +401,7 @@ export const getDREData = (unitId: string, period?: PeriodFilter) => {
 
 // Helper function to get consolidated data for multiple units
 export const getConsolidatedDREData = (unitIds: string[], period?: PeriodFilter) => {
-  console.log('📊 [dashboardData.getConsolidatedDREData] Consolidating for units:', unitIds, 'Period:', period);
+  
   
   if (unitIds.includes('all') || unitIds.length === 0) {
     return getDREData('all', period);
@@ -451,5 +435,3 @@ export const getConsolidatedDREData = (unitIds: string[], period?: PeriodFilter)
   
   return consolidated;
 };
-
-

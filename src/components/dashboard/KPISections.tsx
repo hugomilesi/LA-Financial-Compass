@@ -34,35 +34,47 @@ const kpiConfig = {
 }
 
 export const KPISections = ({ onKPIClick, kpis }: KPISectionsProps) => {
-  if (!kpis || !kpis.primary || !kpis.secondary) {
-    return null; // Or a loading spinner/skeleton
-  }
+  const primaryKpisData = kpis?.primary || [];
+  const secondaryKpisData = kpis?.secondary || [];
 
-  const mapKPIWithIcon = (kpi: any, type: 'primary' | 'secondary') => ({
-    ...kpi,
-    ...kpiConfig[type].find(c => c.title === kpi.title),
+  const primaryKpisToRender = kpiConfig.primary.map(config => {
+    const found = primaryKpisData.find(data => data.title === config.title);
+    return {
+      ...config,
+      value: found?.value ?? "--",
+      percentage: found?.percentage ?? "--",
+    };
+  });
+
+  const secondaryKpisToRender = kpiConfig.secondary.map(config => {
+    const found = secondaryKpisData.find(data => data.title === config.title);
+    return {
+      ...config,
+      value: found?.value ?? "--",
+      percentage: found?.percentage ?? "--",
+    };
   });
 
   return (
     <>
       {/* Primary KPIs - Top 4 metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {kpis.primary.map((kpi: any, index: number) => (
-          <KPICard 
+        {primaryKpisToRender.map((kpi: any, index: number) => (
+          <KPICard
             key={`primary-${index}`}
-            {...mapKPIWithIcon(kpi, 'primary')} 
-            onClick={() => onKPIClick(kpi)} 
+            {...kpi}
+            onClick={() => onKPIClick(kpi)}
           />
         ))}
       </div>
 
       {/* Secondary KPIs - Additional metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {kpis.secondary.map((kpi: any, index: number) => (
-          <KPICard 
+        {secondaryKpisToRender.map((kpi: any, index: number) => (
+          <KPICard
             key={`secondary-${index}`}
-            {...mapKPIWithIcon(kpi, 'secondary')} 
-            onClick={() => onKPIClick(kpi)} 
+            {...kpi}
+            onClick={() => onKPIClick(kpi)}
           />
         ))}
       </div>

@@ -81,7 +81,7 @@ export const useQuickActions = () => {
       });
       
     } catch (error) {
-      console.error('Export error:', error);
+      
       toast({
         title: "Erro na exportação",
         description: "Não foi possível exportar o DRE. Tente novamente.",
@@ -134,7 +134,7 @@ export const useQuickActions = () => {
       });
       
     } catch (error) {
-      console.error('Report generation error:', error);
+      
       toast({
         title: "Erro na geração",
         description: "Não foi possível gerar o relatório. Tente novamente.",

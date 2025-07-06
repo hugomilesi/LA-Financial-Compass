@@ -33,16 +33,16 @@ export const AIInsightsModal = ({ isOpen, onClose, performanceData, selectedUnit
   const [activeTab, setActiveTab] = useState('overview');
 
   const generateInsights = async () => {
-    console.log('🧠 [AIInsightsModal] Generating AI insights...');
+    
     setIsLoading(true);
     
     try {
       const aiService = new AIInsightService();
       const generatedInsights = await aiService.generateInsights(performanceData, selectedUnit);
       setInsights(generatedInsights);
-      console.log('✅ [AIInsightsModal] Generated insights:', generatedInsights.length);
+      
     } catch (error) {
-      console.error('❌ [AIInsightsModal] Error generating insights:', error);
+      
       // Fallback to demo insights
       setInsights(generateDemoInsights());
     } finally {

@@ -14,7 +14,7 @@ import { UnitDetailModal } from './unitPerformance/UnitDetailModal';
 import { UnitAIInsights } from './unitPerformance/UnitAIInsights';
 
 export const UnitPerformancePage = () => {
-  console.log('🎯 [UnitPerformancePage] Component is rendering...');
+  
   
   const { 
     performanceData, 
@@ -25,12 +25,8 @@ export const UnitPerformancePage = () => {
     refreshData 
   } = useUnitPerformance();
   
-  console.log('📊 [UnitPerformancePage] Hook data:', {
-    performanceDataLength: performanceData?.length || 0,
-    comparisonsLength: comparisons?.length || 0,
-    rankingsLength: rankings?.length || 0,
-    isLoading
-  });
+  
+    
   
   const { getDisplayPeriod } = usePeriod();
   const { selectedUnit, setSelectedUnit, getUnitDisplayName } = useUnit();
@@ -59,7 +55,7 @@ export const UnitPerformancePage = () => {
     : rankings.filter(rank => rank.unitId === selectedUnit);
 
   const handleExportData = () => {
-    console.log('📤 [UnitPerformancePage] Exporting data...');
+    
     try {
       const dataToExport = filteredData;
       const csvContent = [
@@ -83,14 +79,14 @@ export const UnitPerformancePage = () => {
       link.download = `desempenho-unidades-${selectedUnit}-${new Date().toISOString().split('T')[0]}.csv`;
       link.click();
     } catch (error) {
-      console.error('❌ [UnitPerformancePage] Export error:', error);
+      
     }
   };
 
-  console.log('🔄 [UnitPerformancePage] Rendering state - isLoading:', isLoading);
+  
 
   if (isLoading) {
-    console.log('⏳ [UnitPerformancePage] Showing loading state');
+    
     return (
       <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
         <div className="flex items-center justify-center h-64">
@@ -103,7 +99,7 @@ export const UnitPerformancePage = () => {
     );
   }
 
-  console.log('📈 [UnitPerformancePage] Calculating summary metrics...');
+  
 
   // Calculate summary metrics with error handling
   const totalRevenue = filteredData?.reduce((sum, unit) => {
@@ -124,17 +120,12 @@ export const UnitPerformancePage = () => {
     ? (filteredData.reduce((sum, unit) => sum + (unit?.financial?.revenueGrowth || 0), 0) / filteredData.length)
     : 0;
 
-  console.log('💰 [UnitPerformancePage] Summary metrics:', {
-    totalRevenue,
-    totalStudents,
-    averageProfitMargin,
-    averageRevenueGrowth,
-    unitsCount: filteredData?.length || 0
-  });
+  
+    
 
   // Error fallback
   if (!performanceData || performanceData.length === 0) {
-    console.log('⚠️ [UnitPerformancePage] No performance data available');
+    
     return (
       <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
         <div className="flex items-center justify-center h-64">
@@ -152,7 +143,7 @@ export const UnitPerformancePage = () => {
     );
   }
 
-  console.log('✅ [UnitPerformancePage] Rendering main content with', filteredData.length, 'units');
+  
 
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">

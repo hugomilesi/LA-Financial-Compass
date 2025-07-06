@@ -44,7 +44,7 @@ export const useKPIGoals = (unitId: string = 'all') => {
       const { data, error } = await query;
 
       if (error) {
-        console.error('Error fetching KPI goals:', error);
+        
         toast.error('Erro ao carregar metas dos KPIs');
         return;
       }
@@ -57,7 +57,7 @@ export const useKPIGoals = (unitId: string = 'all') => {
 
       setGoals({ ...DEFAULT_GOALS, ...customGoals });
     } catch (error) {
-      console.error('Error in fetchGoals:', error);
+      
       toast.error('Erro ao carregar metas dos KPIs');
     } finally {
       setLoading(false);
@@ -84,7 +84,7 @@ export const useKPIGoals = (unitId: string = 'all') => {
         });
 
       if (error) {
-        console.error('Error updating KPI goal:', error);
+        
         toast.error('Erro ao salvar meta do KPI');
         return false;
       }
@@ -98,7 +98,7 @@ export const useKPIGoals = (unitId: string = 'all') => {
       toast.success('Meta atualizada com sucesso!');
       return true;
     } catch (error) {
-      console.error('Error in updateGoal:', error);
+      
       toast.error('Erro ao salvar meta do KPI');
       return false;
     } finally {
@@ -125,7 +125,7 @@ export const useKPIGoals = (unitId: string = 'all') => {
       const { error } = await query;
 
       if (error) {
-        console.error('Error deleting KPI goal:', error);
+        
         toast.error('Erro ao resetar meta do KPI');
         return false;
       }
@@ -139,7 +139,7 @@ export const useKPIGoals = (unitId: string = 'all') => {
       toast.success('Meta resetada para o valor padrão!');
       return true;
     } catch (error) {
-      console.error('Error in resetToDefault:', error);
+      
       toast.error('Erro ao resetar meta do KPI');
     } finally {
       setUpdating(false);

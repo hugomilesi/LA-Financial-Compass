@@ -23,7 +23,7 @@ export const useCostCenterCategories = () => {
           updatedAt: new Date(category.updatedAt)
         })));
       } catch (error) {
-        console.error('Error parsing stored categories:', error);
+        
         setCategories(DEFAULT_COST_CENTER_CATEGORIES);
       }
     } else {
@@ -40,7 +40,7 @@ export const useCostCenterCategories = () => {
           createdAt: new Date(alert.createdAt)
         })));
       } catch (error) {
-        console.error('Error parsing stored alerts:', error);
+        
       }
     }
   }, []);
@@ -94,18 +94,18 @@ export const useCostCenterCategories = () => {
   };
 
   const deleteCategory = (id: string) => {
-    const updatedCategories = categories.filter(category => category.id !== id);
+    const updatedCategories = categories.filter(cat => cat.categoryId !== categoryId);
     saveToStorage(updatedCategories);
   };
 
   const getCategoryMetrics = async (unitId: string = 'all'): Promise<CostCenterMetrics> => {
-    console.log('🔍 [getCategoryMetrics] Calculating metrics for unit:', unitId);
+    
     
     // Get unit-specific financial data
     const unitData = await getDataByUnit(unitId);
     const totalExpenses = unitData?.despesa || 0;
     
-    console.log('💸 [getCategoryMetrics] Total expenses from unit data:', totalExpenses);
+    
     
     // Get unit-specific categories
     const unitCategories = await getCategoriesByUnit(unitId);
@@ -130,16 +130,16 @@ export const useCostCenterCategories = () => {
       monthlyGrowth: 2.3 // This would come from historical data in a real app
     };
     
-    console.log('📊 [getCategoryMetrics] Final metrics:', metrics);
+    
     return metrics;
   };
 
   const getCategoriesByUnit = async (unitId: string) => {
-    console.log('🔍 [getCategoriesByUnit] Getting categories for unit:', unitId);
+    
     
     // Get dynamic cost center data for the unit
     const unitCostData = await getCostCenterDataByUnit(unitId);
-    console.log('📊 [getCategoriesByUnit] Unit cost data:', unitCostData);
+    
     
     // Map the categories to match the cost center data
     const updatedCategories = categories.map(category => {
@@ -162,7 +162,7 @@ export const useCostCenterCategories = () => {
       });
       
       if (matchingCostData) {
-        console.log(`✅ [getCategoriesByUnit] Found match for ${category.name}:`, matchingCostData);
+        
         return {
           ...category,
           totalAmount: matchingCostData.amount,
@@ -171,7 +171,7 @@ export const useCostCenterCategories = () => {
       }
       
       // If no match found, return with zero values for this unit
-      console.log(`❌ [getCategoriesByUnit] No match found for ${category.name}`);
+      
       return {
         ...category,
         totalAmount: 0,
@@ -179,7 +179,7 @@ export const useCostCenterCategories = () => {
       };
     });
     
-    console.log('🏁 [getCategoriesByUnit] Final categories:', updatedCategories);
+    
     return updatedCategories;
   };
 

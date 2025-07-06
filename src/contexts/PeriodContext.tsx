@@ -56,14 +56,14 @@ export const PeriodProvider = ({ children }: PeriodProviderProps) => {
         .order('date_ref', { ascending: true });
 
       if (error) {
-        console.error('Error fetching available dates:', error);
+        
         return;
       }
 
       if (data) {
         const uniqueDates = Array.from(new Set(data.map(item => item.date_ref)));
         const years = Array.from(new Set(uniqueDates.map(dateStr => new Date(dateStr).getFullYear()))).sort((a, b) => a - b);
-        setAvailableYears(years);
+        setAvailableYears(years as number[]);
 
         const monthNames = [
           'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -82,6 +82,13 @@ export const PeriodProvider = ({ children }: PeriodProviderProps) => {
             year: latestDate.getFullYear(),
             month: latestDate.getMonth() + 1,
           }));
+        } else {
+          // Fallback to a known date if no data is found (e.g., 2024-07-01 from sample data)
+          setPeriodFilter(prev => ({
+            ...prev,
+            year: 2024,
+            month: 7, // July
+          }));
         }
       }
     };
@@ -90,37 +97,30 @@ export const PeriodProvider = ({ children }: PeriodProviderProps) => {
   }, []);
 
   const updateMonth = (month: number) => {
-    console.log('🔄 [PeriodContext] Updating month to:', month);
+    
     setPeriodFilter(prev => {
       const newFilter = { ...prev, month };
-      console.log('🔄 [PeriodContext] New period filter:', newFilter);
       return newFilter;
     });
   };
 
   const updateYear = (year: number) => {
-    console.log('🔄 [PeriodContext] Updating year to:', year);
     setPeriodFilter(prev => {
       const newFilter = { ...prev, year };
-      console.log('🔄 [PeriodContext] New period filter:', newFilter);
       return newFilter;
     });
   };
 
   const updateViewType = (viewType: 'monthly' | 'ytd') => {
-    console.log('🔄 [PeriodContext] Updating view type to:', viewType);
     setPeriodFilter(prev => {
       const newFilter = { ...prev, viewType };
-      console.log('🔄 [PeriodContext] New period filter:', newFilter);
       return newFilter;
     });
   };
 
   const updateDateRange = (dateRange?: { start: Date; end: Date }) => {
-    console.log('🔄 [PeriodContext] Updating date range to:', dateRange);
     setPeriodFilter(prev => {
       const newFilter = { ...prev, dateRange };
-      console.log('🔄 [PeriodContext] New period filter:', newFilter);
       return newFilter;
     });
   };

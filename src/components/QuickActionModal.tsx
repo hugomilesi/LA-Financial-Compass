@@ -55,9 +55,9 @@ const unitAnalysisData = [
   // Update DRE preview data when export config changes
   useEffect(() => {
     if (actionType === 'export-dre') {
-      console.log('🔄 [QuickActionModal] Updating DRE preview data');
-      console.log('📊 Export config:', exportConfig);
-      console.log('📅 Period filter:', periodFilter);
+      
+      
+      
       
       // Determine which period to use based on export config
       let period = periodFilter;
@@ -75,7 +75,7 @@ const unitAnalysisData = [
       const dreData = getConsolidatedDREData(exportConfig.units, period);
       setDrePreviewData(dreData);
       
-      console.log('📈 [QuickActionModal] DRE preview data updated:', dreData);
+      
     }
   }, [actionType, exportConfig, periodFilter]);
 

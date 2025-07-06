@@ -11,12 +11,12 @@ export const DashboardHeader = () => {
   const { getDisplayPeriod } = usePeriod();
 
   useEffect(() => {
-    console.log('🏢 [DashboardHeader] Selected Unit:', selectedUnit);
-    console.log('🏢 [DashboardHeader] Display Name:', getUnitDisplayName(selectedUnit));
+    
+    
   }, [selectedUnit, getUnitDisplayName]);
 
   const handleUnitChange = (newUnit: string) => {
-    console.log('🔄 [DashboardHeader] Unit changing from', selectedUnit, 'to', newUnit);
+    
     setSelectedUnit(newUnit);
   };
 

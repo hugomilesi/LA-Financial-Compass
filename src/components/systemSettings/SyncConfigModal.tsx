@@ -32,10 +32,10 @@ export const SyncConfigModal = ({ syncConfig, isOpen, onClose, onSave }: SyncCon
   useEffect(() => {
     if (isOpen) {
       if (syncConfig) {
-        console.log('📝 [SyncConfigModal] Editing sync config:', syncConfig.name);
+        
         setFormData(syncConfig);
       } else {
-        console.log('➕ [SyncConfigModal] Creating new sync config');
+        
         setFormData({
           name: '',
           source: '',
@@ -49,7 +49,7 @@ export const SyncConfigModal = ({ syncConfig, isOpen, onClose, onSave }: SyncCon
   }, [syncConfig, isOpen]);
 
   const handleSave = () => {
-    console.log('💾 [SyncConfigModal] Saving sync config:', formData.name);
+    
     
     if (!formData.name || !formData.source || !formData.target) {
       toast({
@@ -84,7 +84,7 @@ export const SyncConfigModal = ({ syncConfig, isOpen, onClose, onSave }: SyncCon
   };
 
   const handleCancel = () => {
-    console.log('❌ [SyncConfigModal] Cancelling sync config modal');
+    
     onClose();
   };
 

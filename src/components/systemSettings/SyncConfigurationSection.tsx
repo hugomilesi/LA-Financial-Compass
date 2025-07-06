@@ -64,7 +64,7 @@ export const SyncConfigurationSection = ({ syncConfigurations }: SyncConfigurati
   };
 
   const handleRunSync = async (sync: SyncConfiguration) => {
-    console.log('🔄 [SyncConfigurationSection] Running sync:', sync.name);
+    
     setRunningSyncs(prev => new Set(prev).add(sync.id));
     
     try {
@@ -76,7 +76,7 @@ export const SyncConfigurationSection = ({ syncConfigurations }: SyncConfigurati
         description: `${sync.name} foi executado com sucesso`,
       });
     } catch (error) {
-      console.error('❌ [SyncConfigurationSection] Sync error:', error);
+      
       toast({
         title: "Erro na Sincronização",
         description: `Falha ao executar ${sync.name}`,
@@ -92,7 +92,7 @@ export const SyncConfigurationSection = ({ syncConfigurations }: SyncConfigurati
   };
 
   const handleToggleSync = async (sync: SyncConfiguration) => {
-    console.log('⏯️ [SyncConfigurationSection] Toggling sync:', sync.name, 'current status:', sync.status);
+    
     setPausingSyncs(prev => new Set(prev).add(sync.id));
     
     try {
@@ -107,9 +107,9 @@ export const SyncConfigurationSection = ({ syncConfigurations }: SyncConfigurati
         description: `Sincronização ${sync.name} foi ${action}`,
       });
       
-      console.log('✅ [SyncConfigurationSection] Sync status changed to:', newStatus);
+      
     } catch (error) {
-      console.error('❌ [SyncConfigurationSection] Toggle error:', error);
+      
       toast({
         title: "Erro",
         description: `Falha ao alterar status de ${sync.name}`,
@@ -125,19 +125,19 @@ export const SyncConfigurationSection = ({ syncConfigurations }: SyncConfigurati
   };
 
   const handleNewSync = () => {
-    console.log('➕ [SyncConfigurationSection] Opening new sync modal');
+    
     setSelectedSync(null);
     setIsModalOpen(true);
   };
 
   const handleEditSync = (sync: SyncConfiguration) => {
-    console.log('✏️ [SyncConfigurationSection] Edit sync:', sync.name);
+    
     setSelectedSync(sync);
     setIsModalOpen(true);
   };
 
   const handleSaveSync = (sync: SyncConfiguration) => {
-    console.log('💾 [SyncConfigurationSection] Save sync:', sync.name);
+    
     // In a real implementation, this would update the sync configurations
     // For now, we'll just show a success message
     toast({
@@ -147,7 +147,7 @@ export const SyncConfigurationSection = ({ syncConfigurations }: SyncConfigurati
   };
 
   const handleDeleteSync = (sync: SyncConfiguration) => {
-    console.log('🗑️ [SyncConfigurationSection] Delete sync:', sync.name);
+    
     toast({
       title: "Sincronização Removida",
       description: `${sync.name} foi removida com sucesso`,

@@ -139,14 +139,8 @@ export const LogExportModal = ({ isOpen, onClose, logs, currentFilters }: LogExp
   };
 
   const handleExport = async () => {
-    console.log('📊 [LogExportModal] Starting export with configuration:', {
-      format: exportFormat,
-      dateRange,
-      includeCurrentFilters,
-      selectedLevels,
-      selectedServices,
-      maxRecords
-    });
+    
+      
 
     setIsExporting(true);
     
@@ -170,10 +164,10 @@ export const LogExportModal = ({ isOpen, onClose, logs, currentFilters }: LogExp
         description: `${filteredLogs.length} logs foram exportados para ${filename}`,
       });
       
-      console.log('✅ [LogExportModal] Export completed successfully');
+      
       onClose();
     } catch (error) {
-      console.error('❌ [LogExportModal] Export failed:', error);
+      
       toast({
         title: "Erro na Exportação",
         description: "Falha ao exportar os logs. Tente novamente.",

@@ -13,7 +13,7 @@ export interface KPIData {
 
 // Function to fetch historical data from Supabase
 export const getHistoricalDataByUnit = async (unitId: string) => {
-  console.log('📊 [kpiData.getHistoricalDataByUnit] Getting historical data for unit:', unitId);
+  
 
   let query = supabase.from('kpis_data').select('date_ref, kpi_name, value');
 
@@ -24,7 +24,7 @@ export const getHistoricalDataByUnit = async (unitId: string) => {
   const { data, error } = await query.order('date_ref', { ascending: true });
 
   if (error) {
-    console.error('Error fetching historical data:', error);
+    
     return [];
   }
 
@@ -39,21 +39,25 @@ export const getHistoricalDataByUnit = async (unitId: string) => {
   }, {} as Record<string, any>);
 
   const result = Object.values(monthlyData);
-  console.log('📈 [kpiData.getHistoricalDataByUnit] Fetched and processed historical data:', result);
+  
   return result;
 };
 
 // Function to fetch current KPI values from Supabase
-export const getKPIsByUnit = async (unitId: string, getUnitDisplayName: (unitId: string) => string): Promise<KPIData[]> => {
-  console.log('📊 [kpiData.getKPIsByUnit] Getting KPIs for unit:', unitId);
+export const getKPIsByUnit = async (unitId: string, getUnitDisplayName: (unitId: string) => string, selectedPeriod: Date): Promise<KPIData[]> => {
+  
 
   // Fetch the most recent KPI data for each kpi_name
   const { data, error } = await supabase
-    .rpc('get_latest_kpi_data_for_unit', { p_unit_id: unitId === 'all' ? null : unitId });
+    .rpc('get_latest_kpi_data_for_unit', { p_unit_id: unitId === 'all' ? null : unitId, p_date_ref: selectedPeriod.toISOString().split('T')[0] });
+
+  
+  
+  
 
 
   if (error) {
-    console.error('Error fetching KPIs:', error);
+    
     return [];
   }
 
@@ -68,13 +72,13 @@ export const getKPIsByUnit = async (unitId: string, getUnitDisplayName: (unitId:
     unit: unitId === 'all' ? 'Consolidado' : getUnitDisplayName(unitId)
   }));
 
-  console.log('📈 [kpiData.getKPIsByUnit] Generated KPIs from fetched data:', kpis);
+  
   return kpis;
 };
 
 
 export const getKPIDetails = async (kpiId: string, unitId: string, getUnitDisplayName: (unitId: string) => string) => {
-  console.log('🔍 [kpiData.getKPIDetails] Getting details for KPI:', kpiId, 'Unit:', unitId);
+  
 
   const kpis = await getKPIsByUnit(unitId, getUnitDisplayName);
   const kpi = kpis.find(k => k.id === kpiId);

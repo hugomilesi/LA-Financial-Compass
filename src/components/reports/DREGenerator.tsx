@@ -51,7 +51,7 @@ export const DREGenerator = ({
 
     // Validate that we have complete date ranges
     if (!state.filters.dateRange?.from || !state.filters.dateRange?.to) {
-      console.error('Invalid date range');
+      
       return;
     }
 
@@ -80,7 +80,7 @@ export const DREGenerator = ({
       const data = await onGenerate(config);
       actions.setGeneratedData(data);
     } catch (error) {
-      console.error('Error generating DRE:', error);
+      
     } finally {
       actions.setIsGenerating(false);
     }

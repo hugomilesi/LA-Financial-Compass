@@ -9,7 +9,7 @@ interface InsightChartsProps {
 }
 
 export const InsightCharts = ({ performanceData, insights }: InsightChartsProps) => {
-  console.log('📊 [InsightCharts] Rendering charts with', performanceData.length, 'units');
+  
 
   // Prepare data for charts
   const profitMarginData = performanceData.map(unit => ({

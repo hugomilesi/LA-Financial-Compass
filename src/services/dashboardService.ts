@@ -9,18 +9,12 @@ export const getMonthlyFinancials = async (unitSlug: string, period: any) => {
     .single()
 
   if (unitError) {
-    console.error('Error fetching unit:', unitError)
     return []
   }
-
-  const { data, error } = await supabase
-    .from('financial_entries')
-    .select('entry_date, receita, despesa')
     .eq('unit_id', unit.id)
     .order('entry_date', { ascending: true })
 
   if (error) {
-    console.error('Error fetching monthly financials:', error)
     return []
   }
 
@@ -35,18 +29,16 @@ export const getCostCenterDistribution = async (unitSlug: string, period: any) =
     .single()
 
   if (unitError) {
-    console.error('Error fetching unit:', unitError)
     return []
   }
 
   const { data, error } = await supabase
-    .from('cost_center_entries')
-    .select('category_name, value, color')
+    .from('financial_entries')
+    .select('entry_date, receita, despesa')
     .eq('unit_id', unit.id)
     // a real implementation would filter by date
 
   if (error) {
-    console.error('Error fetching cost center distribution:', error)
     return []
   }
 
@@ -61,7 +53,6 @@ export const getKPIs = async (unitSlug: string, period: any, kpiNames: string[])
     .single()
 
   if (unitError) {
-    console.error('Error fetching unit:', unitError)
     return []
   }
 
@@ -73,7 +64,6 @@ export const getKPIs = async (unitSlug: string, period: any, kpiNames: string[])
     // a real implementation would filter by date
 
   if (error) {
-    console.error('Error fetching KPIs:', error)
     return []
   }
 

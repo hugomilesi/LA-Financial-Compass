@@ -54,7 +54,7 @@ const getLevelText = (level: string) => {
 
 // Export logs to CSV file
 export const exportLogsToCSV = (logs: IntegrationLog[], filters?: { search?: string; level?: string; service?: string }) => {
-  console.log('📊 [logExport] Starting logs export with', logs.length, 'logs');
+  
   
   let filteredLogs = logs;
   
@@ -73,7 +73,7 @@ export const exportLogsToCSV = (logs: IntegrationLog[], filters?: { search?: str
     });
   }
   
-  console.log('📊 [logExport] Exporting', filteredLogs.length, 'filtered logs');
+  
   
   const csvContent = convertLogsToCSV(filteredLogs);
   const timestamp = new Date().toISOString().split('T')[0];
@@ -81,7 +81,7 @@ export const exportLogsToCSV = (logs: IntegrationLog[], filters?: { search?: str
   
   downloadFile(csvContent, filename, 'text/csv');
   
-  console.log('✅ [logExport] Export completed:', filename);
+  
   
   return filename;
 };

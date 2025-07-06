@@ -87,7 +87,7 @@ export const DEFAULT_COST_CENTER_CATEGORIES: CostCenterCategory[] = [
     updatedAt: new Date(),
   },
   {
-    id: '8',
+    categoryId: '8',
     name: 'Outros',
     description: 'Categorias de despesas diversas não classificadas nas anteriores.',
     type: 'expense',
@@ -100,22 +100,25 @@ export const DEFAULT_COST_CENTER_CATEGORIES: CostCenterCategory[] = [
   },
 ];
 
-export const getCostCenterCategories = async (unitId: string): Promise<CostCenterCategory[]> => {
-    let query = supabase.from('cost_center_categories').select('*');
+export const getCostCenterCategories = async (): Promise<CostCenterCategory[]> => {
+    const { data, error } = await supabase.from('cost_center_categories').select('*');
 
-    // If unit_id is not 'all', filter by unit_id. Otherwise, fetch all categories.
-    // This assumes that if unit_id column exists, it's used for filtering.
-    // If unit_id column does not exist, this filter will be ignored.
-    if (unitId !== 'all') {
-        query = query.eq('unit_id', unitId);
-    }
-
-    const { data, error } = await query;
     if (error) {
-        console.error('Error fetching cost center categories:', error);
+        
         return [];
     }
-    return data;
+    return data.map(category => ({
+        categoryId: category.category_id,
+        name: category.category_name,
+        description: category.description,
+        type: category.type,
+        isEssential: category.isEssential,
+        isActive: category.isActive,
+        totalAmount: category.totalAmount,
+        percentage: category.percentage,
+        createdAt: category.created_at,
+        updatedAt: category.updated_at,
+    }));
 };
 
 export const getCostCenterDataByUnit = async (unitId: string) => {
@@ -130,20 +133,20 @@ export const getCostCenterDataByUnit = async (unitId: string) => {
     const { data: costCentersData, error: costCentersError } = await costCentersQuery;
 
     if (costCentersError) {
-        console.error(`Error fetching cost center data for unit ${unitId}:`, costCentersError);
+        
         return [];
     }
 
     const { data: categoriesData, error: categoriesError } = await supabase
         .from('cost_center_categories')
-        .select('id, name');
+        .select('category_id, category_name');
 
     if (categoriesError) {
-        console.error('Error fetching cost center categories:', categoriesError);
+        
         return [];
     }
 
-    const categoryMap = new Map(categoriesData.map(cat => [cat.id, cat.name]));
+    const categoryMap = new Map(categoriesData.map(cat => [cat.category_id, cat.category_name]));
 
     return costCentersData.map(item => ({
         name: categoryMap.get(item.category_id) || 'Unknown Category',
@@ -155,7 +158,7 @@ export const getCostCenterDataByUnit = async (unitId: string) => {
 export const generateSmartAlerts = (categories: CostCenterCategory[]): CostCenterAlert[] => {
   // Placeholder for smart alert generation logic
   // This function would typically analyze category data and generate alerts based on predefined rules
-  console.log('Generating smart alerts for categories:', categories);
+  
   const alerts: CostCenterAlert[] = [];
 
   // Example: Alert if 'Pessoal' expenses are too high

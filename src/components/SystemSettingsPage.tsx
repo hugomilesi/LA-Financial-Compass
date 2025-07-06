@@ -45,7 +45,7 @@ export const SystemSettingsPage = () => {
   }
 
   const handleDeleteWebhook = async (webhookId: string) => {
-    console.log('🗑️ [SystemSettingsPage] Deleting webhook:', webhookId);
+    
     // In a real implementation, this would call a delete API
     // For now, we'll just show a success message
     toast({

@@ -58,7 +58,7 @@ export const KPIsPage = () => {
 
   const handleExportReport = () => {
     // TODO: Implementar exportação de PDF incluindo os novos gráficos
-    console.log('Exportando relatório com gráficos atualizados...');
+    
   };
 
   return (

@@ -24,7 +24,7 @@ export const CostCenterCategoryCard = ({
 
   const handleDelete = () => {
     if (window.confirm(`Tem certeza que deseja excluir a categoria "${category.name}"?`)) {
-      onDelete(category.id);
+      onDelete(category.categoryId);
     }
   };
 

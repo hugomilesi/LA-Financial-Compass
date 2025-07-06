@@ -5,7 +5,7 @@ import { getHistoricalDataByUnit } from '@/utils/kpiData';
 import { useUnit } from '@/contexts/UnitContext';
 
 export const useUnitPerformance = () => {
-  console.log('🔍 [useUnitPerformance] Hook initialized');
+  
   const { units } = useUnit();
   
   const [performanceData, setPerformanceData] = useState<UnitPerformanceData[]>([]);
@@ -15,35 +15,35 @@ export const useUnitPerformance = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log('🚀 [useUnitPerformance] useEffect triggered, calling generatePerformanceData');
+    
     generatePerformanceData();
   }, [units]); // Add units to dependency array
 
   const generatePerformanceData = async () => {
-    console.log('🔍 [useUnitPerformance] Generating performance data...');
+    
     setIsLoading(true);
     setError(null);
     
     try {
       // Verify units data
-      console.log('📋 [useUnitPerformance] Available units:', units);
+      
       
       const availableUnits = units.filter(unit => unit.id !== 'all');
-      console.log('🏢 [useUnitPerformance] Filtered units:', availableUnits);
+      
       
       if (availableUnits.length === 0) {
         throw new Error('No units available for performance analysis');
       }
 
       const data: UnitPerformanceData[] = availableUnits.map(unit => {
-        console.log(`🔍 [useUnitPerformance] Processing unit: ${unit.id} - ${unit.displayName}`);
+        
         
         try {
           const unitData = getDataByUnit(unit.id);
-          console.log(`📊 [useUnitPerformance] Unit data for ${unit.id}:`, unitData);
+          
           
           const historicalData = getHistoricalDataByUnit(unit.id);
-          console.log(`📈 [useUnitPerformance] Historical data for ${unit.id}:`, historicalData);
+          
           
           // Calculate financial metrics
           const profit = unitData.receita - unitData.despesa;
@@ -85,25 +85,25 @@ export const useUnitPerformance = () => {
             alerts
           };
           
-          console.log(`✅ [useUnitPerformance] Completed processing unit ${unit.id}`);
+          
           return unitPerformance;
           
         } catch (unitError) {
-          console.error(`❌ [useUnitPerformance] Error processing unit ${unit.id}:`, unitError);
+          
           throw unitError;
         }
       });
 
-      console.log('📊 [useUnitPerformance] Generated performance data:', data);
+      
       setPerformanceData(data);
       
       generateComparisons(data);
       generateRankings(data);
       
-      console.log('✅ [useUnitPerformance] Performance data generation completed successfully');
+      
       
     } catch (error) {
-      console.error('❌ [useUnitPerformance] Error generating performance data:', error);
+      
       setError(error instanceof Error ? error.message : 'Unknown error occurred');
     } finally {
       setIsLoading(false);
@@ -202,7 +202,7 @@ export const useUnitPerformance = () => {
   };
 
   const generateComparisons = (data: UnitPerformanceData[]) => {
-    console.log('📊 [useUnitPerformance] Generating comparisons...');
+    
     
     const metrics = [
       { key: 'revenue', label: 'Receita', category: 'financial' as const, getValue: (d: UnitPerformanceData) => d.financial.revenue },
@@ -237,7 +237,7 @@ export const useUnitPerformance = () => {
   };
 
   const generateRankings = (data: UnitPerformanceData[]) => {
-    console.log('🏆 [useUnitPerformance] Generating rankings...');
+    
     
     const rankings: UnitRanking[] = data.map(unit => {
       const financialScore = calculateScore([
@@ -297,13 +297,8 @@ export const useUnitPerformance = () => {
     return comparisons.filter(comp => comp.category === category);
   };
 
-  console.log('🔄 [useUnitPerformance] Hook returning data:', {
-    performanceDataLength: performanceData.length,
-    comparisonsLength: comparisons.length,
-    rankingsLength: rankings.length,
-    isLoading,
-    error
-  });
+  
+    
 
   return {
     performanceData,

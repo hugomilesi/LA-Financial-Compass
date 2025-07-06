@@ -185,7 +185,7 @@ export const useReports = () => {
       });
       
     } catch (error) {
-      console.error('Download error:', error);
+      
       toast({
         title: "Erro no download",
         description: "Não foi possível baixar o relatório",

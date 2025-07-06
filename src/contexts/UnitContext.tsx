@@ -25,15 +25,15 @@ export const UnitProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const fetchUnits = async () => {
       const { data, error } = await supabase
         .from('units')
-        .select('id, name, display_name');
+        .select('id, name');
 
       if (error) {
-        console.error('Error fetching units:', error);
+        
       } else if (data) {
         const fetchedUnits: Unit[] = data.map(unit => ({
           id: unit.id,
           name: unit.name,
-          displayName: unit.display_name,
+          displayName: unit.name,
         }));
         setUnits([{ id: 'all', name: 'all', displayName: 'Todas as Unidades' }, ...fetchedUnits]);
       }

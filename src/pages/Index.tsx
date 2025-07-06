@@ -38,7 +38,7 @@ const Index = () => {
         }, 2000);
       }
     } catch (error) {
-      console.error('Unexpected logout error:', error);
+      
       setLogoutError('Erro inesperado. Redirecionando...');
       toast.error('Erro inesperado. Redirecionando...');
       // Force redirect to landing even on error
@@ -53,7 +53,7 @@ const Index = () => {
   // Only redirect to landing if user becomes null AND we're not in an auth flow
   useEffect(() => {
     if (!user && authMode !== 'landing' && authMode !== 'login' && authMode !== 'signup') {
-      console.log('User became null, redirecting to landing from:', authMode);
+      
       setAuthMode('landing');
       setCurrentPage('dashboard');
     }

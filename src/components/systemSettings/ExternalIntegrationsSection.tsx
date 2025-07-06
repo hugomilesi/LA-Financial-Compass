@@ -25,7 +25,7 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
 
   // Sync local state with props
   useEffect(() => {
-    console.log('🔄 [ExternalIntegrationsSection] Syncing integrations from props:', integrations.length);
+    
     setLocalIntegrations([...integrations]);
   }, [integrations]);
 
@@ -66,12 +66,12 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
   };
 
   const handleTestConnection = async (integration: ExternalIntegration) => {
-    console.log('🔍 [ExternalIntegrationsSection] Testing connection for:', integration.name);
+    
     setLoadingIntegration(integration.id);
     
     try {
       const result = await testConnection(integration.id);
-      console.log('✅ [ExternalIntegrationsSection] Test connection result:', result);
+      
       
       toast({
         title: "Teste de Conexão",
@@ -79,7 +79,7 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
         variant: result.success ? "default" : "destructive",
       });
     } catch (error) {
-      console.error('❌ [ExternalIntegrationsSection] Test connection error:', error);
+      
       toast({
         title: "Erro no Teste",
         description: `Falha ao testar conexão com ${integration.name}`,
@@ -91,10 +91,10 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
   };
 
   const handleToggleIntegration = async (integration: ExternalIntegration) => {
-    console.log('🔄 [ExternalIntegrationsSection] Toggling integration:', integration.name, 'Current status:', integration.status);
+    
     
     const newStatus = integration.status === 'connected' ? 'disconnected' : 'connected';
-    console.log('🔄 [ExternalIntegrationsSection] New status will be:', newStatus);
+    
     
     const updatedIntegration: ExternalIntegration = { 
       ...integration, 
@@ -108,14 +108,14 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
     
     try {
       await updateIntegration(updatedIntegration);
-      console.log('✅ [ExternalIntegrationsSection] Integration updated successfully');
+      
       
       toast({
         title: "Integração Atualizada",
         description: `${integration.name} foi ${newStatus === 'connected' ? 'conectado' : 'desconectado'}`,
       });
     } catch (error) {
-      console.error('❌ [ExternalIntegrationsSection] Error updating integration:', error);
+      
       
       // Revert local state on error
       setLocalIntegrations(prev => 
@@ -131,19 +131,19 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
   };
 
   const handleEditIntegration = (integration: ExternalIntegration) => {
-    console.log('✏️ [ExternalIntegrationsSection] Edit integration clicked:', integration.name);
+    
     setSelectedIntegration(integration);
     setIsModalOpen(true);
   };
 
   const handleNewIntegration = () => {
-    console.log('➕ [ExternalIntegrationsSection] New integration clicked');
+    
     setSelectedIntegration(null);
     setIsModalOpen(true);
   };
 
   const handleDeleteIntegration = async (integration: ExternalIntegration) => {
-    console.log('🗑️ [ExternalIntegrationsSection] Delete integration:', integration.name);
+    
     // In a real implementation, this would call a delete API
     toast({
       title: "Integração Removida",
@@ -152,7 +152,7 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
   };
 
   const handleSaveIntegration = async (integration: ExternalIntegration) => {
-    console.log('💾 [ExternalIntegrationsSection] Save integration:', integration.name);
+    
     await updateIntegration(integration);
     setIsModalOpen(false);
   };
@@ -162,7 +162,7 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
     return date.toLocaleString('pt-BR');
   };
 
-  console.log('🏗️ [ExternalIntegrationsSection] Rendering with local integrations:', localIntegrations.length);
+  
 
   return (
     <div className="space-y-6">
@@ -206,7 +206,7 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
                   <Switch
                     checked={integration.status === 'connected'}
                     onCheckedChange={(checked) => {
-                      console.log('🎚️ [Switch] onCheckedChange called with:', checked, 'for integration:', integration.name);
+                      
                       handleToggleIntegration(integration);
                     }}
                   />
@@ -236,7 +236,7 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
                     size="sm"
                     variant="outline"
                     onClick={() => {
-                      console.log('🧪 [Button] Test button clicked for:', integration.name);
+                      
                       handleTestConnection(integration);
                     }}
                     disabled={loadingIntegration === integration.id}
@@ -253,7 +253,7 @@ export const ExternalIntegrationsSection = ({ integrations }: ExternalIntegratio
                     size="sm" 
                     variant="outline"
                     onClick={(e) => {
-                      console.log('✏️ [Button] Edit button clicked for:', integration.name);
+                      
                       e.preventDefault();
                       e.stopPropagation();
                       handleEditIntegration(integration);

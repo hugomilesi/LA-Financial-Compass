@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/supabaseClient';
 
 interface AuthContextType {
   user: User | null;
@@ -32,7 +32,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        console.log('Auth state change:', event, session ? 'session exists' : 'no session');
+        
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -41,7 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('Initial session check:', session ? 'session exists' : 'no session');
+      
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -79,7 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async (onSuccess?: () => void) => {
     try {
       setSigningOut(true);
-      console.log('Attempting logout...');
+      
       
       const { error } = await supabase.auth.signOut();
       
@@ -91,24 +91,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Execute callback regardless of error status
       // Server errors (like "session not found") shouldn't prevent UI navigation
       if (onSuccess) {
-        console.log('Executing logout success callback');
+        
         onSuccess();
       }
       
       if (error) {
-        console.log('Logout server error (continuing with local cleanup):', error);
+        
         // For "session not found" errors, this is actually expected behavior
         // The user is already logged out on the server, so we just clean local state
         if (error.message?.includes('Session not found') || error.message?.includes('session_not_found')) {
-          console.log('Session was already invalid on server - logout successful');
+          
           return { error: null }; // Treat as success since user is effectively logged out
         }
       }
       
-      console.log('Logout completed successfully');
+      
       return { error };
     } catch (error) {
-      console.error('Unexpected logout error:', error);
+      
       
       // Force cleanup even on unexpected errors
       setSession(null);
@@ -116,7 +116,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       // Execute callback even on error to prevent UI from getting stuck
       if (onSuccess) {
-        console.log('Executing logout callback after error');
+        
         onSuccess();
       }
       
